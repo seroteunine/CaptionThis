@@ -11,7 +11,7 @@ const io = new Server(server, {
     }
 });
 
-const { generateRoomID } = require('./utils/generateRoomID');
+import { generateRoomID } from './utils';
 const RoomManager = require('./roomManager');
 const roomManager = new RoomManager();
 
@@ -21,6 +21,8 @@ io.on('connection', (socket) => {
     socket.on('create-room', () => {
         const roomID = generateRoomID();
         roomManager.addRoom(roomID, socket.id);
+        socket.emit('valid-room', roomID);
+        console.log(roomID);
     })
 
     socket.on('join-room', (roomID) => {
@@ -28,8 +30,9 @@ io.on('connection', (socket) => {
         if (room) {
             console.log('found');
             room.addPlayer(socket.id);
+            socket.emit('valid-room', roomID)
         } else {
-            console.log('room not found');
+            socket.emit('invalid-room', roomID);
         }
     })
 

@@ -1,23 +1,22 @@
-import { useEffect } from 'react'
-import { io } from 'socket.io-client'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from './pages/Home';
+import WaitingRoom from './pages/WaitingRoom';
+import { socket, SocketContext } from "./context/socket";
 
 function App() {
 
-  useEffect(() => {
-    const socket = io('http://localhost:5000')
-
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, [])
-
   return (
-    <>
-      <h1>Swag</h1>
-    </>
-  )
+    <SocketContext.Provider value={{ socket }}>
+
+      <BrowserRouter>
+        <Routes>
+          <Route path='' element={<Home />}></Route>
+          <Route path='waitingroom' element={<WaitingRoom />}></Route>
+        </Routes>
+      </BrowserRouter>
+
+    </SocketContext.Provider>
+  );
 }
 
 export default App

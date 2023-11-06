@@ -1,8 +1,7 @@
-const uuid = require('uuid')
+const uuid = require('uuid');
 
-function generateRoomID() {
+export function generateRoomID(): string {
     const randomUUID = uuid.v4().replace(/-/g, '');
     return randomUUID.substr(0, 4);
 }
 
-module.exports = generateRoomID;
