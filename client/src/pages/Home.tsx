@@ -1,10 +1,10 @@
-import { MouseEventHandler, useContext, useEffect, useState } from 'react'
-import { SocketContext } from '../context/socket'
+import { MouseEventHandler, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { useWebSocket } from '../context/socket';
 
 function Home() {
+    const socket = useWebSocket();
 
-    const { socket } = useContext(SocketContext);
     let navigate = useNavigate();
 
     const [roomCode, setRoomCode] = useState('');
@@ -19,17 +19,18 @@ function Home() {
     }
 
     useEffect(() => {
-        socket?.on('valid-room', () => {
+        socket?.on('valid-room', (roomCode) => {
+            localStorage.setItem('roomID', roomCode)
             navigate('waitingroom');
         })
         socket?.on('invalid-room', () => {
             setError(true)
         })
-    }, []);
+    }, [socket]);
 
     return (
         <>
-            <h1><input type='text' placeholder='room code' onChange={(e) => setRoomCode(e.target.value)} /><button onClick={joinRoom}>Join Room</button></h1>
+            <h2><input type='text' placeholder='room code' onChange={(e) => setRoomCode(e.target.value)} /><button onClick={joinRoom}>Join Room</button></h2>
             <button onClick={createRoom}>Create Room</button>
             {error && <h3>Invalid roomcode</h3>}
         </>

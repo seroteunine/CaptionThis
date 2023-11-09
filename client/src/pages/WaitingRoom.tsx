@@ -1,15 +1,22 @@
 import { useContext, useEffect, useState } from 'react'
-import { SocketContext } from '../context/socket';
+import { useWebSocket } from '../context/socket';
 
 function WaitingRoom() {
 
-    const [roomName, setRoomName] = useState('');
+    const socket = useWebSocket();
 
-    const { socket } = useContext(SocketContext);
+    const [roomName, setRoomName] = useState('');
+    const [players, setPlayers] = useState([]);
 
     useEffect(() => {
+        socket?.emit('get-players', localStorage.getItem('roomID'));
+
         socket?.on('valid-room', (data) => {
             setRoomName(data)
+        })
+
+        socket?.on('all-players', (data) => {
+            setPlayers(data);
         })
 
         return () => {
@@ -21,6 +28,11 @@ function WaitingRoom() {
         <>
             <h1>WaitingRoom</h1>
             <h2>{roomName}</h2>
+            {players &&
+                players.map((player) => (
+                    <h3 key={player}>{player}</h3>
+                ))}
+
         </>
     )
 }
