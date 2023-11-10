@@ -35,18 +35,9 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('send-message', ({ roomCode, textMessage }) => {
-        console.log(roomCode, textMessage);
-
-        const host = roomManager.getRoom(roomCode).getHost();
-        io.to(host).emit('send-message', textMessage);
-    })
-
     socket.on('send-image', ({ roomCode, image }) => {
         const host = roomManager.getRoom(roomCode).getHost();
         io.to(host).emit('send-image', image);
-        console.log(image);
-
     })
 
 })

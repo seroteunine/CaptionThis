@@ -10,7 +10,6 @@ function WaitingRoomHost() {
     const [images, setImages] = useState<string[]>([]);
 
     useEffect(() => {
-        socket?.emit('get-waitingroom-start');
 
         socket?.on('send-image', (arrayBuffer) => {
             const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
@@ -19,17 +18,18 @@ function WaitingRoomHost() {
         })
 
         return () => {
-            socket?.off('waitingroom-start');
             socket?.off('send-image');
+            if (images) images.forEach((image) => URL.revokeObjectURL(image));
         }
-    }, [])
+
+    }, [images])
 
     return (
         <>
             <h1>WaitingRoom - Host</h1>
             <h2>{roomCode}</h2>
             {images.map((imageUrl, index) => (
-                <img key={index} src={imageUrl} style={{ width: 150, height: "auto" }} />
+                <img key={index} src={imageUrl} style={{ width: 400, height: "auto" }} />
             ))}
         </>
     )
