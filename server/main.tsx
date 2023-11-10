@@ -6,8 +6,12 @@ import { Server } from 'socket.io'
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "http://10.10.2.105:5173",
         methods: ["GET", "POST"]
+    },
+    connectionStateRecovery: {
+        maxDisconnectionDuration: 2 * 60 * 1000,
+        skipMiddlewares: true,
     }
 });
 
@@ -36,8 +40,11 @@ io.on('connection', (socket) => {
     })
 
     socket.on('send-image', ({ roomCode, image }) => {
-        const host = roomManager.getRoom(roomCode).getHost();
-        io.to(host).emit('send-image', image);
+        const room = roomManager.getRoom(roomCode);
+        if (room) {
+            const host = room.getHost();
+            io.to(host).emit('send-image', image);
+        }
     })
 
 })

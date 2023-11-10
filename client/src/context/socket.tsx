@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
-const SOCKET_URL = "http://localhost:5000"
+const SOCKET_URL = "http://10.10.2.105:5000"
 
 const WebSocketContext = createContext<Socket | null>(null);
 export const useWebSocket = () => useContext(WebSocketContext);
