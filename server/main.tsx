@@ -29,10 +29,7 @@ io.on('connection', (socket) => {
         const room = roomManager.getRoom(roomID);
         if (room) {
             room.addPlayer(socket.id);
-            io.emit('valid-room', roomID)
-            room.getPlayers().forEach((playerID: string) => {
-                io.to(playerID).emit('all-players', room.getPlayers());
-            })
+            socket.emit('valid-room', roomID)
         } else {
             socket.emit('invalid-room', roomID);
         }
