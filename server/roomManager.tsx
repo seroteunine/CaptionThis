@@ -16,6 +16,10 @@ class Room {
         return this.players;
     }
 
+    getHost() {
+        return this.host;
+    }
+
 }
 
 class roomManager {

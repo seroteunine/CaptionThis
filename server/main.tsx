@@ -19,20 +19,27 @@ io.on('connection', (socket) => {
     console.log(`${socket.id} connected.`);
 
     socket.on('create-room', () => {
-        const roomID = generateRoomID();
-        roomManager.addRoom(roomID, socket.id);
-        socket.emit('valid-room', roomID);
-        console.log(roomID);
+        const roomCode = generateRoomID();
+        roomManager.addRoom(roomCode, socket.id);
+        socket.emit('valid-room', { roomCode: roomCode, isHost: true });
+        console.log(roomCode);
     })
 
-    socket.on('join-room', (roomID) => {
-        const room = roomManager.getRoom(roomID);
+    socket.on('join-room', (roomCode) => {
+        const room = roomManager.getRoom(roomCode);
         if (room) {
             room.addPlayer(socket.id);
-            socket.emit('valid-room', roomID)
+            socket.emit('valid-room', { roomCode: roomCode, isHost: false })
         } else {
-            socket.emit('invalid-room', roomID);
+            socket.emit('invalid-room', roomCode);
         }
+    })
+
+    socket.on('send-message', ({ roomCode, textMessage }) => {
+        console.log(roomCode, textMessage);
+
+        const host = roomManager.getRoom(roomCode).getHost();
+        io.to(host).emit('send-message', textMessage);
     })
 
 })

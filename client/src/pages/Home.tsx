@@ -20,9 +20,9 @@ function Home() {
     }
 
     useEffect(() => {
-        socket?.on('valid-room', (roomCode) => {
+        socket?.on('valid-room', ({ roomCode, isHost }) => {
             setRoomCode(roomCode);
-            navigate('waitingroom');
+            isHost ? navigate('waitingroom-host') : navigate('waitingroom-player');
         })
         socket?.on('invalid-room', () => {
             setError(true)
