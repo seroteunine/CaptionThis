@@ -15,12 +15,12 @@ function WaitingRoomHost() {
             const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
             const imageUrl = URL.createObjectURL(blob);
             setImages((previmages) => [...previmages, imageUrl]);
-        })
+        });
 
         return () => {
             socket?.off('send-image');
             if (images) images.forEach((image) => URL.revokeObjectURL(image));
-        }
+        };
 
     }, [images])
 
