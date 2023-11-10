@@ -42,6 +42,13 @@ io.on('connection', (socket) => {
         io.to(host).emit('send-message', textMessage);
     })
 
+    socket.on('send-image', ({ roomCode, image }) => {
+        const host = roomManager.getRoom(roomCode).getHost();
+        io.to(host).emit('send-image', image);
+        console.log(image);
+
+    })
+
 })
 
 server.listen(5000, () => {
