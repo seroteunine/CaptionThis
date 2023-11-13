@@ -1,12 +1,12 @@
 export enum Phase {
-    WAITING,
-    PHOTO_UPLOAD,
-    CAPTION,
-    VOTING,
-    END,
+    WAITING = "WAITING",
+    PHOTO_UPLOAD = "PHOTO_UPLOAD",
+    CAPTION = "CAPTION",
+    VOTING = "VOTING",
+    END = "END",
 };
 
-export class GameState {
+export class Game {
 
     playerNames: string[];
     gamePhase: Phase;
@@ -31,5 +31,9 @@ export class GameState {
     addPlayer(playerName: string) {
         this.playerNames.push(playerName);
     };
+
+    getPlayers() {
+        return this.playerNames;
+    }
 
 };

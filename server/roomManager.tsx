@@ -1,23 +1,25 @@
+import { Game } from "./gamelogic/game";
+
 class Room {
 
     host: string;
-    players: string[];
+    game: Game | undefined;
 
     constructor(hostID: string) {
         this.host = hostID;
-        this.players = [];
+        this.game = undefined;
     }
 
-    addPlayer(playerID: string) {
-        this.players.push(playerID);
-    }
-
-    getPlayers() {
-        return this.players;
+    setGame(game: Game) {
+        this.game = game;
     }
 
     getHost() {
         return this.host;
+    }
+
+    getGame() {
+        return this.game;
     }
 
 }

@@ -1,26 +1,33 @@
-import { Socket } from "socket.io";
+import { Game, Phase } from '../gamelogic/game';
+
+interface GameDTO {
+    gamePhase: Phase;
+    playerNames: string[];
+}
 
 export class GameService {
-    socket;
-    game;
-    constructor(socket: Socket) {
-        this.socket = socket;
-        this.game = new GameState();
-        this.setupSocketListeners();
+
+    initGame() {
+        return new Game();
     }
 
-    setupSocketListeners() {
-        this.socket.on('client:set-name', (playerName) => {
-            this.setNameOfPlayer(playerName);
-        });
+    getCurrentPhase(game: Game) {
+        return game.getCurrentPhase();
     }
 
-    setNameOfPlayer(playerName: string) {
-        this.game.addPlayer(playerName);
+    addPlayer(game: Game, playerName: string) {
+        game.addPlayer(playerName);
     }
 
-    startGame() {
-        this.game.s
+    getPlayers(game: Game) {
+        return game.getPlayers();
+    }
+
+    getGameDTO(game: Game): GameDTO {
+        return {
+            gamePhase: game.getCurrentPhase(),
+            playerNames: game.getPlayers()
+        };
     }
 
 }

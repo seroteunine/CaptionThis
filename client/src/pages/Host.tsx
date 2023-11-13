@@ -9,24 +9,28 @@ function Host() {
     const { roomCode } = useRoomCode();
     const [images, setImages] = useState<string[]>([]);
 
-
     useEffect(() => {
 
-        socket?.on('send-image', (arrayBuffer) => {
+        socket.on('send-image', (arrayBuffer) => {
             const blob = new Blob([arrayBuffer]);
             const imageUrl = URL.createObjectURL(blob);
             setImages((previmages) => [...previmages, imageUrl]);
         });
 
+        socket.on('game-status', (gameDTO) => {
+            console.log(gameDTO);
+        })
+
         return () => {
-            socket?.off('send-image');
+            socket.off('send-image');
+            socket.off('game-status');
             if (images) images.forEach((image) => URL.revokeObjectURL(image));
         };
 
     }, [images])
 
     const startGame = () => {
-        console.log('game started');
+        socket.emit('host:start-game', roomCode);
     };
 
     return (

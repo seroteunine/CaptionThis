@@ -12,6 +12,8 @@ const io = new Server(server, {
 });
 
 import { generateRoomID } from './utils';
+import { GameService } from './service/gameService';
+const gameController = new GameService();
 const RoomManager = require('./roomManager');
 const roomManager = new RoomManager();
 
@@ -40,6 +42,18 @@ io.on('connection', (socket) => {
         if (room) {
             const host = room.getHost();
             io.to(host).emit('send-image', image);
+        }
+    })
+
+    socket.on('host:start-game', (roomCode) => {
+        const room = roomManager.getRoom(roomCode);
+
+        if (room.getGame()) {
+            socket.emit('error', 'room already has a game.');
+        } else {
+            const game = gameController.initGame();
+            room.setGame(game);
+            socket.emit('game-status', gameController.getGameDTO(game));
         }
     })
 
