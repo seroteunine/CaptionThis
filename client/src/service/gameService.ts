@@ -1,9 +1,9 @@
 import { Socket } from "socket.io-client";
 
-class GameService {
+export class GameService {
     socket;
     game;
-    constructor(socket: Socket, GameState: any) {
+    constructor(socket: Socket) {
         this.socket = socket;
         this.game = new GameState();
         this.setupSocketListeners();

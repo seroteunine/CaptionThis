@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useWebSocket } from '../context/socket';
 import { useRoomCode } from '../context/roomCode';
+import { GameService } from '../service/gameService';
 
 function Host() {
 
-    const socket = useWebSocket();
+    const socket = useWebSocket()!;
 
     const { roomCode } = useRoomCode();
     const [images, setImages] = useState<string[]>([]);
+
+    const gameService = new GameService(socket);
 
     useEffect(() => {
 
@@ -17,6 +20,8 @@ function Host() {
             setImages((previmages) => [...previmages, imageUrl]);
         });
 
+
+
         return () => {
             socket?.off('send-image');
             if (images) images.forEach((image) => URL.revokeObjectURL(image));
@@ -25,7 +30,7 @@ function Host() {
     }, [images])
 
     const startGame = () => {
-        console.log('game started');
+        gameService.startGame();
     };
 
     return (
