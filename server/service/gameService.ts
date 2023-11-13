@@ -1,4 +1,4 @@
-import { Socket } from "socket.io-client";
+import { Socket } from "socket.io";
 
 export class GameService {
     socket;
@@ -20,7 +20,7 @@ export class GameService {
     }
 
     startGame() {
-        console.log('Game started');
+        this.game.s
     }
 
 }
