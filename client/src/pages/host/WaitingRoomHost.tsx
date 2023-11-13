@@ -12,7 +12,7 @@ function WaitingRoomHost() {
     useEffect(() => {
 
         socket?.on('send-image', (arrayBuffer) => {
-            const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
+            const blob = new Blob([arrayBuffer]);
             const imageUrl = URL.createObjectURL(blob);
             setImages((previmages) => [...previmages, imageUrl]);
         });

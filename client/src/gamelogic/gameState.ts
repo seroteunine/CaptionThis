@@ -1,9 +1,9 @@
-enum Phase {
-    WAITING,
-    PHOTO_UPLOAD,
-    CAPTION,
-    VOTING,
-    END
+export enum Phase {
+    WAITING = "WAITING",
+    PHOTO_UPLOAD = "PHOTO_UPLOAD",
+    CAPTION = "CAPTION",
+    VOTING = "VOTING",
+    END = "END",
 };
 
 export class GameState {
