@@ -5,7 +5,10 @@ test('New gamestate object is on waiting phase', () => {
     expect(game.getCurrentPhase()).toBe(Phase.WAITING);
 });
 
+test('start game should go to photo upload phase', () => {
+    const game = new GameState();
 
-test('Should pass', () => {
-    expect(true).toBe(true);
+    game.startGame();
+
+    expect(game.getCurrentPhase()).toBe(Phase.PHOTO_UPLOAD);
 });
