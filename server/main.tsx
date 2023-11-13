@@ -8,10 +8,6 @@ const io = new Server(server, {
     cors: {
         origin: "http://10.10.2.105:5173",
         methods: ["GET", "POST"]
-    },
-    connectionStateRecovery: {
-        maxDisconnectionDuration: 2 * 60 * 1000,
-        skipMiddlewares: true,
     }
 });
 
