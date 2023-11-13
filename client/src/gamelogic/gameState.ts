@@ -20,7 +20,7 @@ export class GameState {
         if (this.gamePhase === Phase.WAITING) {
             this.gamePhase = Phase.PHOTO_UPLOAD;
         } else {
-            console.log('mag niet');
+            throw new Error("Only allowed if phase is waiting");
         }
     };
 
