@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useWebSocket } from '../../context/socket';
-import { useRoomCode } from '../../context/roomCode';
+import { useWebSocket } from '../context/socket';
+import { useRoomCode } from '../context/roomCode';
 
-function WaitingRoomPlayer() {
+function Player() {
 
     const socket = useWebSocket();
 
@@ -30,4 +30,4 @@ function WaitingRoomPlayer() {
     )
 }
 
-export default WaitingRoomPlayer
+export default Player

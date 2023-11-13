@@ -22,7 +22,7 @@ function Home() {
     useEffect(() => {
         socket?.on('valid-room', ({ roomCode, isHost }) => {
             setRoomCode(roomCode);
-            isHost ? navigate('waitingroom-host') : navigate('waitingroom-player');
+            isHost ? navigate('host') : navigate('player');
         })
         socket?.on('invalid-room', () => {
             setError(true)

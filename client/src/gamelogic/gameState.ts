@@ -28,4 +28,8 @@ export class GameState {
         return this.gamePhase;
     };
 
+    addPlayer(playerName: string) {
+        this.playerNames.push(playerName);
+    };
+
 };

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useWebSocket } from '../../context/socket';
-import { useRoomCode } from '../../context/roomCode';
+import { useWebSocket } from '../context/socket';
+import { useRoomCode } from '../context/roomCode';
 
-function WaitingRoomHost() {
+function Host() {
 
     const socket = useWebSocket();
 
@@ -24,10 +24,15 @@ function WaitingRoomHost() {
 
     }, [images])
 
+    const startGame = () => {
+        console.log('game started');
+    };
+
     return (
         <>
             <h1>WaitingRoom - Host</h1>
             <h2>{roomCode}</h2>
+            <button onClick={startGame}> Start game </button>
             {images.map((imageUrl, index) => (
                 <img key={index} src={imageUrl} style={{ width: 400, height: "auto" }} />
             ))}
@@ -35,4 +40,4 @@ function WaitingRoomHost() {
     )
 }
 
-export default WaitingRoomHost
+export default Host
