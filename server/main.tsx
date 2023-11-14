@@ -15,15 +15,15 @@ const io = new Server(server, {
     }
 });
 
-import { generateRoomID, generateSessionID } from './utils';
+
+import { generateGameID, generateSessionID } from './utils';
 // import { GameController } from './controller/gameController';
-// import { GameRepository } from './repository/gameRepository';
-import { RoomRepository } from './repository/roomRepository';
+// const gameController = new GameController();
+import { GameRepository } from './repository/gameRepository';
+const gameRepository = new GameRepository();
 import { SessionRepository } from './repository/socketConnectionRepository';
 const sessionRepository = new SessionRepository();
-// const gameController = new GameController();
-// const gameRepository = new GameRepository();
-const roomRepository = new RoomRepository();
+
 
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
@@ -38,53 +38,56 @@ io.use((socket_before, next) => {
     next();
 });
 
+import { Game } from './gamelogic/game';
+
+type GameDTO = {
+    gameID: string;
+    game: Game;
+}
+
+function sendGameUpdate(gameID: string) {
+    const game = gameRepository.getGame(gameID);
+    const gameDTO = {
+        gameID: gameID,
+        game: game
+    }
+    const host = game?.getHost();
+    const players = game?.getPlayers();
+    const host_socket = sessionRepository.getSocketID(host || '');
+    io.to(host_socket || '').emit('game-update', gameDTO);
+    players?.forEach((player) => {
+        const player_socket = sessionRepository.getSocketID(player || '');
+        io.to(player_socket || '').emit('game-update', gameDTO);
+    })
+}
+
 io.on('connection', (socket_before) => {
 
     const socket = socket_before as CustomSocket;
     socket.emit("session", socket.sessionID);
 
-    socket.on('host:create-room', () => {
-        const roomID = generateRoomID();
-        roomRepository.addRoom(roomID, socket.sessionID);
-        const room = roomRepository.getRoom(roomID);
-        if (room) {
-            socket.emit('host:room-created', { room, roomID });
+    socket.on('host:create-game', () => {
+        const gameID = generateGameID();
+        const hostID = socket.sessionID;
+        gameRepository.addGame(gameID, new Game(hostID));
+        const game = gameRepository.getGame(gameID);
+        if (game) {
+            sendGameUpdate(gameID);
         } else {
-            console.log('error with creating room');
+            console.log('error with creating game');
         }
     })
 
-    socket.on('player:join-room', (roomID) => {
-        console.log(`player with id ${socket.sessionID} wants to join room: ${roomID}`);
-        const room = roomRepository.getRoom(roomID);
-        if (room) {
-            room.addPlayer(socket.sessionID);
-            socket.emit('player:room-joined', room);
+    socket.on('player:join-game', (gameID) => {
+        const game = gameRepository.getGame(gameID);
+        if (game) {
+            game.addPlayer(socket.sessionID);
+            sendGameUpdate(gameID);
         } else {
-            socket.emit('player:invalid-room', roomID);
-            console.log('error with joining room');
+            socket.emit('player:invalid-game', gameID);
+            console.log('error with joining game');
         }
     })
-
-    // socket.on('send-image', ({ roomCode, image }) => {
-    //     const room = roomManager.getRoom(roomCode);
-    //     if (room) {
-    //         const host = room.getHost();
-    //         io.to(host).emit('send-image', image);
-    //     }
-    // })
-
-    // socket.on('host:start-game', (roomID) => {
-    //     const game = gameRepository.getGame(roomID);
-
-    //     if (game) {
-    //         socket.emit('error', 'room already has a game.');
-    //     } else {
-    //         const game = gameController.initGame();
-    //         gameRepository.addGame(roomID, game);
-    //         socket.emit('host:game-created');
-    //     }
-    // })
 
 })
 

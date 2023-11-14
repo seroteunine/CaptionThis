@@ -8,13 +8,27 @@ export enum Phase {
 
 export class Game {
 
-    playerNames: string[];
     gamePhase: Phase;
+    host: string;
+    players: string[];
 
-    constructor() {
-        this.playerNames = [];
+    constructor(host: string) {
         this.gamePhase = Phase.WAITING;
+        this.host = host;
+        this.players = [];
     };
+
+    getHost() {
+        return this.host;
+    }
+
+    getPlayers() {
+        return this.players;
+    }
+
+    addPlayer(player: string) {
+        this.players.push(player);
+    }
 
     startGame() {
         if (this.gamePhase === Phase.WAITING) {
@@ -27,13 +41,5 @@ export class Game {
     getCurrentPhase() {
         return this.gamePhase;
     };
-
-    addPlayer(playerName: string) {
-        this.playerNames.push(playerName);
-    };
-
-    getPlayers() {
-        return this.playerNames;
-    }
 
 };

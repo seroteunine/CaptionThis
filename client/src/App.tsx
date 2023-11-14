@@ -6,8 +6,9 @@ import Player from './pages/Player';
 
 function App() {
 
-  const [hasSession, setHasSession] = useState(false);
   const [roomCode, setRoomCode] = useState('');
+  const [isPlayer, setIsPlayer] = useState(false);
+  const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
     const sessionID = sessionStorage.getItem("sessionID");
@@ -22,12 +23,12 @@ function App() {
       sessionStorage.setItem("sessionID", sessionID);
     });
 
-    socket.on('host:room-created', ({ room, roomID }: any) => {
-      console.log('created room', room, roomID);
+    socket.on('host:room-created', () => {
+      setIsHost(true);
     })
 
-    socket.on('player:room-joined', (room) => {
-      console.log('joined room', room);
+    socket.on('player:room-joined', () => {
+      setIsPlayer(true);
     })
 
     return () => {
@@ -39,18 +40,18 @@ function App() {
   }, []);
 
   const createRoom = () => {
-    socket.emit('host:create-room');
+    socket.emit('host:create-game');
   }
 
   const joinRoom = () => {
-    socket.emit('player:join-room', roomCode);
+    socket.emit('player:join-game', roomCode);
   }
 
   return (
     <>
-      {!hasSession ?
-        <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home> :
-        <Host></Host>
+      {isHost ? <Host></Host> :
+        isPlayer ? <Player></Player> :
+          <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home>
       }
     </>
   );
