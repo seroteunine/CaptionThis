@@ -1,4 +1,4 @@
-const { Game, Phase } = require('../gameState');
+const { Game, Phase } = require('../game');
 
 test('New gamestate object is on waiting phase', () => {
     const game = new Game();
