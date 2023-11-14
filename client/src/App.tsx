@@ -1,26 +1,36 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import Home from './pages/Home';
+import socket from './socket';
 import Host from './pages/Host';
 import Player from './pages/Player';
-import { WebSocketProvider } from './context/socket';
-import { RoomCodeProvider } from "./context/roomCode";
 
 function App() {
 
+  const [inLobby, setInLobby] = useState(true);
+  const [isHost, setIsHost] = useState(true);
+
+  useEffect(() => {
+
+    const sessionID = sessionStorage.getItem("sessionID");
+
+    if (sessionID) {
+      socket.auth = { sessionID };
+    }
+
+    socket.on("session", ({ sessionID }) => {
+      socket.auth = { sessionID };
+      sessionStorage.setItem("sessionID", sessionID);
+    });
+
+  }, []);
+
   return (
-    <WebSocketProvider>
-      <RoomCodeProvider>
-
-        <BrowserRouter>
-          <Routes>
-            <Route path='' element={<Home />}></Route>
-            <Route path='host' element={<Host />}></Route>
-            <Route path='player' element={<Player />}></Route>
-          </Routes>
-        </BrowserRouter>
-
-      </RoomCodeProvider>
-    </WebSocketProvider>
+    <>
+      {inLobby ?
+        <Home setInLobby={setInLobby} socket={socket}></Home> :
+        <Host></Host>
+      }
+    </>
   );
 }
 

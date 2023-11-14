@@ -1,51 +1,26 @@
 import { MouseEventHandler, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { useWebSocket } from '../context/socket';
-import { useRoomCode } from '../context/roomCode';
+import { Socket } from 'socket.io-client';
 
-function Home() {
-    const socket = useWebSocket()!;
-    const [roomCodeInput, setRoomCodeInput] = useState('');
-    const { setRoomCode } = useRoomCode();
-
-    let navigate = useNavigate();
-    const [error, setError] = useState(false);
+function Home({ socket, setInLobby }: { socket: Socket, setInLobby: React.Dispatch<React.SetStateAction<boolean>> }) {
+    const [roomID, setRoomID] = useState('');
 
     const createRoom: MouseEventHandler<HTMLButtonElement> = () => {
-        socket?.emit('host:create-room')
+        console.log('creat room');
     }
 
     const joinRoom: MouseEventHandler<HTMLButtonElement> = () => {
-        socket?.emit('player:join-room', roomCodeInput)
+        console.log('join room');
     }
 
-    useEffect(() => {
-
-        socket.on("session", ({ sessionID }) => {
-            socket.auth = { sessionID };
-            sessionStorage.setItem("sessionID", sessionID);
-        });
-
-        socket?.on('host:room-created', ({ roomID }) => {
-            setRoomCode(roomID);
-            sessionStorage.setItem('roomID', roomID);
-            navigate('host');
-        })
-        socket?.on('player:room-joined', ({ roomID }) => {
-            setRoomCode(roomID);
-            sessionStorage.setItem('roomID', roomID);
-            navigate('player');
-        })
-        socket?.on('player:invalid-room', () => {
-            setError(true)
-        })
-    }, [socket]);
+    const createOrJoinRoom = () => {
+        setInLobby(false);
+        socket.connect();
+    }
 
     return (
         <>
-            <h2><input type='text' placeholder='room code' onChange={(e) => setRoomCodeInput(e.target.value)} /><button onClick={joinRoom}>Join Room</button></h2>
-            <button onClick={createRoom}>Create Room</button>
-            {error && <h3>Invalid roomcode</h3>}
+            <h2><input type='text' placeholder='room code' onChange={(e) => setRoomID(e.target.value)} /><button onClick={joinRoom}>Join Room</button></h2>
+            <button onClick={createOrJoinRoom}>Create Room</button>
         </>
     )
 }
