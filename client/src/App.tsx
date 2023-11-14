@@ -9,6 +9,7 @@ function App() {
   const [roomCode, setRoomCode] = useState('');
   const [isPlayer, setIsPlayer] = useState(false);
   const [isHost, setIsHost] = useState(false);
+  const [gameState, setGameState] = useState();
 
   useEffect(() => {
     const sessionID = sessionStorage.getItem("sessionID");
@@ -23,18 +24,20 @@ function App() {
       sessionStorage.setItem("sessionID", sessionID);
     });
 
-    socket.on('host:room-created', () => {
+    socket.on('host:game-update', ({ gameState }) => {
       setIsHost(true);
+      setGameState(gameState);
     })
 
-    socket.on('player:room-joined', () => {
+    socket.on('player:game-update', ({ gameState }) => {
       setIsPlayer(true);
+      setGameState(gameState);
     })
 
     return () => {
       socket.off('session');
-      socket.off('host:room-created');
-      socket.off('player:room-joined');
+      socket.off('host:game-update');
+      socket.off('player:game-update');
     }
 
   }, []);
@@ -49,8 +52,8 @@ function App() {
 
   return (
     <>
-      {isHost ? <Host></Host> :
-        isPlayer ? <Player></Player> :
+      {isHost ? <Host gameState={gameState}></Host> :
+        isPlayer ? <Player gameState={gameState}></Player> :
           <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home>
       }
     </>

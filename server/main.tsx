@@ -45,19 +45,27 @@ type GameDTO = {
     game: Game;
 }
 
-function sendGameUpdate(gameID: string) {
+function sendGameUpdateHost(gameID: string) {
     const game = gameRepository.getGame(gameID);
     const gameDTO = {
         gameID: gameID,
         game: game
     }
     const host = game?.getHost();
-    const players = game?.getPlayers();
     const host_socket = sessionRepository.getSocketID(host || '');
-    io.to(host_socket || '').emit('game-update', gameDTO);
+    io.to(host_socket || '').emit('host:game-update', gameDTO);
+}
+
+function sendGameUpdatePlayers(gameID: string) {
+    const game = gameRepository.getGame(gameID);
+    const gameDTO = {
+        gameID: gameID,
+        game: game
+    }
+    const players = game?.getPlayers();
     players?.forEach((player) => {
         const player_socket = sessionRepository.getSocketID(player || '');
-        io.to(player_socket || '').emit('game-update', gameDTO);
+        io.to(player_socket || '').emit('player:game-update', gameDTO);
     })
 }
 
@@ -72,7 +80,7 @@ io.on('connection', (socket_before) => {
         gameRepository.addGame(gameID, new Game(hostID));
         const game = gameRepository.getGame(gameID);
         if (game) {
-            sendGameUpdate(gameID);
+            sendGameUpdateHost(gameID);
         } else {
             console.log('error with creating game');
         }
@@ -82,7 +90,8 @@ io.on('connection', (socket_before) => {
         const game = gameRepository.getGame(gameID);
         if (game) {
             game.addPlayer(socket.sessionID);
-            sendGameUpdate(gameID);
+            sendGameUpdatePlayers(gameID);
+            sendGameUpdateHost(gameID);
         } else {
             socket.emit('player:invalid-game', gameID);
             console.log('error with joining game');

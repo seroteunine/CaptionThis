@@ -1,16 +1,10 @@
-import { useState } from 'react'
-
-function Host() {
-
-    const [images, setImages] = useState<string[]>([]);
+function Host({ gameState }: { gameState: any }) {
 
     return (
         <>
             <h1>WaitingRoom - Host</h1>
+            {gameState}
             <button > Start game </button>
-            {images.map((imageUrl, index) => (
-                <img key={index} src={imageUrl} style={{ width: 400, height: "auto" }} />
-            ))}
         </>
     )
 }
