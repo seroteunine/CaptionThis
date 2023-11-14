@@ -23,9 +23,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src",
-    "../server/service",
-    "../server/gamelogic"
+    "src"
   ],
   "references": [
     {
