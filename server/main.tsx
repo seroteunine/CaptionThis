@@ -1,7 +1,11 @@
 const express = require('express')
 const app = express();
 const http = require('http')
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
+
+interface CustomSocket extends Socket {
+    sessionID: string;
+}
 
 const server = http.Server(app)
 const io = new Server(server, {
@@ -11,25 +15,42 @@ const io = new Server(server, {
     }
 });
 
-import { generateRoomID, generateUserID } from './utils';
+import { generateRoomID, generateSessionID } from './utils';
 import { GameController } from './controller/gameController';
 import { GameRepository } from './repository/gameRepository';
 import { RoomRepository } from './repository/roomRepository';
+import { SocketRepository } from './repository/socketConnectionRepository';
 const gameController = new GameController();
 const gameRepository = new GameRepository();
 const roomRepository = new RoomRepository();
+const socketRepository = new SocketRepository();
+
+io.use((socket, next) => {
+    const customSocket = socket as CustomSocket;
+    const sessionID = customSocket.handshake.auth.sessionID;
+    if (sessionID) {
+        return next();
+    }
+    customSocket.sessionID = generateSessionID();
+    next();
+});
 
 io.on('connection', (socket) => {
-    console.log(`${socket.id} connected.`);
+
+    const customSocket = socket as CustomSocket;
+
+    socket.emit("session", {
+        sessionID: customSocket.sessionID
+    });
 
     socket.on('host:create-room', () => {
         const roomID = generateRoomID();
-        const userID = generateUserID();
-        roomRepository.addRoom(roomID, userID);
+        const sessionID = customSocket.sessionID;
+        roomRepository.addRoom(roomID, sessionID);
         const room = roomRepository.getRoom(roomID);
         if (room) {
-            socket.emit('host:room-created', { roomID: roomID, userID: userID, isHost: true });
-            console.log(`room created ${roomID} for hostID: ${userID}`);
+            socket.emit('host:room-created', { roomID: roomID, sessionID: sessionID, isHost: true });
+            console.log(`room created ${roomID} for hostID: ${sessionID}`);
         } else {
             console.log('error with creating room');
         }
@@ -37,11 +58,11 @@ io.on('connection', (socket) => {
 
     socket.on('player:join-room', (roomID) => {
         const room = roomRepository.getRoom(roomID);
+        const sessionID = customSocket.sessionID;
         if (room) {
-            const userID = generateUserID();
-            room.addPlayer(userID);
-            socket.emit('player:room-joined', { roomID: roomID, userID: userID, isHost: false })
-            console.log(`room joined ${roomID} for userID: ${userID}`);
+            room.addPlayer(sessionID);
+            socket.emit('player:room-joined', { roomID: roomID, sessionID: sessionID, isHost: false })
+            console.log(`room joined ${roomID} for sessionID: ${sessionID}`);
             console.log(room);
         } else {
             socket.emit('player:invalid-room', roomID);

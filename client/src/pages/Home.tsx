@@ -4,7 +4,7 @@ import { useWebSocket } from '../context/socket';
 import { useRoomCode } from '../context/roomCode';
 
 function Home() {
-    const socket = useWebSocket();
+    const socket = useWebSocket()!;
     const [roomCodeInput, setRoomCodeInput] = useState('');
     const { setRoomCode } = useRoomCode();
 
@@ -20,16 +20,15 @@ function Home() {
     }
 
     useEffect(() => {
-        socket?.on('host:room-created', ({ roomID, userID }) => {
+
+        socket?.on('host:room-created', ({ roomID }) => {
             setRoomCode(roomID);
-            localStorage.setItem('userID', userID);
-            localStorage.setItem('roomID', roomID);
+            sessionStorage.setItem('roomID', roomID);
             navigate('host');
         })
-        socket?.on('player:room-joined', ({ roomID, userID }) => {
+        socket?.on('player:room-joined', ({ roomID }) => {
             setRoomCode(roomID);
-            localStorage.setItem('userID', userID);
-            localStorage.setItem('roomID', roomID);
+            sessionStorage.setItem('roomID', roomID);
             navigate('player');
         })
         socket?.on('player:invalid-room', () => {

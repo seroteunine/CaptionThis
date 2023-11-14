@@ -5,7 +5,7 @@ export function generateRoomID(): string {
     return randomUUID.substr(0, 4);
 }
 
-export function generateUserID(): string {
+export function generateSessionID(): string {
     const randomUUID = uuid.v4().replace(/-/g, '');
     return randomUUID.substr(0, 8);
 }
