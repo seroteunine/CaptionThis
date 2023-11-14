@@ -1,30 +1,28 @@
-import { Game } from "./gamelogic/game";
-
 class Room {
 
     host: string;
-    game: Game | undefined;
+    players: string[];
 
     constructor(hostID: string) {
         this.host = hostID;
-        this.game = undefined;
-    }
-
-    setGame(game: Game) {
-        this.game = game;
+        this.players = [];
     }
 
     getHost() {
         return this.host;
     }
 
-    getGame() {
-        return this.game;
+    addPlayer(playerID: string) {
+        this.players.push(playerID);
+    }
+
+    getPlayers() {
+        return this.players;
     }
 
 }
 
-class roomManager {
+export class RoomRepository {
 
     rooms: Map<string, Room>;
 
@@ -33,7 +31,8 @@ class roomManager {
     }
 
     addRoom(roomID: string, hostID: string) {
-        this.rooms.set(roomID, new Room(hostID));
+        const room = new Room(hostID);
+        this.rooms.set(roomID, room);
     }
 
     getRoom(roomID: string) {
@@ -41,5 +40,3 @@ class roomManager {
     }
 
 }
-
-module.exports = roomManager;

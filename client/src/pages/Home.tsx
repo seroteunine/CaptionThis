@@ -12,19 +12,27 @@ function Home() {
     const [error, setError] = useState(false);
 
     const createRoom: MouseEventHandler<HTMLButtonElement> = () => {
-        socket?.emit('create-room')
+        socket?.emit('host:create-room')
     }
 
     const joinRoom: MouseEventHandler<HTMLButtonElement> = () => {
-        socket?.emit('join-room', roomCodeInput)
+        socket?.emit('player:join-room', roomCodeInput)
     }
 
     useEffect(() => {
-        socket?.on('valid-room', ({ roomCode, isHost }) => {
-            setRoomCode(roomCode);
-            isHost ? navigate('host') : navigate('player');
+        socket?.on('host:room-created', ({ roomID, userID }) => {
+            setRoomCode(roomID);
+            localStorage.setItem('userID', userID);
+            localStorage.setItem('roomID', roomID);
+            navigate('host');
         })
-        socket?.on('invalid-room', () => {
+        socket?.on('player:room-joined', ({ roomID, userID }) => {
+            setRoomCode(roomID);
+            localStorage.setItem('userID', userID);
+            localStorage.setItem('roomID', roomID);
+            navigate('player');
+        })
+        socket?.on('player:invalid-room', () => {
             setError(true)
         })
     }, [socket]);
