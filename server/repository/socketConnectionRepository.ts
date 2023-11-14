@@ -6,20 +6,12 @@ export class SessionRepository {
         this.connections = new Map<string, string>();
     }
 
-    addMapping(sessionID: string, userID: string) {
-        this.connections.set(sessionID, userID);
+    addMapping(sessionID: string, socketID: string) {
+        this.connections.set(sessionID, socketID);
     }
 
-    getSessionID(sessionID: string) {
+    getSocketID(sessionID: string) {
         return this.connections.get(sessionID);
-    }
-
-    updateMapping(sessionID: string, userID: string) {
-        this.connections.set(sessionID, userID);
-    }
-
-    deleteMapping(sessionID: string) {
-        this.connections.delete(sessionID);
     }
 
 }

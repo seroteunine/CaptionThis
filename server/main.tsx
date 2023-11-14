@@ -16,11 +16,13 @@ const io = new Server(server, {
 });
 
 import { generateRoomID, generateSessionID } from './utils';
-import { GameController } from './controller/gameController';
-import { GameRepository } from './repository/gameRepository';
+// import { GameController } from './controller/gameController';
+// import { GameRepository } from './repository/gameRepository';
 import { RoomRepository } from './repository/roomRepository';
-const gameController = new GameController();
-const gameRepository = new GameRepository();
+import { SessionRepository } from './repository/socketConnectionRepository';
+const sessionRepository = new SessionRepository();
+// const gameController = new GameController();
+// const gameRepository = new GameRepository();
 const roomRepository = new RoomRepository();
 
 io.use((socket_before, next) => {
@@ -28,9 +30,11 @@ io.use((socket_before, next) => {
     const sessionID = socket.handshake.auth.sessionID;
     if (sessionID) {
         socket.sessionID = sessionID;
+        sessionRepository.addMapping(socket.sessionID, socket.id);
         return next();
     }
     socket.sessionID = generateSessionID();
+    sessionRepository.addMapping(socket.sessionID, socket.id);
     next();
 });
 
@@ -40,29 +44,27 @@ io.on('connection', (socket_before) => {
     socket.emit("session", socket.sessionID);
 
     socket.on('host:create-room', () => {
-        console.log('host creates room with socket id', socket.sessionID);
-        // roomRepository.addRoom(roomID, sessionID);
-        // const room = roomRepository.getRoom(roomID);
-        // if (room) {
-        //     console.log(`room created`);
-        // } else {
-        //     console.log('error with creating room');
-        // }
+        const roomID = generateRoomID();
+        roomRepository.addRoom(roomID, socket.sessionID);
+        const room = roomRepository.getRoom(roomID);
+        if (room) {
+            socket.emit('host:room-created', { room, roomID });
+        } else {
+            console.log('error with creating room');
+        }
     })
 
-    // socket.on('player:join-room', (roomID) => {
-    //     const room = roomRepository.getRoom(roomID);
-    //     const sessionID = customSocket.sessionID;
-    //     if (room) {
-    //         room.addPlayer(sessionID);
-    //         socket.emit('player:room-joined', { roomID: roomID, sessionID: sessionID, isHost: false })
-    //         console.log(`room joined ${roomID} for sessionID: ${sessionID}`);
-    //         console.log(room);
-    //     } else {
-    //         socket.emit('player:invalid-room', roomID);
-    //         console.log('error with joining room');
-    //     }
-    // })
+    socket.on('player:join-room', (roomID) => {
+        console.log(`player with id ${socket.sessionID} wants to join room: ${roomID}`);
+        const room = roomRepository.getRoom(roomID);
+        if (room) {
+            room.addPlayer(socket.sessionID);
+            socket.emit('player:room-joined', room);
+        } else {
+            socket.emit('player:invalid-room', roomID);
+            console.log('error with joining room');
+        }
+    })
 
     // socket.on('send-image', ({ roomCode, image }) => {
     //     const room = roomManager.getRoom(roomCode);
