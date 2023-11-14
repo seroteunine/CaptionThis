@@ -1,4 +1,4 @@
-export class SocketRepository {
+export class SessionRepository {
 
     connections: Map<string, string>;
 
@@ -6,20 +6,20 @@ export class SocketRepository {
         this.connections = new Map<string, string>();
     }
 
-    addMapping(socketID: string, userID: string) {
-        this.connections.set(socketID, userID);
+    addMapping(sessionID: string, userID: string) {
+        this.connections.set(sessionID, userID);
     }
 
-    getSessionID(socketID: string) {
-        return this.connections.get(socketID);
+    getSessionID(sessionID: string) {
+        return this.connections.get(sessionID);
     }
 
-    updateMapping(socketID: string, userID: string) {
-        this.connections.set(socketID, userID);
+    updateMapping(sessionID: string, userID: string) {
+        this.connections.set(sessionID, userID);
     }
 
-    deleteMapping(socketID: string) {
-        this.connections.delete(socketID);
+    deleteMapping(sessionID: string) {
+        this.connections.delete(sessionID);
     }
 
 }

@@ -19,56 +19,50 @@ import { generateRoomID, generateSessionID } from './utils';
 import { GameController } from './controller/gameController';
 import { GameRepository } from './repository/gameRepository';
 import { RoomRepository } from './repository/roomRepository';
-import { SocketRepository } from './repository/socketConnectionRepository';
 const gameController = new GameController();
 const gameRepository = new GameRepository();
 const roomRepository = new RoomRepository();
-const socketRepository = new SocketRepository();
 
-io.use((socket, next) => {
-    const customSocket = socket as CustomSocket;
-    const sessionID = customSocket.handshake.auth.sessionID;
+io.use((socket_before, next) => {
+    const socket = socket_before as CustomSocket;
+    const sessionID = socket.handshake.auth.sessionID;
     if (sessionID) {
+        socket.sessionID = sessionID;
         return next();
     }
-    customSocket.sessionID = generateSessionID();
+    socket.sessionID = generateSessionID();
     next();
 });
 
-io.on('connection', (socket) => {
+io.on('connection', (socket_before) => {
 
-    const customSocket = socket as CustomSocket;
-
-    socket.emit("session", {
-        sessionID: customSocket.sessionID
-    });
+    const socket = socket_before as CustomSocket;
+    socket.emit("session", socket.sessionID);
 
     socket.on('host:create-room', () => {
-        const roomID = generateRoomID();
-        const sessionID = customSocket.sessionID;
-        roomRepository.addRoom(roomID, sessionID);
-        const room = roomRepository.getRoom(roomID);
-        if (room) {
-            socket.emit('host:room-created', { roomID: roomID, sessionID: sessionID, isHost: true });
-            console.log(`room created ${roomID} for hostID: ${sessionID}`);
-        } else {
-            console.log('error with creating room');
-        }
+        console.log('host creates room with socket id', socket.sessionID);
+        // roomRepository.addRoom(roomID, sessionID);
+        // const room = roomRepository.getRoom(roomID);
+        // if (room) {
+        //     console.log(`room created`);
+        // } else {
+        //     console.log('error with creating room');
+        // }
     })
 
-    socket.on('player:join-room', (roomID) => {
-        const room = roomRepository.getRoom(roomID);
-        const sessionID = customSocket.sessionID;
-        if (room) {
-            room.addPlayer(sessionID);
-            socket.emit('player:room-joined', { roomID: roomID, sessionID: sessionID, isHost: false })
-            console.log(`room joined ${roomID} for sessionID: ${sessionID}`);
-            console.log(room);
-        } else {
-            socket.emit('player:invalid-room', roomID);
-            console.log('error with joining room');
-        }
-    })
+    // socket.on('player:join-room', (roomID) => {
+    //     const room = roomRepository.getRoom(roomID);
+    //     const sessionID = customSocket.sessionID;
+    //     if (room) {
+    //         room.addPlayer(sessionID);
+    //         socket.emit('player:room-joined', { roomID: roomID, sessionID: sessionID, isHost: false })
+    //         console.log(`room joined ${roomID} for sessionID: ${sessionID}`);
+    //         console.log(room);
+    //     } else {
+    //         socket.emit('player:invalid-room', roomID);
+    //         console.log('error with joining room');
+    //     }
+    // })
 
     // socket.on('send-image', ({ roomCode, image }) => {
     //     const room = roomManager.getRoom(roomCode);
