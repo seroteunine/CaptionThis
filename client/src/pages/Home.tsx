@@ -21,6 +21,11 @@ function Home() {
 
     useEffect(() => {
 
+        socket.on("session", ({ sessionID }) => {
+            socket.auth = { sessionID };
+            sessionStorage.setItem("sessionID", sessionID);
+        });
+
         socket?.on('host:room-created', ({ roomID }) => {
             setRoomCode(roomID);
             sessionStorage.setItem('roomID', roomID);

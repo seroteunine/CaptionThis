@@ -12,10 +12,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const socketIo = io(SOCKET_URL);
 
-        socketIo!.on("session", ({ sessionID }) => {
-            socketIo.auth = { sessionID };
-            sessionStorage.setItem("sessionID", sessionID);
-        });
+
 
         setSocket(socketIo);
 
