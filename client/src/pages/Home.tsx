@@ -1,4 +1,4 @@
-import { MouseEventHandler, useEffect, useState } from 'react'
+import { MouseEventHandler } from 'react'
 
 function Home({ createRoom, joinRoom, setRoomCode }: { createRoom: MouseEventHandler<HTMLButtonElement>, joinRoom: MouseEventHandler<HTMLButtonElement>, setRoomCode: React.Dispatch<React.SetStateAction<string>> }) {
 

@@ -42,14 +42,22 @@ import { Game } from './gamelogic/game';
 
 type GameDTO = {
     gameID: string;
-    game: Game;
+    gameState: {
+        phase: string;
+        host: string;
+        players: string[];
+    };
 }
 
 function sendGameUpdateHost(gameID: string) {
     const game = gameRepository.getGame(gameID);
     const gameDTO = {
         gameID: gameID,
-        game: game
+        gameState: {
+            phase: game?.getCurrentPhase(),
+            host: game?.getHost(),
+            players: game?.getPlayers()
+        }
     }
     const host = game?.getHost();
     const host_socket = sessionRepository.getSocketID(host || '');
@@ -60,7 +68,11 @@ function sendGameUpdatePlayers(gameID: string) {
     const game = gameRepository.getGame(gameID);
     const gameDTO = {
         gameID: gameID,
-        game: game
+        gameState: {
+            phase: game?.getCurrentPhase(),
+            host: game?.getHost(),
+            players: game?.getPlayers()
+        }
     }
     const players = game?.getPlayers();
     players?.forEach((player) => {
@@ -96,6 +108,14 @@ io.on('connection', (socket_before) => {
             socket.emit('player:invalid-game', gameID);
             console.log('error with joining game');
         }
+    })
+
+    socket.on('host:start-game', (gameID) => {
+        console.log('started game, ', gameID);
+        const game = gameRepository.getGame(gameID);
+        game?.startGame();
+        sendGameUpdateHost(gameID);
+        sendGameUpdatePlayers(gameID);
     })
 
 })
