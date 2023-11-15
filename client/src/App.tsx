@@ -1,3 +1,5 @@
+import './index.css';
+
 import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import socket from './socket';
@@ -69,12 +71,12 @@ function App() {
   }
 
   return (
-    <>
+    <div>
       {isHost ? <Host gameDTO={gameDTO!} startGame={startGame}></Host> :
         isPlayer ? <Player gameDTO={gameDTO!}></Player> :
           <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home>
       }
-    </>
+    </div>
   );
 }
 
