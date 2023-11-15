@@ -1,7 +1,13 @@
 const express = require('express')
 const app = express();
 const http = require('http')
+
 import { Server, Socket } from 'socket.io'
+import { Game } from './domain/game';
+import { generateGameID, generateSessionID } from './utils';
+import { GameManager } from './managers/gameManager';
+import { SocketManager } from './managers/socketManager';
+
 
 const server = http.Server(app)
 const io = new Server(server, {
@@ -11,12 +17,11 @@ const io = new Server(server, {
     }
 });
 
-import { Game } from './domain/game';
-import { generateGameID, generateSessionID } from './utils';
-import { GameManager } from './managers/gameManager';
-import { SocketManager } from './managers/socketManager';
-const gameManager = new GameManager();
-const socketManager = new SocketManager();
+
+
+interface CustomSocket extends Socket {
+    sessionID: string;
+}
 
 type GameDTO = {
     gameID: string;
@@ -24,6 +29,7 @@ type GameDTO = {
     host: string;
     players: string[];
 }
+
 
 function sendHostGameUpdate(game: Game) {
     const host = game.getHost();
@@ -49,9 +55,10 @@ function sendGameIfExists(sessionID: string) {
     }
 }
 
-interface CustomSocket extends Socket {
-    sessionID: string;
-}
+
+
+const gameManager = new GameManager();
+const socketManager = new SocketManager();
 
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
