@@ -18,7 +18,7 @@ function App() {
   const [roomCode, setRoomCode] = useState('');
   const [isPlayer, setIsPlayer] = useState(false);
   const [isHost, setIsHost] = useState(false);
-  const [gameState, setGameState] = useState<GameDTO>();
+  const [gameDTO, setGameDTO] = useState<GameDTO>();
 
   useEffect(() => {
     const sessionID = sessionStorage.getItem("sessionID");
@@ -35,12 +35,12 @@ function App() {
 
     socket.on('host:game-update', (gameDTO) => {
       setIsHost(true);
-      setGameState(gameDTO);
+      setGameDTO(gameDTO);
     })
 
     socket.on('player:game-update', (gameDTO) => {
       setIsPlayer(true);
-      setGameState(gameDTO);
+      setGameDTO(gameDTO);
     })
 
     return () => {
@@ -60,8 +60,8 @@ function App() {
   }
 
   const startGame = () => {
-    if (gameState) {
-      const gameID = gameState.gameID;
+    if (gameDTO) {
+      const gameID = gameDTO.gameID;
       socket.emit('host:start-game', gameID);
     } else {
       console.log('game cannot be started because there is no gamestate.');
@@ -70,8 +70,8 @@ function App() {
 
   return (
     <>
-      {isHost ? <Host gameState={gameState!} startGame={startGame}></Host> :
-        isPlayer ? <Player gameState={gameState!}></Player> :
+      {isHost ? <Host gameDTO={gameDTO!} startGame={startGame}></Host> :
+        isPlayer ? <Player gameDTO={gameDTO!}></Player> :
           <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home>
       }
     </>
