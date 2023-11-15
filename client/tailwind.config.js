@@ -1,7 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
-  content: [],
+  content: [
+    './public/**/*.html',
+    './src/**/*.{js,jsx,ts,tsx,vue}',
+  ],
   theme: {
     extend: {
       fontFamily: {
