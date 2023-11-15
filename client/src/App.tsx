@@ -8,11 +8,9 @@ import Player from './pages/Player';
 
 type GameDTO = {
   gameID: string;
-  gameState: {
-    phase: string;
-    host: string;
-    players: string[];
-  };
+  phase: string;
+  host: string;
+  players: string[];
 }
 
 function App() {

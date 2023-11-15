@@ -8,11 +8,13 @@ export enum Phase {
 
 export class Game {
 
+    gameID: string;
     gamePhase: Phase;
     host: string;
     players: string[];
 
-    constructor(host: string) {
+    constructor(gameID: string, host: string) {
+        this.gameID = gameID;
         this.gamePhase = Phase.WAITING;
         this.host = host;
         this.players = [];
@@ -41,5 +43,14 @@ export class Game {
     getCurrentPhase() {
         return this.gamePhase;
     };
+
+    returnGameDTO() {
+        return {
+            gameID: this.gameID,
+            phase: this.gamePhase.toString(),
+            host: this.host,
+            players: this.players
+        }
+    }
 
 };

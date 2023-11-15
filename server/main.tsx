@@ -20,37 +20,21 @@ const socketManager = new SocketManager();
 
 type GameDTO = {
     gameID: string;
-    gameState: {
-        phase: string;
-        host: string;
-        players: string[];
-    };
+    phase: string;
+    host: string;
+    players: string[];
 }
 
-function sendHostGameUpdate(game: Game, gameID: string) {
+function sendHostGameUpdate(game: Game) {
     const host = game.getHost();
-    const gameDTO: GameDTO = {
-        gameID: gameID,
-        gameState: {
-            phase: game.getCurrentPhase().toString(),
-            host: host,
-            players: game.getPlayers()
-        }
-    }
+    const gameDTO: GameDTO = game.returnGameDTO();
     const host_socket = socketManager.getSocketID(host || '');
     io.to(host_socket || '').emit('host:game-update', gameDTO);
 }
 
-function sendPlayersGameUpdate(game: Game, gameID: string) {
+function sendPlayersGameUpdate(game: Game) {
     const players = game.getPlayers();
-    const gameDTO: GameDTO = {
-        gameID: gameID,
-        gameState: {
-            phase: game.getCurrentPhase().toString(),
-            host: game.getHost(),
-            players: players
-        }
-    }
+    const gameDTO: GameDTO = game.returnGameDTO();
     players.forEach((player) => {
         const player_socket = socketManager.getSocketID(player);
         io.to(player_socket || '').emit('player:game-update', gameDTO);
@@ -58,22 +42,10 @@ function sendPlayersGameUpdate(game: Game, gameID: string) {
 }
 
 function sendGameIfExists(sessionID: string) {
-    const socketID = socketManager.getSocketID(sessionID)!;
-    console.log(socketID);
-
     const game = gameManager.getGameBySessionID(sessionID);
-    console.log(game);
-
     if (game) {
-        const gameDTO: GameDTO = {
-            gameID: 'test',
-            gameState: {
-                phase: game.getCurrentPhase().toString(),
-                host: game.getHost(),
-                players: game.getPlayers()
-            }
-        }
-        io.to(socketID).emit('general:resend-game', gameDTO);
+        sendHostGameUpdate(game);
+        sendPlayersGameUpdate(game);
     }
 }
 
@@ -95,26 +67,26 @@ io.use((socket_before, next) => {
 io.on('connection', (socket_before) => {
 
     const socket = socket_before as CustomSocket;
+
     socket.emit("session", socket.sessionID);
     sendGameIfExists(socket.sessionID);
 
     socket.on('host:create-game', () => {
         const gameID = generateGameID();
         const hostID = socket.sessionID;
-        const game = new Game(hostID);
-        gameManager.addGame(gameID, game);
-        sendHostGameUpdate(game, gameID);
+        const game = new Game(gameID, hostID);
+        gameManager.addGame(game);
+        sendHostGameUpdate(game);
     })
 
     socket.on('player:join-game', (gameID) => {
         const game = gameManager.getGame(gameID);
         if (game) {
             game.addPlayer(socket.sessionID);
-            sendPlayersGameUpdate(game, gameID);
-            sendHostGameUpdate(game, gameID);
+            sendPlayersGameUpdate(game);
+            sendHostGameUpdate(game);
         } else {
             socket.emit('player:invalid-game', gameID);
-            console.log('error with joining game');
         }
     })
 
@@ -123,8 +95,8 @@ io.on('connection', (socket_before) => {
         const game = gameManager.getGame(gameID);
         if (game) {
             game.startGame();
-            sendHostGameUpdate(game, gameID);
-            sendPlayersGameUpdate(game, gameID);
+            sendHostGameUpdate(game);
+            sendPlayersGameUpdate(game);
         } else {
             console.log('error starting game, could not be found in Manager.');
         }
