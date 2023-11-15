@@ -45,7 +45,7 @@ function sendPlayersGameUpdate(game: Game) {
     })
 }
 
-function sendGameIfExists(sessionID: string) {
+function resendGameIfExists(sessionID: string) {
     const game = gameManager.getGameBySessionID(sessionID);
     if (game) {
         sendHostGameUpdate(game);
@@ -73,7 +73,7 @@ io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
 
     socket.emit("session", socket.sessionID);
-    sendGameIfExists(socket.sessionID);
+    resendGameIfExists(socket.sessionID);
 
     socket.on('host:create-game', () => {
         const gameID = generateGameID();
