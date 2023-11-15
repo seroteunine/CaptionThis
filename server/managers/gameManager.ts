@@ -1,6 +1,6 @@
-import { Game } from "../gamelogic/game";
+import { Game } from "../domain/game";
 
-export class GameRepository {
+export class GameManager {
 
     games: Map<string, Game>;
 

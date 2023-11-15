@@ -11,11 +11,11 @@ const io = new Server(server, {
     }
 });
 
-import { Game } from './gamelogic/game';
+import { Game } from './domain/game';
 import { generateGameID, generateSessionID } from './utils';
-import { GameRepository } from './repository/gameRepository';
-import { SocketManager } from './repository/socketManager';
-const gameRepository = new GameRepository();
+import { GameManager } from './managers/gameManager';
+import { SocketManager } from './managers/socketManager';
+const gameManager = new GameManager();
 const socketManager = new SocketManager();
 
 type GameDTO = {
@@ -81,12 +81,12 @@ io.on('connection', (socket_before) => {
         const gameID = generateGameID();
         const hostID = socket.sessionID;
         const game = new Game(hostID);
-        gameRepository.addGame(gameID, game);
+        gameManager.addGame(gameID, game);
         sendHostGameUpdate(game, gameID);
     })
 
     socket.on('player:join-game', (gameID) => {
-        const game = gameRepository.getGame(gameID);
+        const game = gameManager.getGame(gameID);
         if (game) {
             game.addPlayer(socket.sessionID);
             sendPlayersGameUpdate(game, gameID);
@@ -99,13 +99,13 @@ io.on('connection', (socket_before) => {
 
     socket.on('host:start-game', (gameID) => {
         console.log('started game, ', gameID);
-        const game = gameRepository.getGame(gameID);
+        const game = gameManager.getGame(gameID);
         if (game) {
             game.startGame();
             sendHostGameUpdate(game, gameID);
             sendPlayersGameUpdate(game, gameID);
         } else {
-            console.log('error starting game, could not be found in repository.');
+            console.log('error starting game, could not be found in Manager.');
         }
     })
 
