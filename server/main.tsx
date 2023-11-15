@@ -57,6 +57,26 @@ function sendPlayersGameUpdate(game: Game, gameID: string) {
     })
 }
 
+function sendGameIfExists(sessionID: string) {
+    const socketID = socketManager.getSocketID(sessionID)!;
+    console.log(socketID);
+
+    const game = gameManager.getGameBySessionID(sessionID);
+    console.log(game);
+
+    if (game) {
+        const gameDTO: GameDTO = {
+            gameID: 'test',
+            gameState: {
+                phase: game.getCurrentPhase().toString(),
+                host: game.getHost(),
+                players: game.getPlayers()
+            }
+        }
+        io.to(socketID).emit('general:resend-game', gameDTO);
+    }
+}
+
 interface CustomSocket extends Socket {
     sessionID: string;
 }
@@ -76,6 +96,7 @@ io.on('connection', (socket_before) => {
 
     const socket = socket_before as CustomSocket;
     socket.emit("session", socket.sessionID);
+    sendGameIfExists(socket.sessionID);
 
     socket.on('host:create-game', () => {
         const gameID = generateGameID();
@@ -98,7 +119,7 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('host:start-game', (gameID) => {
-        console.log('started game, ', gameID);
+        console.log('started game with code: ', gameID);
         const game = gameManager.getGame(gameID);
         if (game) {
             game.startGame();
