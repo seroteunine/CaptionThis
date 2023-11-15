@@ -17,6 +17,16 @@ test('start game should go to photo upload phase', () => {
     expect(game.getCurrentPhase()).toBe(Phase.PHOTO_UPLOAD);
 });
 
+test('no starting when its not in waiting phase', () => {
+    const game = new Game(gameID, host);
+
+    game.startGame();
+
+    expect(() => {
+        game.startGame();
+    }).toThrow();
+});
+
 test('no double players', () => {
     const game = new Game(gameID, host);
 

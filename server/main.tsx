@@ -69,9 +69,7 @@ io.use((socket_before, next) => {
 });
 
 io.on('connection', (socket_before) => {
-
     const socket = socket_before as CustomSocket;
-
     socket.emit("session", socket.sessionID);
     resendGameIfExists(socket.sessionID);
 
