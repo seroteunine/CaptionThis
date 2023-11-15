@@ -16,3 +16,13 @@ test('start game should go to photo upload phase', () => {
 
     expect(game.getCurrentPhase()).toBe(Phase.PHOTO_UPLOAD);
 });
+
+test('no double players', () => {
+    const game = new Game(gameID, host);
+
+    game.addPlayer('a123');
+
+    expect(() => {
+        game.addPlayer('a123');
+    }).toThrow();
+})

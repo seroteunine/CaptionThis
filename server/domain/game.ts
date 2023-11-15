@@ -29,6 +29,9 @@ export class Game {
     }
 
     addPlayer(player: string) {
+        if (this.players.includes(player)) {
+            throw new Error();
+        }
         this.players.push(player);
     }
 
