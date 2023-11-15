@@ -8,12 +8,22 @@ export class GameManager {
         this.games = new Map<string, Game>();
     }
 
-    addGame(roomID: string, game: Game) {
-        this.games.set(roomID, game);
+    addGame(game: Game) {
+        this.games.set(game.gameID, game);
     }
 
-    getGame(roomID: string) {
-        return this.games.get(roomID);
+    getGame(gameID: string) {
+        return this.games.get(gameID);
+    }
+
+    getGameBySessionID(sessionID: string) {
+        for (let game of this.games.values()) {
+            const players = game.getPlayers();
+            if (players.includes(sessionID) || game.getHost() === sessionID) {
+                return game;
+            }
+        }
+        return undefined;
     }
 
 }
