@@ -3,7 +3,11 @@ export default {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   content: [],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Helvetica Bold', 'Arial', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }

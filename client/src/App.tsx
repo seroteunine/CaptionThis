@@ -71,7 +71,7 @@ function App() {
   }
 
   return (
-    <div className='min-h-screen bg-blue-100'>
+    <div className='min-h-screen bg-blue-100 font-bold'>
       {isHost ? <Host gameDTO={gameDTO!} startGame={startGame}></Host> :
         isPlayer ? <Player gameDTO={gameDTO!}></Player> :
           <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home>
