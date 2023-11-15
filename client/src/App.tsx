@@ -18,6 +18,7 @@ type GameDTO = {
 function App() {
 
   const [roomCode, setRoomCode] = useState('');
+  const [codeInvalid, setCodeInvalid] = useState(false);
   const [isPlayer, setIsPlayer] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [gameDTO, setGameDTO] = useState<GameDTO>();
@@ -45,10 +46,15 @@ function App() {
       setGameDTO(gameDTO);
     })
 
+    socket.on('player:invalid-game', () => {
+      setCodeInvalid(true);
+    })
+
     return () => {
       socket.off('session');
       socket.off('host:game-update');
       socket.off('player:game-update');
+      socket.off('player:invalid-game');
     }
 
   }, []);
@@ -74,7 +80,7 @@ function App() {
     <div className='min-h-screen bg-blue-100 font-bold'>
       {isHost ? <Host gameDTO={gameDTO!} startGame={startGame}></Host> :
         isPlayer ? <Player gameDTO={gameDTO!}></Player> :
-          <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home>
+          <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode} codeInvalid={codeInvalid}></Home>
       }
     </div>
   );
