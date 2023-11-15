@@ -8,7 +8,6 @@ import { generateGameID, generateSessionID } from './utils';
 import { GameManager } from './managers/gameManager';
 import { SocketManager } from './managers/socketManager';
 
-
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
@@ -16,7 +15,6 @@ const io = new Server(server, {
         methods: ["GET", "POST"]
     }
 });
-
 
 
 interface CustomSocket extends Socket {
@@ -56,7 +54,6 @@ function sendGameIfExists(sessionID: string) {
 }
 
 
-
 const gameManager = new GameManager();
 const socketManager = new SocketManager();
 
@@ -88,25 +85,25 @@ io.on('connection', (socket_before) => {
 
     socket.on('player:join-game', (gameID) => {
         const game = gameManager.getGame(gameID);
-        if (game) {
-            game.addPlayer(socket.sessionID);
-            sendPlayersGameUpdate(game);
-            sendHostGameUpdate(game);
-        } else {
+        if (!game) {
             socket.emit('player:invalid-game', gameID);
+            return;
         }
+        game.addPlayer(socket.sessionID);
+        sendPlayersGameUpdate(game);
+        sendHostGameUpdate(game);
     })
 
     socket.on('host:start-game', (gameID) => {
         console.log('started game with code: ', gameID);
         const game = gameManager.getGame(gameID);
-        if (game) {
-            game.startGame();
-            sendHostGameUpdate(game);
-            sendPlayersGameUpdate(game);
-        } else {
-            console.log('error starting game, could not be found in Manager.');
+        if (!game) {
+            socket.emit('host:error', 'Game could not be started, because it couldnt be found.')
+            return;
         }
+        game.startGame();
+        sendHostGameUpdate(game);
+        sendPlayersGameUpdate(game);
     })
 
 })
