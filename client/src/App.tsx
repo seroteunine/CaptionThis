@@ -1,26 +1,80 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import Home from './pages/Home';
-import WaitingRoomHost from './pages/host/WaitingRoomHost';
-import WaitingRoomPlayer from './pages/player/WaitingRoomPlayer';
-import { WebSocketProvider } from './context/socket';
-import { RoomCodeProvider } from "./context/roomCode";
+import socket from './socket';
+import Host from './pages/Host';
+import Player from './pages/Player';
+
+type GameDTO = {
+  gameID: string;
+  gameState: {
+    phase: string;
+    host: string;
+    players: string[];
+  };
+}
 
 function App() {
 
+  const [roomCode, setRoomCode] = useState('');
+  const [isPlayer, setIsPlayer] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [gameState, setGameState] = useState<GameDTO>();
+
+  useEffect(() => {
+    const sessionID = sessionStorage.getItem("sessionID");
+
+    if (sessionID) {
+      socket.auth = { sessionID };
+      sessionStorage.setItem("sessionID", sessionID);
+    }
+
+    socket.on("session", (sessionID) => {
+      socket.auth = { sessionID };
+      sessionStorage.setItem("sessionID", sessionID);
+    });
+
+    socket.on('host:game-update', (gameDTO) => {
+      setIsHost(true);
+      setGameState(gameDTO);
+    })
+
+    socket.on('player:game-update', (gameDTO) => {
+      setIsPlayer(true);
+      setGameState(gameDTO);
+    })
+
+    return () => {
+      socket.off('session');
+      socket.off('host:game-update');
+      socket.off('player:game-update');
+    }
+
+  }, []);
+
+  const createRoom = () => {
+    socket.emit('host:create-game');
+  }
+
+  const joinRoom = () => {
+    socket.emit('player:join-game', roomCode);
+  }
+
+  const startGame = () => {
+    if (gameState) {
+      const gameID = gameState.gameID;
+      socket.emit('host:start-game', gameID);
+    } else {
+      console.log('game cannot be started because there is no gamestate.');
+    }
+  }
+
   return (
-    <WebSocketProvider>
-      <RoomCodeProvider>
-
-        <BrowserRouter>
-          <Routes>
-            <Route path='' element={<Home />}></Route>
-            <Route path='waitingroom-host' element={<WaitingRoomHost />}></Route>
-            <Route path='waitingroom-player' element={<WaitingRoomPlayer />}></Route>
-          </Routes>
-        </BrowserRouter>
-
-      </RoomCodeProvider>
-    </WebSocketProvider>
+    <>
+      {isHost ? <Host gameState={gameState!} startGame={startGame}></Host> :
+        isPlayer ? <Player gameState={gameState!}></Player> :
+          <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode}></Home>
+      }
+    </>
   );
 }
 

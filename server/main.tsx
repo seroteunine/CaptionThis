@@ -1,7 +1,11 @@
 const express = require('express')
 const app = express();
 const http = require('http')
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
+
+interface CustomSocket extends Socket {
+    sessionID: string;
+}
 
 const server = http.Server(app)
 const io = new Server(server, {
@@ -11,36 +15,107 @@ const io = new Server(server, {
     }
 });
 
-import { generateRoomID } from './utils';
-const RoomManager = require('./roomManager');
-const roomManager = new RoomManager();
 
-io.on('connection', (socket) => {
-    console.log(`${socket.id} connected.`);
+import { generateGameID, generateSessionID } from './utils';
+// import { GameController } from './controller/gameController';
+// const gameController = new GameController();
+import { GameRepository } from './repository/gameRepository';
+const gameRepository = new GameRepository();
+import { SessionRepository } from './repository/socketConnectionRepository';
+const sessionRepository = new SessionRepository();
 
-    socket.on('create-room', () => {
-        const roomCode = generateRoomID();
-        roomManager.addRoom(roomCode, socket.id);
-        socket.emit('valid-room', { roomCode: roomCode, isHost: true });
-        console.log(roomCode);
+
+io.use((socket_before, next) => {
+    const socket = socket_before as CustomSocket;
+    const sessionID = socket.handshake.auth.sessionID;
+    if (sessionID) {
+        socket.sessionID = sessionID;
+        sessionRepository.addMapping(socket.sessionID, socket.id);
+        return next();
+    }
+    socket.sessionID = generateSessionID();
+    sessionRepository.addMapping(socket.sessionID, socket.id);
+    next();
+});
+
+import { Game } from './gamelogic/game';
+
+type GameDTO = {
+    gameID: string;
+    gameState: {
+        phase: string;
+        host: string;
+        players: string[];
+    };
+}
+
+function sendGameUpdateHost(gameID: string) {
+    const game = gameRepository.getGame(gameID);
+    const gameDTO = {
+        gameID: gameID,
+        gameState: {
+            phase: game?.getCurrentPhase(),
+            host: game?.getHost(),
+            players: game?.getPlayers()
+        }
+    }
+    const host = game?.getHost();
+    const host_socket = sessionRepository.getSocketID(host || '');
+    io.to(host_socket || '').emit('host:game-update', gameDTO);
+}
+
+function sendGameUpdatePlayers(gameID: string) {
+    const game = gameRepository.getGame(gameID);
+    const gameDTO = {
+        gameID: gameID,
+        gameState: {
+            phase: game?.getCurrentPhase(),
+            host: game?.getHost(),
+            players: game?.getPlayers()
+        }
+    }
+    const players = game?.getPlayers();
+    players?.forEach((player) => {
+        const player_socket = sessionRepository.getSocketID(player || '');
+        io.to(player_socket || '').emit('player:game-update', gameDTO);
     })
+}
 
-    socket.on('join-room', (roomCode) => {
-        const room = roomManager.getRoom(roomCode);
-        if (room) {
-            room.addPlayer(socket.id);
-            socket.emit('valid-room', { roomCode: roomCode, isHost: false })
+io.on('connection', (socket_before) => {
+
+    const socket = socket_before as CustomSocket;
+    socket.emit("session", socket.sessionID);
+
+    socket.on('host:create-game', () => {
+        const gameID = generateGameID();
+        const hostID = socket.sessionID;
+        gameRepository.addGame(gameID, new Game(hostID));
+        const game = gameRepository.getGame(gameID);
+        if (game) {
+            sendGameUpdateHost(gameID);
         } else {
-            socket.emit('invalid-room', roomCode);
+            console.log('error with creating game');
         }
     })
 
-    socket.on('send-image', ({ roomCode, image }) => {
-        const room = roomManager.getRoom(roomCode);
-        if (room) {
-            const host = room.getHost();
-            io.to(host).emit('send-image', image);
+    socket.on('player:join-game', (gameID) => {
+        const game = gameRepository.getGame(gameID);
+        if (game) {
+            game.addPlayer(socket.sessionID);
+            sendGameUpdatePlayers(gameID);
+            sendGameUpdateHost(gameID);
+        } else {
+            socket.emit('player:invalid-game', gameID);
+            console.log('error with joining game');
         }
+    })
+
+    socket.on('host:start-game', (gameID) => {
+        console.log('started game, ', gameID);
+        const game = gameRepository.getGame(gameID);
+        game?.startGame();
+        sendGameUpdateHost(gameID);
+        sendGameUpdatePlayers(gameID);
     })
 
 })

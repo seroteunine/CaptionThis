@@ -16,27 +16,35 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
+
+    # Server
+    - name: Setup Node.js for Server
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-
-    # Install and test server
+        cache-dependency-path: server/package-lock.json
     - name: Install server dependencies
       working-directory: ./server
-      run: npm ci
+      run: npm install
     - name: Build server
       working-directory: ./server
       run: npm run build --if-present
+    - name: Test server
+      working-directory: ./server
+      run: npm test
 
-    # Install and test client
+    # Client
+    - name: Setup Node.js for Client
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
     - name: Install client dependencies
       working-directory: ./client
-      run: npm ci
+      run: npm install
     - name: Build client
       working-directory: ./client
       run: npm run build --if-present
-    - name: Test client
-      working-directory: ./client
-      run: npm test
+
