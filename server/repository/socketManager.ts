@@ -1,4 +1,4 @@
-export class SessionRepository {
+export class SocketManager {
 
     connections: Map<string, string>;
 

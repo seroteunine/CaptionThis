@@ -3,10 +3,6 @@ const app = express();
 const http = require('http')
 import { Server, Socket } from 'socket.io'
 
-interface CustomSocket extends Socket {
-    sessionID: string;
-}
-
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
@@ -15,30 +11,12 @@ const io = new Server(server, {
     }
 });
 
-
-import { generateGameID, generateSessionID } from './utils';
-// import { GameController } from './controller/gameController';
-// const gameController = new GameController();
-import { GameRepository } from './repository/gameRepository';
-const gameRepository = new GameRepository();
-import { SessionRepository } from './repository/socketConnectionRepository';
-const sessionRepository = new SessionRepository();
-
-
-io.use((socket_before, next) => {
-    const socket = socket_before as CustomSocket;
-    const sessionID = socket.handshake.auth.sessionID;
-    if (sessionID) {
-        socket.sessionID = sessionID;
-        sessionRepository.addMapping(socket.sessionID, socket.id);
-        return next();
-    }
-    socket.sessionID = generateSessionID();
-    sessionRepository.addMapping(socket.sessionID, socket.id);
-    next();
-});
-
 import { Game } from './gamelogic/game';
+import { generateGameID, generateSessionID } from './utils';
+import { GameRepository } from './repository/gameRepository';
+import { SocketManager } from './repository/socketManager';
+const gameRepository = new GameRepository();
+const socketManager = new SocketManager();
 
 type GameDTO = {
     gameID: string;
@@ -49,37 +27,50 @@ type GameDTO = {
     };
 }
 
-function sendGameUpdateHost(gameID: string) {
-    const game = gameRepository.getGame(gameID);
-    const gameDTO = {
+function sendHostGameUpdate(game: Game, gameID: string) {
+    const host = game.getHost();
+    const gameDTO: GameDTO = {
         gameID: gameID,
         gameState: {
-            phase: game?.getCurrentPhase(),
-            host: game?.getHost(),
-            players: game?.getPlayers()
+            phase: game.getCurrentPhase().toString(),
+            host: host,
+            players: game.getPlayers()
         }
     }
-    const host = game?.getHost();
-    const host_socket = sessionRepository.getSocketID(host || '');
+    const host_socket = socketManager.getSocketID(host || '');
     io.to(host_socket || '').emit('host:game-update', gameDTO);
 }
 
-function sendGameUpdatePlayers(gameID: string) {
-    const game = gameRepository.getGame(gameID);
-    const gameDTO = {
+function sendPlayersGameUpdate(game: Game, gameID: string) {
+    const players = game.getPlayers();
+    const gameDTO: GameDTO = {
         gameID: gameID,
         gameState: {
-            phase: game?.getCurrentPhase(),
-            host: game?.getHost(),
-            players: game?.getPlayers()
+            phase: game.getCurrentPhase().toString(),
+            host: game.getHost(),
+            players: players
         }
     }
-    const players = game?.getPlayers();
-    players?.forEach((player) => {
-        const player_socket = sessionRepository.getSocketID(player || '');
+    players.forEach((player) => {
+        const player_socket = socketManager.getSocketID(player);
         io.to(player_socket || '').emit('player:game-update', gameDTO);
     })
 }
+
+interface CustomSocket extends Socket {
+    sessionID: string;
+}
+
+io.use((socket_before, next) => {
+    const socket = socket_before as CustomSocket;
+    let sessionID = socket.handshake.auth.sessionID;
+    if (!sessionID) {
+        sessionID = generateSessionID();
+    }
+    socket.sessionID = sessionID;
+    socketManager.addMapping(socket.sessionID, socket.id);
+    next();
+});
 
 io.on('connection', (socket_before) => {
 
@@ -89,21 +80,17 @@ io.on('connection', (socket_before) => {
     socket.on('host:create-game', () => {
         const gameID = generateGameID();
         const hostID = socket.sessionID;
-        gameRepository.addGame(gameID, new Game(hostID));
-        const game = gameRepository.getGame(gameID);
-        if (game) {
-            sendGameUpdateHost(gameID);
-        } else {
-            console.log('error with creating game');
-        }
+        const game = new Game(hostID);
+        gameRepository.addGame(gameID, game);
+        sendHostGameUpdate(game, gameID);
     })
 
     socket.on('player:join-game', (gameID) => {
         const game = gameRepository.getGame(gameID);
         if (game) {
             game.addPlayer(socket.sessionID);
-            sendGameUpdatePlayers(gameID);
-            sendGameUpdateHost(gameID);
+            sendPlayersGameUpdate(game, gameID);
+            sendHostGameUpdate(game, gameID);
         } else {
             socket.emit('player:invalid-game', gameID);
             console.log('error with joining game');
@@ -113,9 +100,13 @@ io.on('connection', (socket_before) => {
     socket.on('host:start-game', (gameID) => {
         console.log('started game, ', gameID);
         const game = gameRepository.getGame(gameID);
-        game?.startGame();
-        sendGameUpdateHost(gameID);
-        sendGameUpdatePlayers(gameID);
+        if (game) {
+            game.startGame();
+            sendHostGameUpdate(game, gameID);
+            sendPlayersGameUpdate(game, gameID);
+        } else {
+            console.log('error starting game, could not be found in repository.');
+        }
     })
 
 })

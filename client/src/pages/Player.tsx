@@ -7,12 +7,16 @@ type GameDTO = {
     };
 }
 
-function Player({ gameState }: { gameState: GameDTO }) {
+function Player({ gameDTO }: { gameDTO: GameDTO }) {
 
     return (
         <>
-            <h1>WaitingRoom - Player</h1>
-            {gameState.gameID}
+            <h1>Room: {gameDTO.gameID} - You're a player</h1>
+            <h2>Phase: {gameDTO.gameState.phase}</h2>
+            <h2>Players in this game:</h2>
+            {gameDTO.gameState.players.map((player) => (
+                <h3 key={player}>{player}</h3>
+            ))}
         </>
     )
 }

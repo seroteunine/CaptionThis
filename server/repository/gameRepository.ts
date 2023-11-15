@@ -16,8 +16,4 @@ export class GameRepository {
         return this.games.get(roomID);
     }
 
-    saveGame(roomID: string, game: Game) {
-        this.games.set(roomID, game);
-    }
-
 }
