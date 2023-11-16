@@ -3,7 +3,7 @@ import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
 type GameDTO = {
     phase: string;
     players: string[];
-    photos: ArrayBuffer[];
+    photos: { [k: string]: ArrayBuffer };
 }
 
 type RoomDTO = {
