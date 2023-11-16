@@ -73,9 +73,9 @@ function App() {
   const startgame = () => {
     if (roomDTO) {
       const roomID = roomDTO.roomID;
-      socket.emit('host:start-room', roomID);
+      socket.emit('host:start-game', roomID);
     } else {
-      console.log('room cannot be started because there is no roomstate.');
+      console.log('game cannot be started because there is no roomstate.');
     }
   }
 

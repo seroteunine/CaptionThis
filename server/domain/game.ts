@@ -1,5 +1,4 @@
 export enum Phase {
-    WAITING = "WAITING",
     PHOTO_UPLOAD = "PHOTO_UPLOAD",
     CAPTION = "CAPTION",
     VOTING = "VOTING",
@@ -12,7 +11,7 @@ export class Game {
     players: string[];
 
     constructor() {
-        this.gamePhase = Phase.WAITING;
+        this.gamePhase = Phase.PHOTO_UPLOAD;
         this.players = [];
     };
 
@@ -26,14 +25,6 @@ export class Game {
         }
         this.players.push(player);
     }
-
-    startGame() {
-        if (this.gamePhase === Phase.WAITING) {
-            this.gamePhase = Phase.PHOTO_UPLOAD;
-        } else {
-            throw new Error("Only allowed if phase is waiting");
-        }
-    };
 
     getCurrentPhase() {
         return this.gamePhase;

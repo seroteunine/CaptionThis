@@ -5,6 +5,7 @@ export class Room {
     roomID: string;
     hostID: string;
     playerIDs: string[];
+
     game: Game | undefined;
 
     constructor(roomID: string, hostID: string) {
@@ -34,6 +35,12 @@ export class Room {
             hostID: this.hostID,
             playerIDs: this.playerIDs,
             game: this.game ? this.game.getGameDTO() : undefined
+        }
+    }
+
+    startGame() {
+        if (this.playerIDs.length >= 3 && this.playerIDs.length <= 8) {
+            this.game = new Game();
         }
     }
 

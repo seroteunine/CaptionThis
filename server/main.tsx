@@ -3,7 +3,6 @@ const app = express();
 const http = require('http')
 
 import { Server, Socket } from 'socket.io'
-import { Game } from './domain/game';
 import { Room } from './domain/room';
 import { generateRoomID, generateSessionID } from './utils';
 
@@ -48,6 +47,11 @@ function sendPlayersRoomDTO(room: Room) {
     })
 }
 
+function sendEveryoneRoomDTO(room: Room) {
+    sendHostRoomDTO(room);
+    sendPlayersRoomDTO(room);
+}
+
 function resendRoomIfExists(sessionID: string) {
     for (let room of roomMap.values()) {
         const players = room.getPlayers();
@@ -84,6 +88,7 @@ io.on('connection', (socket_before) => {
         const room = new Room(roomID, hostID);
         roomMap.set(roomID, room);
         sendHostRoomDTO(room);
+        console.log(`host ${hostID} created room ${roomID}`);
     })
 
     socket.on('player:join-room', (roomID) => {
@@ -91,22 +96,18 @@ io.on('connection', (socket_before) => {
         const room = roomMap.get(roomID);
         if (room) {
             room.addPlayer(playerID);
-            sendHostRoomDTO(room);
-            sendPlayersRoomDTO(room);
+            sendEveryoneRoomDTO(room);
         }
     })
 
-    // socket.on('host:start-game', (gameID) => {
-    //     console.log('started game with code: ', gameID);
-    //     const game = gameManager.getGame(gameID);
-    //     if (!game) {
-    //         socket.emit('host:error', 'Game could not be started, because it couldnt be found.')
-    //         return;
-    //     }
-    //     game.startGame();
-    //     sendHostGameUpdate(game);
-    //     sendPlayersGameUpdate(game);
-    // })
+    socket.on('host:start-game', (gameID) => {
+        console.log(`host ${socket.sessionID} started game with ${gameID}`);
+        const room = roomMap.get(gameID);
+        if (room) {
+            room.startGame();
+            sendEveryoneRoomDTO(room);
+        }
+    })
 
 })
 
