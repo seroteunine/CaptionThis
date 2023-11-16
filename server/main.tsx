@@ -113,6 +113,10 @@ io.on('connection', (socket_before) => {
         }
     })
 
+    socket.on('player:send-image', (imageInputDTO) => {
+        console.log(`${socket.sessionID} sent image.`);
+    })
+
 })
 
 server.listen(5000, () => {

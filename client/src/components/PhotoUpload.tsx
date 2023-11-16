@@ -14,7 +14,7 @@ function PhotoUpload() {
     }
 
     function sendFile() {
-        socket.emit('testtest');
+        socket.emit('player:send-image', file);
     }
 
     return (
