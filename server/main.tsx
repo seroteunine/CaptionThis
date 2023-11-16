@@ -104,7 +104,11 @@ io.on('connection', (socket_before) => {
     socket.on('host:start-game', (gameID) => {
         const room = roomMap.get(gameID);
         if (room) {
-            room.startGame();
+            room.tryStartGame();
+            if (!room.hasGame()) {
+                socket.emit('host:invalid-gamestart');
+                return;
+            }
             sendEveryoneRoomDTO(room);
         }
     })
