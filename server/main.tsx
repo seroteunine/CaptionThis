@@ -93,16 +93,22 @@ io.on('connection', (socket_before) => {
     socket.on('player:join-room', (roomID) => {
         const playerID = socket.sessionID;
         const room = roomMap.get(roomID);
-        if (room) {
-            room.addPlayer(playerID);
-            sendEveryoneRoomDTO(room);
+        if (!room) {
+            socket.emit('player:invalid-room');
+            return;
         }
+        room.addPlayer(playerID);
+        sendEveryoneRoomDTO(room);
     })
 
     socket.on('host:start-game', (gameID) => {
         const room = roomMap.get(gameID);
         if (room) {
-            room.startGame();
+            room.tryStartGame();
+            if (!room.hasGame()) {
+                socket.emit('host:invalid-gamestart');
+                return;
+            }
             sendEveryoneRoomDTO(room);
         }
     })

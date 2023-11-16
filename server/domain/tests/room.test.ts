@@ -28,9 +28,9 @@ test('Game can not be started with 2 people', () => {
     room.addPlayer('111');
     room.addPlayer('222');
 
-    room.startGame();
+    room.tryStartGame();
 
-    expect(room.game).toBe(undefined);
+    expect(room.hasGame()).toBe(false);
 })
 
 test('Game can not be started with 9 people', () => {
@@ -46,9 +46,9 @@ test('Game can not be started with 9 people', () => {
     room.addPlayer('888');
     room.addPlayer('999');
 
-    room.startGame();
+    room.tryStartGame();
 
-    expect(room.game).toBe(undefined);
+    expect(room.hasGame()).toBe(false);
 })
 
 test('Game CAN be started with 5 people', () => {
@@ -60,9 +60,9 @@ test('Game CAN be started with 5 people', () => {
     room.addPlayer('444');
     room.addPlayer('555');
 
-    room.startGame();
+    room.tryStartGame();
 
-    expect(room.game).toBeDefined();
+    expect(room.hasGame()).toBe(true);
 })
 
 test('Players can not join when the game is already started', () => {
@@ -74,7 +74,8 @@ test('Players can not join when the game is already started', () => {
 
     expect(room.getPlayers().length).toBe(3);
 
-    room.startGame();
+    room.tryStartGame();
+
     room.addPlayer('444');
 
     expect(room.getPlayers().length).toBe(3);

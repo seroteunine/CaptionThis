@@ -44,6 +44,10 @@ function App() {
       setRoomDTO(roomDTO);
     })
 
+    socket.on('host:invalid-gamestart', () => {
+      alert('Game could not be started.')
+    })
+
     socket.on('player:room-update', (roomDTO) => {
       setIsPlayer(true);
       setRoomDTO(roomDTO);
@@ -56,6 +60,7 @@ function App() {
     return () => {
       socket.off('session');
       socket.off('host:room-update');
+      socket.off('host:invalid-gamestart');
       socket.off('player:room-update');
       socket.off('player:invalid-room');
     }

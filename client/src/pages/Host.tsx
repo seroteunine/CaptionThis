@@ -14,6 +14,8 @@ type RoomDTO = {
 
 function Host({ roomDTO, startGame }: { roomDTO: RoomDTO, startGame: MouseEventHandler<HTMLButtonElement> }) {
 
+    const isStartingDisallowed = roomDTO.playerIDs.length < 3 || roomDTO.playerIDs.length > 8;
+
     return (
         <>
             <h1>Room: {roomDTO.roomID} - You're the host {roomDTO.hostID}</h1>
@@ -26,7 +28,11 @@ function Host({ roomDTO, startGame }: { roomDTO: RoomDTO, startGame: MouseEventH
                 ?
                 <h2>Game is started and in phase: {roomDTO.game.phase}</h2>
                 :
-                <button onClick={startGame}> Start game </button>
+                <button
+                    className={`px-4 py-2 rounded font-bold text-white
+                        ${isStartingDisallowed ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'}`}
+                    onClick={startGame}
+                    disabled={isStartingDisallowed}> Start game </button>
             }
         </>
     )

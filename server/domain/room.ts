@@ -20,7 +20,7 @@ export class Room {
     }
 
     addPlayer(playerID: string) {
-        if (!this.playerIDs.includes(playerID) && !this.game) {
+        if (!this.playerIDs.includes(playerID) && !this.hasGame()) {
             this.playerIDs.push(playerID);
         }
     }
@@ -38,10 +38,14 @@ export class Room {
         }
     }
 
-    startGame() {
+    tryStartGame() {
         if (this.playerIDs.length >= 3 && this.playerIDs.length <= 8) {
             this.game = new Game();
         }
+    }
+
+    hasGame() {
+        return this.game ? true : false;
     }
 
 }
