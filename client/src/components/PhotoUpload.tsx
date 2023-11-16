@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useWebSocket } from "../context/socket";
 
 function PhotoUpload() {
+
+    const socket = useWebSocket()!;
 
     const [file, setFile] = useState<File>();
 
@@ -11,7 +14,7 @@ function PhotoUpload() {
     }
 
     function sendFile() {
-        console.log(file);
+        socket.emit('testtest');
     }
 
     return (
