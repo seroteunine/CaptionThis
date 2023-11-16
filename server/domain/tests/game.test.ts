@@ -1,14 +1,6 @@
-const { Game, Phase } = require('../game');
+import { Game, Phase } from '../game';
 
-test('New gamestate object is on waiting phase', () => {
+test('New gamestate object is on photoUpload phase', () => {
     const game = new Game();
-    expect(game.getCurrentPhase()).toBe(Phase.WAITING);
-});
-
-test('start game should go to photo upload phase', () => {
-    const game = new Game();
-
-    game.startGame();
-
     expect(game.getCurrentPhase()).toBe(Phase.PHOTO_UPLOAD);
 });

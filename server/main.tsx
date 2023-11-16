@@ -3,10 +3,8 @@ const app = express();
 const http = require('http')
 
 import { Server, Socket } from 'socket.io'
-import { Game } from './domain/game';
-import { generateGameID, generateSessionID } from './utils';
-import { GameManager } from './managers/gameManager';
-import { SocketManager } from './managers/socketManager';
+import { Room } from './domain/room';
+import { generateRoomID, generateSessionID } from './utils';
 
 const server = http.Server(app)
 const io = new Server(server, {
@@ -22,40 +20,50 @@ interface CustomSocket extends Socket {
 }
 
 type GameDTO = {
-    gameID: string;
     phase: string;
-    host: string;
     players: string[];
 }
 
-
-function sendHostGameUpdate(game: Game) {
-    const host = game.getHost();
-    const gameDTO: GameDTO = game.returnGameDTO();
-    const host_socket = socketManager.getSocketID(host || '');
-    io.to(host_socket || '').emit('host:game-update', gameDTO);
+type RoomDTO = {
+    roomID: string,
+    hostID: string,
+    playerIDs: string[],
+    game: GameDTO | undefined
 }
 
-function sendPlayersGameUpdate(game: Game) {
-    const players = game.getPlayers();
-    const gameDTO: GameDTO = game.returnGameDTO();
+function sendHostRoomDTO(room: Room) {
+    const roomDTO: RoomDTO = room.getRoomDTO();
+    const hostID = room.getHostID();
+    const hostSocketID = socketIDMap.get(hostID);
+    io.to(hostSocketID || '').emit('host:room-update', roomDTO);
+}
+
+function sendPlayersRoomDTO(room: Room) {
+    const roomDTO: RoomDTO = room.getRoomDTO();
+    const players = room.getPlayers();
     players.forEach((player) => {
-        const player_socket = socketManager.getSocketID(player);
-        io.to(player_socket || '').emit('player:game-update', gameDTO);
+        const playerSocketID = socketIDMap.get(player);
+        io.to(playerSocketID || '').emit('player:room-update', roomDTO);
     })
 }
 
-function sendGameIfExists(sessionID: string) {
-    const game = gameManager.getGameBySessionID(sessionID);
-    if (game) {
-        sendHostGameUpdate(game);
-        sendPlayersGameUpdate(game);
+function sendEveryoneRoomDTO(room: Room) {
+    sendHostRoomDTO(room);
+    sendPlayersRoomDTO(room);
+}
+
+function resendRoomIfExists(sessionID: string) {
+    for (let room of roomMap.values()) {
+        const players = room.getPlayers();
+        if (players.includes(sessionID) || room.getHostID() === sessionID) {
+            sendEveryoneRoomDTO(room);
+            return;
+        }
     }
 }
 
-
-const gameManager = new GameManager();
-const socketManager = new SocketManager();
+const socketIDMap = new Map<string, string>();
+const roomMap = new Map<string, Room>();
 
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
@@ -64,46 +72,39 @@ io.use((socket_before, next) => {
         sessionID = generateSessionID();
     }
     socket.sessionID = sessionID;
-    socketManager.addMapping(socket.sessionID, socket.id);
+    socketIDMap.set(socket.sessionID, socket.id);
     next();
 });
 
 io.on('connection', (socket_before) => {
-
     const socket = socket_before as CustomSocket;
-
     socket.emit("session", socket.sessionID);
-    sendGameIfExists(socket.sessionID);
+    resendRoomIfExists(socket.sessionID);
 
-    socket.on('host:create-game', () => {
-        const gameID = generateGameID();
+    socket.on('host:create-room', () => {
+        const roomID = generateRoomID();
         const hostID = socket.sessionID;
-        const game = new Game(gameID, hostID);
-        gameManager.addGame(game);
-        sendHostGameUpdate(game);
+        const room = new Room(roomID, hostID);
+        roomMap.set(roomID, room);
+        sendHostRoomDTO(room);
+        console.log(`host ${hostID} created room ${roomID}`);
     })
 
-    socket.on('player:join-game', (gameID) => {
-        const game = gameManager.getGame(gameID);
-        if (!game) {
-            socket.emit('player:invalid-game', gameID);
-            return;
+    socket.on('player:join-room', (roomID) => {
+        const playerID = socket.sessionID;
+        const room = roomMap.get(roomID);
+        if (room) {
+            room.addPlayer(playerID);
+            sendEveryoneRoomDTO(room);
         }
-        game.addPlayer(socket.sessionID);
-        sendPlayersGameUpdate(game);
-        sendHostGameUpdate(game);
     })
 
     socket.on('host:start-game', (gameID) => {
-        console.log('started game with code: ', gameID);
-        const game = gameManager.getGame(gameID);
-        if (!game) {
-            socket.emit('host:error', 'Game could not be started, because it couldnt be found.')
-            return;
+        const room = roomMap.get(gameID);
+        if (room) {
+            room.startGame();
+            sendEveryoneRoomDTO(room);
         }
-        game.startGame();
-        sendHostGameUpdate(game);
-        sendPlayersGameUpdate(game);
     })
 
 })
