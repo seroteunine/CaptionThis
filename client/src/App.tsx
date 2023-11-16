@@ -1,10 +1,9 @@
 import './index.css';
-
 import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import Host from './pages/Host';
 import Player from './pages/Player';
-import { useWebSocket } from './context/socket';
+import socket from './socket';
 
 type GameDTO = {
   phase: string;
@@ -20,8 +19,6 @@ type RoomDTO = {
 }
 
 function App() {
-
-  const socket = useWebSocket()!;
 
   const [roomCode, setRoomCode] = useState('');
   const [codeInvalid, setCodeInvalid] = useState(false);

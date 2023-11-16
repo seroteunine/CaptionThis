@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { useWebSocket } from "../../context/socket";
+import socket from '../../socket';
 
 function PhotoUploadPlayer() {
-
-    const socket = useWebSocket()!;
 
     const [file, setFile] = useState<File>();
 
