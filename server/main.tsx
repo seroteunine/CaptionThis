@@ -100,7 +100,6 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('host:start-game', (gameID) => {
-        console.log(`host ${socket.sessionID} started game with ${gameID}`);
         const room = roomMap.get(gameID);
         if (room) {
             room.startGame();
