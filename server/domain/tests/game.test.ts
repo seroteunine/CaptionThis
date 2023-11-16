@@ -1,16 +1,12 @@
 import { Game, Phase } from '../game';
 
-// Define mock global parameters that all tests can use
-const gameID: string = 'aB12';
-const host: string = 'abcd1234'
-
 test('New gamestate object is on waiting phase', () => {
-    const game = new Game(gameID, host);
+    const game = new Game();
     expect(game.getCurrentPhase()).toBe(Phase.WAITING);
 });
 
 test('start game should go to photo upload phase', () => {
-    const game = new Game(gameID, host);
+    const game = new Game();
 
     game.startGame();
 
@@ -18,7 +14,7 @@ test('start game should go to photo upload phase', () => {
 });
 
 test('no starting when its not in waiting phase', () => {
-    const game = new Game(gameID, host);
+    const game = new Game();
 
     game.startGame();
 
@@ -28,7 +24,7 @@ test('no starting when its not in waiting phase', () => {
 });
 
 test('no double players', () => {
-    const game = new Game(gameID, host);
+    const game = new Game();
 
     game.addPlayer('a123');
 

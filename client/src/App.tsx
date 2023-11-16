@@ -7,10 +7,15 @@ import Host from './pages/Host';
 import Player from './pages/Player';
 
 type GameDTO = {
-  gameID: string;
   phase: string;
-  host: string;
   players: string[];
+}
+
+type RoomDTO = {
+  roomID: string,
+  hostID: string,
+  playerIDs: string[],
+  game: GameDTO | undefined
 }
 
 function App() {
@@ -19,7 +24,7 @@ function App() {
   const [codeInvalid, setCodeInvalid] = useState(false);
   const [isPlayer, setIsPlayer] = useState(false);
   const [isHost, setIsHost] = useState(false);
-  const [gameDTO, setGameDTO] = useState<GameDTO>();
+  const [roomDTO, setRoomDTO] = useState<RoomDTO>();
 
   useEffect(() => {
     const sessionID = sessionStorage.getItem("sessionID");
@@ -34,50 +39,50 @@ function App() {
       sessionStorage.setItem("sessionID", sessionID);
     });
 
-    socket.on('host:game-update', (gameDTO) => {
+    socket.on('host:room-update', (roomDTO) => {
       setIsHost(true);
-      setGameDTO(gameDTO);
+      setRoomDTO(roomDTO);
     })
 
-    socket.on('player:game-update', (gameDTO) => {
+    socket.on('player:room-update', (roomDTO) => {
       setIsPlayer(true);
-      setGameDTO(gameDTO);
+      setRoomDTO(roomDTO);
     })
 
-    socket.on('player:invalid-game', () => {
+    socket.on('player:invalid-room', () => {
       setCodeInvalid(true);
     })
 
     return () => {
       socket.off('session');
-      socket.off('host:game-update');
-      socket.off('player:game-update');
-      socket.off('player:invalid-game');
+      socket.off('host:room-update');
+      socket.off('player:room-update');
+      socket.off('player:invalid-room');
     }
 
   }, []);
 
   const createRoom = () => {
-    socket.emit('host:create-game');
+    socket.emit('host:create-room');
   }
 
   const joinRoom = () => {
-    socket.emit('player:join-game', roomCode);
+    socket.emit('player:join-room', roomCode);
   }
 
-  const startGame = () => {
-    if (gameDTO) {
-      const gameID = gameDTO.gameID;
-      socket.emit('host:start-game', gameID);
+  const startgame = () => {
+    if (roomDTO) {
+      const roomID = roomDTO.roomID;
+      socket.emit('host:start-room', roomID);
     } else {
-      console.log('game cannot be started because there is no gamestate.');
+      console.log('room cannot be started because there is no roomstate.');
     }
   }
 
   return (
     <div className='min-h-screen bg-blue-100 font-bold'>
-      {isHost ? <Host gameDTO={gameDTO!} startGame={startGame}></Host> :
-        isPlayer ? <Player gameDTO={gameDTO!}></Player> :
+      {isHost ? <Host roomDTO={roomDTO!} startGame={startgame}></Host> :
+        isPlayer ? <Player roomDTO={roomDTO!}></Player> :
           <Home createRoom={createRoom} joinRoom={joinRoom} setRoomCode={setRoomCode} codeInvalid={codeInvalid}></Home>
       }
     </div>

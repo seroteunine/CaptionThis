@@ -1,20 +1,21 @@
 type GameDTO = {
-    gameID: string;
     phase: string;
-    host: string;
     players: string[];
 }
 
-function Player({ gameDTO }: { gameDTO: GameDTO }) {
+type RoomDTO = {
+    roomID: string,
+    hostID: string,
+    playerIDs: string[],
+    game: GameDTO | undefined
+}
+
+function Player({ roomDTO }: { roomDTO: RoomDTO }) {
 
     return (
         <>
-            <h1>Room: {gameDTO.gameID} - You're a player</h1>
-            <h2>Phase: {gameDTO.phase}</h2>
-            <h2>Players in this game:</h2>
-            {gameDTO.players.map((player) => (
-                <h3 key={player}>{player}</h3>
-            ))}
+            <h1>Room: {roomDTO.roomID} - You're a player</h1>
+            {roomDTO.game ? <h2>Game is started. </h2> : <h2>Wait for game to start.</h2>}
         </>
     )
 }

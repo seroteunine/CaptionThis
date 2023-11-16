@@ -1,21 +1,26 @@
 import { MouseEventHandler } from "react"
 
 type GameDTO = {
-    gameID: string;
     phase: string;
-    host: string;
     players: string[];
 }
 
-function Host({ gameDTO, startGame }: { gameDTO: GameDTO, startGame: MouseEventHandler<HTMLButtonElement> }) {
+type RoomDTO = {
+    roomID: string,
+    hostID: string,
+    playerIDs: string[],
+    game: GameDTO | undefined
+}
+
+function Host({ roomDTO, startGame }: { roomDTO: RoomDTO, startGame: MouseEventHandler<HTMLButtonElement> }) {
 
     return (
         <>
-            <h1>Room: {gameDTO.gameID} - You're the host</h1>
-            <h2>Gamephase: {gameDTO.phase}</h2>
+            <h1>Room: {roomDTO.roomID} - You're the host {roomDTO.hostID}</h1>
+            {roomDTO.game ? <h2>Game is started</h2> : <h2>Wait for the game to start</h2>}
             <button onClick={startGame}> Start game </button>
-            <h2>Players in this game:</h2>
-            {gameDTO.players.map((player) => (
+            <h3>Players:</h3>
+            {roomDTO.playerIDs.map((player) => (
                 <h3 key={player}>{player}</h3>
             ))}
         </>
