@@ -22,6 +22,7 @@ interface CustomSocket extends Socket {
 type GameDTO = {
     phase: string;
     players: string[];
+    photos: ArrayBuffer[];
 }
 
 type RoomDTO = {
@@ -52,15 +53,22 @@ function sendEveryoneRoomDTO(room: Room) {
     sendPlayersRoomDTO(room);
 }
 
-function resendRoomIfExists(sessionID: string) {
+function getRoomBySessionID(sessionID: string) {
     for (let room of roomMap.values()) {
         const players = room.getPlayers();
         if (players.includes(sessionID) || room.getHostID() === sessionID) {
-            sendEveryoneRoomDTO(room);
-            return;
+            return room;
         }
     }
 }
+
+function resendRoomIfExists(sessionID: string) {
+    const room = getRoomBySessionID(sessionID);
+    if (room) {
+        sendEveryoneRoomDTO(room);
+    }
+}
+
 
 const socketIDMap = new Map<string, string>();
 const roomMap = new Map<string, Room>();
@@ -101,8 +109,8 @@ io.on('connection', (socket_before) => {
         sendEveryoneRoomDTO(room);
     })
 
-    socket.on('host:start-game', (gameID) => {
-        const room = roomMap.get(gameID);
+    socket.on('host:start-game', (roomID) => {
+        const room = roomMap.get(roomID);
         if (room) {
             room.tryStartGame();
             if (!room.hasGame()) {
@@ -114,7 +122,11 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('player:send-image', (imageInputDTO) => {
-        console.log(`${socket.sessionID} sent image.`);
+        const room = getRoomBySessionID(socket.sessionID);
+        if (room) {
+            room.addPhoto(socket.sessionID, imageInputDTO);
+            sendEveryoneRoomDTO(room);
+        }
     })
 
 })

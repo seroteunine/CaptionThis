@@ -9,6 +9,7 @@ import { useWebSocket } from './context/socket';
 type GameDTO = {
   phase: string;
   players: string[];
+  photos: ArrayBuffer[];
 }
 
 type RoomDTO = {

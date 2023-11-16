@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useWebSocket } from "../context/socket";
+import { useWebSocket } from "../../context/socket";
 
-function PhotoUpload() {
+function PhotoUploadPlayer() {
 
     const socket = useWebSocket()!;
 
@@ -25,4 +25,4 @@ function PhotoUpload() {
     )
 }
 
-export default PhotoUpload
+export default PhotoUploadPlayer

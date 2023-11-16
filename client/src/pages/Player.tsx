@@ -1,8 +1,9 @@
-import PhotoUpload from "../components/PhotoUpload";
+import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
 
 type GameDTO = {
     phase: string;
     players: string[];
+    photos: ArrayBuffer[];
 }
 
 type RoomDTO = {
@@ -19,7 +20,7 @@ function Player({ roomDTO }: { roomDTO: RoomDTO }) {
             <h1>Room: {roomDTO.roomID} - You're a player</h1>
 
             {roomDTO.game ?
-                <PhotoUpload></PhotoUpload>
+                <PhotoUploadPlayer></PhotoUploadPlayer>
                 :
                 <h2>Wait for game to start.</h2>
             }
