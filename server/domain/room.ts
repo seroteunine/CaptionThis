@@ -20,7 +20,7 @@ export class Room {
     }
 
     addPlayer(playerID: string) {
-        if (!this.playerIDs.includes(playerID)) {
+        if (!this.playerIDs.includes(playerID) && !this.game) {
             this.playerIDs.push(playerID);
         }
     }

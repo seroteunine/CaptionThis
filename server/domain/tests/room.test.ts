@@ -64,3 +64,18 @@ test('Game CAN be started with 5 people', () => {
 
     expect(room.game).toBeDefined();
 })
+
+test('Players can not join when the game is already started', () => {
+    const room = new Room(roomID, hostID);
+
+    room.addPlayer('111');
+    room.addPlayer('222');
+    room.addPlayer('333');
+
+    expect(room.getPlayers().length).toBe(3);
+
+    room.startGame();
+    room.addPlayer('444');
+
+    expect(room.getPlayers().length).toBe(3);
+})

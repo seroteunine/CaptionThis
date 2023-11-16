@@ -56,8 +56,7 @@ function resendRoomIfExists(sessionID: string) {
     for (let room of roomMap.values()) {
         const players = room.getPlayers();
         if (players.includes(sessionID) || room.getHostID() === sessionID) {
-            sendHostRoomDTO(room);
-            sendPlayersRoomDTO(room);
+            sendEveryoneRoomDTO(room);
             return;
         }
     }
