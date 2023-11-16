@@ -1,8 +1,10 @@
 import { MouseEventHandler } from "react"
+import PhotoUploadHost from "../components/host/PhotoUploadHost";
 
 type GameDTO = {
     phase: string;
     players: string[];
+    photos: ArrayBuffer[];
 }
 
 type RoomDTO = {
@@ -26,7 +28,7 @@ function Host({ roomDTO, startGame }: { roomDTO: RoomDTO, startGame: MouseEventH
 
             {roomDTO.game
                 ?
-                <h2>Game is started and in phase: {roomDTO.game.phase}</h2>
+                <PhotoUploadHost gameDTO={roomDTO.game}></PhotoUploadHost>
                 :
                 <button
                     className={`px-4 py-2 rounded font-bold text-white

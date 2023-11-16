@@ -1,4 +1,4 @@
-import { Game } from "./game";
+import { Game, Phase } from "./game";
 
 export class Room {
 
@@ -46,6 +46,12 @@ export class Room {
 
     hasGame() {
         return this.game ? true : false;
+    }
+
+    addPhoto(playerID: string, photo: ArrayBuffer) {
+        if (this.hasGame() && this.game?.gamePhase === Phase.PHOTO_UPLOAD) {
+            this.game.addPhoto(photo);
+        }
     }
 
 }

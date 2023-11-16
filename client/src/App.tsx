@@ -2,13 +2,14 @@ import './index.css';
 
 import { useEffect, useState } from 'react';
 import Home from './pages/Home';
-import socket from './socket';
 import Host from './pages/Host';
 import Player from './pages/Player';
+import { useWebSocket } from './context/socket';
 
 type GameDTO = {
   phase: string;
   players: string[];
+  photos: ArrayBuffer[];
 }
 
 type RoomDTO = {
@@ -20,6 +21,8 @@ type RoomDTO = {
 
 function App() {
 
+  const socket = useWebSocket()!;
+
   const [roomCode, setRoomCode] = useState('');
   const [codeInvalid, setCodeInvalid] = useState(false);
   const [isPlayer, setIsPlayer] = useState(false);
@@ -27,6 +30,7 @@ function App() {
   const [roomDTO, setRoomDTO] = useState<RoomDTO>();
 
   useEffect(() => {
+
     const sessionID = sessionStorage.getItem("sessionID");
 
     if (sessionID) {
@@ -64,7 +68,6 @@ function App() {
       socket.off('player:room-update');
       socket.off('player:invalid-room');
     }
-
   }, []);
 
   const createRoom = () => {
