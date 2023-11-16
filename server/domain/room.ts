@@ -50,7 +50,7 @@ export class Room {
 
     addPhoto(playerID: string, photo: ArrayBuffer) {
         if (this.hasGame() && this.game?.gamePhase === Phase.PHOTO_UPLOAD) {
-            this.game.addPhoto(photo);
+            this.game.addPhoto(playerID, photo);
         }
     }
 

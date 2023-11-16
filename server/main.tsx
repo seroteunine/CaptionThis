@@ -22,7 +22,7 @@ interface CustomSocket extends Socket {
 type GameDTO = {
     phase: string;
     players: string[];
-    photos: ArrayBuffer[];
+    photos: { [k: string]: ArrayBuffer };
 }
 
 type RoomDTO = {
