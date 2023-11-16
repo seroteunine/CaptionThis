@@ -20,7 +20,7 @@ function PhotoUploadPlayer() {
     return (
         <div>
             <h1>Photo uploading phase</h1>
-            <input onChange={selectFile} type="file"></input><button onClick={sendFile}>Use this image</button>
+            <input onChange={selectFile} type="file"></input><button className="px-4 py-2 rounded font-bold bg-white" onClick={sendFile}>Use this image</button>
         </div>
     )
 }
