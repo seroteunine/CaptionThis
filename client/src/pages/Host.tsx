@@ -1,4 +1,7 @@
+import CaptionHost from "../components/host/CaptionHost";
+import EndHost from "../components/host/EndHost";
 import PhotoUploadHost from "../components/host/PhotoUploadHost";
+import VotingHost from "../components/host/VotingHost";
 import { useRoom } from "../context/RoomContext";
 import { startGame } from "../service/SocketService";
 
@@ -24,7 +27,14 @@ function Host() {
 
             {roomDTO!.game
                 ?
-                <PhotoUploadHost></PhotoUploadHost>
+                <div>
+                    {{
+                        "PHOTO_UPLOAD": <PhotoUploadHost></PhotoUploadHost>,
+                        "CAPTION": <CaptionHost></CaptionHost>,
+                        "VOTING": <VotingHost></VotingHost>,
+                        "END": <EndHost></EndHost>
+                    }[roomDTO!.game.phase]}
+                </div>
                 :
                 <button
                     className={`px-4 py-2 rounded font-bold text-white

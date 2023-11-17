@@ -125,6 +125,14 @@ io.on('connection', (socket_before) => {
         }
     })
 
+    socket.on('host:next-phase', (roomID) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame()) {
+            room.game!.nextPhase();
+            sendEveryoneRoomDTO(room);
+        }
+    })
+
     socket.on('player:send-image', (imageInputDTO) => {
         const room = getRoomByPlayerID(socket.playerID);
         if (room) {

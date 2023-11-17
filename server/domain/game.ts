@@ -36,6 +36,24 @@ export class Game {
         this.photos.set(playerName, photo);
     }
 
+    nextPhase() {
+        switch (this.gamePhase) {
+            case Phase.PHOTO_UPLOAD:
+                this.gamePhase = Phase.CAPTION;
+                break;
+            case Phase.CAPTION:
+                this.gamePhase = Phase.VOTING;
+                break;
+            case Phase.VOTING:
+                this.gamePhase = Phase.END;
+                break;
+            case Phase.END:
+                throw new Error("Game is already in the final phase");
+            default:
+                throw new Error("Invalid game phase");
+        }
+    }
+
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),
