@@ -7,14 +7,14 @@ import socket from './socket';
 
 type GameDTO = {
   phase: string;
-  players: string[];
+  playerNames: string[];
   photos: { [k: string]: ArrayBuffer };
 }
 
 type RoomDTO = {
   roomID: string,
   hostID: string,
-  playerIDs: string[],
+  playersIDToName: { [k: string]: string };
   game: GameDTO | undefined
 }
 
@@ -28,16 +28,16 @@ function App() {
 
   useEffect(() => {
 
-    const sessionID = sessionStorage.getItem("sessionID");
+    const playerID = sessionStorage.getItem("playerID");
 
-    if (sessionID) {
-      socket.auth = { sessionID };
-      sessionStorage.setItem("sessionID", sessionID);
+    if (playerID) {
+      socket.auth = { playerID };
+      sessionStorage.setItem("sessionID", playerID);
     }
 
-    socket.on("session", (sessionID) => {
-      socket.auth = { sessionID };
-      sessionStorage.setItem("sessionID", sessionID);
+    socket.on("playerID", (playerID) => {
+      socket.auth = { playerID };
+      sessionStorage.setItem("playerID", playerID);
     });
 
     socket.on('host:room-update', (roomDTO) => {
@@ -59,7 +59,7 @@ function App() {
     })
 
     return () => {
-      socket.off('session');
+      socket.off('playerID');
       socket.off('host:room-update');
       socket.off('host:invalid-gamestart');
       socket.off('player:room-update');

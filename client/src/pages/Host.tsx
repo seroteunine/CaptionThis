@@ -3,28 +3,28 @@ import PhotoUploadHost from "../components/host/PhotoUploadHost";
 
 type GameDTO = {
     phase: string;
-    players: string[];
+    playerNames: string[];
     photos: { [k: string]: ArrayBuffer };
 }
 
 type RoomDTO = {
     roomID: string,
     hostID: string,
-    playerIDs: string[],
+    playersIDToName: { [k: string]: string };
     game: GameDTO | undefined
 }
 
 function Host({ roomDTO, startGame }: { roomDTO: RoomDTO, startGame: MouseEventHandler<HTMLButtonElement> }) {
 
-    const isStartingDisallowed = roomDTO.playerIDs.length < 3 || roomDTO.playerIDs.length > 8;
+    const isStartingDisallowed = Object.keys(roomDTO.playersIDToName).length < 3 || Object.keys(roomDTO.playersIDToName).length > 8;
 
     return (
         <>
             <h1>Room: {roomDTO.roomID} - You're the host {roomDTO.hostID}</h1>
             <h3>Players:</h3>
-            {roomDTO.playerIDs.map((player) => (
-                <h3 key={player}>{player}</h3>))
-            }
+            {Object.entries(roomDTO.playersIDToName).map(([key, value]) => (
+                <h3 key={key}>{value}</h3>
+            ))}
 
             {roomDTO.game
                 ?

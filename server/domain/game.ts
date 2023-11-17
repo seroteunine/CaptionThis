@@ -8,24 +8,24 @@ export enum Phase {
 export class Game {
 
     gamePhase: Phase;
-    players: string[];
+    playerNames: string[];
     photos: Map<string, ArrayBuffer>;
 
     constructor() {
         this.gamePhase = Phase.PHOTO_UPLOAD;
-        this.players = [];
+        this.playerNames = [];
         this.photos = new Map<string, ArrayBuffer>();
     };
 
     getPlayers() {
-        return this.players;
+        return this.playerNames;
     }
 
     addPlayer(player: string) {
-        if (this.players.includes(player)) {
+        if (this.playerNames.includes(player)) {
             throw new Error();
         }
-        this.players.push(player);
+        this.playerNames.push(player);
     }
 
     getCurrentPhase() {
@@ -39,7 +39,7 @@ export class Game {
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),
-            players: this.players,
+            playerNames: this.playerNames,
             photos: Object.fromEntries(this.photos.entries())
         }
     }
