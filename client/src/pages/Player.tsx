@@ -1,7 +1,11 @@
 import { useState } from "react";
-import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
 import { sendName } from "../service/SocketService";
 import { useRoom } from "../context/RoomContext";
+
+import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
+import CaptionPlayer from "../components/player/CaptionPlayer";
+import VotingPlayer from "../components/player/VotingPlayer";
+import EndPlayer from "../components/player/EndPlayer";
 
 function Player() {
 
@@ -22,7 +26,14 @@ function Player() {
             <h1>Room: {roomDTO!.roomID} - You're a player</h1>
 
             {roomDTO!.game ?
-                <PhotoUploadPlayer></PhotoUploadPlayer>
+                <div>
+                    {{
+                        "PHOTO_UPLOAD": <PhotoUploadPlayer></PhotoUploadPlayer>,
+                        "CAPTION": <CaptionPlayer></CaptionPlayer>,
+                        "VOTING": <VotingPlayer></VotingPlayer>,
+                        "END": <EndPlayer></EndPlayer>
+                    }[roomDTO!.game.phase]}
+                </div>
                 :
                 <div>
                     <h2>Wait for game to start.</h2>

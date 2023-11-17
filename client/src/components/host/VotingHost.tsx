@@ -1,12 +1,11 @@
-import { useRoom } from "../../context/RoomContext";
+import NextPhaseButton from "./NextPhaseButton";
 
 function VotingHost() {
-
-    const { roomDTO } = useRoom();
 
     return (
         <div>
             <h1>Voting phase</h1>
+            <NextPhaseButton nextPhase="End"></NextPhaseButton>
         </div>
     )
 }

@@ -1,9 +1,9 @@
+import { useRoom } from "../context/RoomContext";
+import { startGame } from "../service/SocketService";
 import CaptionHost from "../components/host/CaptionHost";
 import EndHost from "../components/host/EndHost";
 import PhotoUploadHost from "../components/host/PhotoUploadHost";
 import VotingHost from "../components/host/VotingHost";
-import { useRoom } from "../context/RoomContext";
-import { startGame } from "../service/SocketService";
 
 function Host() {
 

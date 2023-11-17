@@ -1,4 +1,4 @@
-function EndHost() {
+function EndPlayer() {
 
     return (
         <div>
@@ -7,4 +7,4 @@ function EndHost() {
     )
 }
 
-export default EndHost
+export default EndPlayer
