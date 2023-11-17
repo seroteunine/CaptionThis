@@ -88,6 +88,8 @@ io.use((socket_before, next) => {
 
 io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
+
+    //For reconnected clients
     socket.emit("playerID", socket.playerID);
     resendRoomIfExists(socket.playerID);
 
