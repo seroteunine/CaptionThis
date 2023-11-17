@@ -19,7 +19,9 @@ test('Players can be added to the room', () => {
 
     room.addPlayer('qwer1234');
 
-    expect(room.getPlayers()).toStrictEqual(['qwer1234']);
+    const expectedMap = new Map();
+    expectedMap.set('qwer1234', 'qwer1234')
+    expect(room.getPlayers()).toStrictEqual(expectedMap);
 });
 
 test('Game can not be started with 2 people', () => {
