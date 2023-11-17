@@ -32,8 +32,8 @@ export class Game {
         return this.gamePhase;
     };
 
-    addPhoto(sessionID: string, photo: ArrayBuffer) {
-        this.photos.set(sessionID, photo);
+    addPhoto(playerName: string, photo: ArrayBuffer) {
+        this.photos.set(playerName, photo);
     }
 
     getGameDTO() {
