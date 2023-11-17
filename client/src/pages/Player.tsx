@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
-import * as SocketService from "../service/SocketService";
+import { sendName } from "../service/SocketService";
 import { useRoom } from "../context/RoomContext";
 
 function Player() {
@@ -14,7 +14,7 @@ function Player() {
     }
 
     function handleSendName() {
-        SocketService.sendName(username);
+        sendName(username);
     }
 
     return (

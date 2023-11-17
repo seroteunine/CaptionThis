@@ -1,6 +1,6 @@
 import socket from '../socket';
 
-//Emitters
+
 export function createRoom() {
     socket.emit('host:create-room');
 }
@@ -19,5 +19,9 @@ export function sendFile(file: File) {
 
 export function startGame(roomID: string) {
     socket.emit('host:start-game', roomID);
+}
+
+export function goNextPhase(roomID: string) {
+    socket.emit('host:next-phase', roomID)
 }
 
