@@ -10,7 +10,6 @@ function ImageComponent({ arrayBuffer }: { arrayBuffer: ArrayBuffer }) {
 
             setImageUrl(url);
 
-            // Cleanup
             return () => {
                 URL.revokeObjectURL(url);
             };
