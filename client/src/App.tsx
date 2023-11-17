@@ -9,6 +9,7 @@ import { useRoom } from './context/RoomContext';
 function App() {
 
   const [codeInvalid, setCodeInvalid] = useState(false);
+  const playerID = sessionStorage.getItem("playerID");
 
   const { roomDTO, setRoomDTO } = useRoom();
 
@@ -22,8 +23,15 @@ function App() {
       setRoomDTO(roomDTO);
     })
 
+    socket.on('host:invalid-gamestart', () => {
+      alert('Game could not be started.')
+    })
+
+    socket.on('player:invalid-room', () => {
+      setCodeInvalid(true);
+    })
+
     //For reconnections
-    const playerID = sessionStorage.getItem("playerID");
     if (playerID) {
       socket.auth = { playerID };
       sessionStorage.setItem("sessionID", playerID);
@@ -33,20 +41,12 @@ function App() {
       sessionStorage.setItem("playerID", playerID);
     });
 
-    socket.on('host:invalid-gamestart', () => {
-      alert('Game could not be started.')
-    })
-
-    socket.on('player:invalid-room', () => {
-      setCodeInvalid(true);
-    })
-
     return () => {
       socket.off('host:room-update');
       socket.off('player:room-update');
-      socket.off('playerID');
       socket.off('host:invalid-gamestart');
       socket.off('player:invalid-room');
+      socket.off('playerID');
     }
   }, []);
 
@@ -56,7 +56,7 @@ function App() {
       {!roomDTO ?
         <Home codeInvalid={codeInvalid}></Home>
         :
-        roomDTO.hostID ?
+        (roomDTO.hostID === playerID) ?
           <Host></Host> :
           <Player></Player>
       }

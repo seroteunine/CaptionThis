@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { sendFile as Service_sendFile } from '../../service/SocketService';
+import { sendFile } from '../../service/SocketService';
 
 function PhotoUploadPlayer() {
 
@@ -13,7 +13,7 @@ function PhotoUploadPlayer() {
 
     function handleSendFile() {
         if (file) {
-            Service_sendFile(file);
+            sendFile(file);
         }
     }
 
