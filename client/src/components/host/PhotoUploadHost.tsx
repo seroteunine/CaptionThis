@@ -2,7 +2,7 @@ import ImageComponent from "./ImageComponent";
 
 type GameDTO = {
     phase: string;
-    players: string[];
+    playerNames: string[];
     photos: { [k: string]: ArrayBuffer };
 }
 

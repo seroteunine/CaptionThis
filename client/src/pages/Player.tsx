@@ -1,19 +1,31 @@
+import { useState } from "react";
 import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
+import socket from "../socket";
 
 type GameDTO = {
     phase: string;
-    players: string[];
+    playerNames: string[];
     photos: { [k: string]: ArrayBuffer };
 }
 
 type RoomDTO = {
     roomID: string,
     hostID: string,
-    playerIDs: string[],
+    playersIDToName: { [k: string]: string };
     game: GameDTO | undefined
 }
 
 function Player({ roomDTO }: { roomDTO: RoomDTO }) {
+
+    const [username, setUsername] = useState('');
+
+    function setValue(e: React.ChangeEvent<HTMLInputElement>) {
+        setUsername(e.target.value);
+    }
+
+    function sendName() {
+        socket.emit('player:set-name', username);
+    }
 
     return (
         <>
@@ -22,7 +34,10 @@ function Player({ roomDTO }: { roomDTO: RoomDTO }) {
             {roomDTO.game ?
                 <PhotoUploadPlayer></PhotoUploadPlayer>
                 :
-                <h2>Wait for game to start.</h2>
+                <div>
+                    <h2>Wait for game to start.</h2>
+                    <input type="text" placeholder="New name" onChange={(e) => setValue(e)}></input><button onClick={sendName}>Change name</button>
+                </div>
             }
         </>
     )

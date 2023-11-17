@@ -72,11 +72,11 @@ test('Players can not join when the game is already started', () => {
     room.addPlayer('222');
     room.addPlayer('333');
 
-    expect(room.getPlayers().length).toBe(3);
+    expect(room.getPlayers().size).toBe(3);
 
     room.tryStartGame();
 
     room.addPlayer('444');
 
-    expect(room.getPlayers().length).toBe(3);
+    expect(room.getPlayers().size).toBe(3);
 })

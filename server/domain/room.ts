@@ -4,14 +4,14 @@ export class Room {
 
     roomID: string;
     hostID: string;
-    playerIDs: string[];
+    playersIDToName: Map<string, string>;
 
     game: Game | undefined;
 
     constructor(roomID: string, hostID: string) {
         this.roomID = roomID;
         this.hostID = hostID;
-        this.playerIDs = [];
+        this.playersIDToName = new Map<string, string>();
         this.game = undefined;
     }
 
@@ -20,26 +20,36 @@ export class Room {
     }
 
     addPlayer(playerID: string) {
-        if (!this.playerIDs.includes(playerID) && !this.hasGame()) {
-            this.playerIDs.push(playerID);
+        if (!this.playersIDToName.has(playerID) && !this.hasGame()) {
+            this.playersIDToName.set(playerID, playerID);
         }
     }
 
+    setPlayerName(playerID: string, playerName: string) {
+        if (!this.playersIDToName.has(playerID)) {
+            throw new Error('Name could not be set because the playerID is not in the room.');
+        }
+        if (this.game) {
+            throw new Error('Name could not be set because the game already started.');
+        }
+        this.playersIDToName.set(playerID, playerName);
+    }
+
     getPlayers() {
-        return this.playerIDs;
+        return this.playersIDToName;
     }
 
     getRoomDTO() {
         return {
             roomID: this.roomID,
             hostID: this.hostID,
-            playerIDs: this.playerIDs,
+            playersIDToName: Object.fromEntries(this.playersIDToName.entries()),
             game: this.game ? this.game.getGameDTO() : undefined
         }
     }
 
     tryStartGame() {
-        if (this.playerIDs.length >= 3 && this.playerIDs.length <= 8) {
+        if (this.playersIDToName.size >= 3 && this.playersIDToName.size <= 8) {
             this.game = new Game();
         }
     }
@@ -49,8 +59,9 @@ export class Room {
     }
 
     addPhoto(playerID: string, photo: ArrayBuffer) {
-        if (this.hasGame() && this.game?.gamePhase === Phase.PHOTO_UPLOAD) {
-            this.game.addPhoto(playerID, photo);
+        const playerName = this.playersIDToName.get(playerID);
+        if (this.hasGame() && this.game?.gamePhase === Phase.PHOTO_UPLOAD && playerName) {
+            this.game.addPhoto(playerName, photo);
         }
     }
 

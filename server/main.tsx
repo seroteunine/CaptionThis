@@ -4,7 +4,7 @@ const http = require('http')
 
 import { Server, Socket } from 'socket.io'
 import { Room } from './domain/room';
-import { generateRoomID, generateSessionID } from './utils';
+import { generateRoomID, generatePlayerID } from './utils';
 
 const server = http.Server(app)
 const io = new Server(server, {
@@ -16,21 +16,22 @@ const io = new Server(server, {
 
 
 interface CustomSocket extends Socket {
-    sessionID: string;
+    playerID: string;
 }
 
 type GameDTO = {
     phase: string;
-    players: string[];
+    playerNames: string[];
     photos: { [k: string]: ArrayBuffer };
 }
 
 type RoomDTO = {
     roomID: string,
     hostID: string,
-    playerIDs: string[],
+    playersIDToName: { [k: string]: string };
     game: GameDTO | undefined
 }
+
 
 function sendHostRoomDTO(room: Room) {
     const roomDTO: RoomDTO = room.getRoomDTO();
@@ -42,10 +43,10 @@ function sendHostRoomDTO(room: Room) {
 function sendPlayersRoomDTO(room: Room) {
     const roomDTO: RoomDTO = room.getRoomDTO();
     const players = room.getPlayers();
-    players.forEach((player) => {
-        const playerSocketID = socketIDMap.get(player);
+    for (const playerID of players.keys()) {
+        const playerSocketID = socketIDMap.get(playerID);
         io.to(playerSocketID || '').emit('player:room-update', roomDTO);
-    })
+    }
 }
 
 function sendEveryoneRoomDTO(room: Room) {
@@ -53,17 +54,17 @@ function sendEveryoneRoomDTO(room: Room) {
     sendPlayersRoomDTO(room);
 }
 
-function getRoomBySessionID(sessionID: string) {
+function getRoomByPlayerID(playerID: string) {
     for (let room of roomMap.values()) {
         const players = room.getPlayers();
-        if (players.includes(sessionID) || room.getHostID() === sessionID) {
+        if (players.has(playerID) || room.getHostID() === playerID) {
             return room;
         }
     }
 }
 
-function resendRoomIfExists(sessionID: string) {
-    const room = getRoomBySessionID(sessionID);
+function resendRoomIfExists(playerID: string) {
+    const room = getRoomByPlayerID(playerID);
     if (room) {
         sendEveryoneRoomDTO(room);
     }
@@ -73,25 +74,26 @@ function resendRoomIfExists(sessionID: string) {
 const socketIDMap = new Map<string, string>();
 const roomMap = new Map<string, Room>();
 
+
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
-    let sessionID = socket.handshake.auth.sessionID;
-    if (!sessionID) {
-        sessionID = generateSessionID();
+    let playerID = socket.handshake.auth.playerID;
+    if (!playerID) {
+        playerID = generatePlayerID();
     }
-    socket.sessionID = sessionID;
-    socketIDMap.set(socket.sessionID, socket.id);
+    socket.playerID = playerID;
+    socketIDMap.set(socket.playerID, socket.id);
     next();
 });
 
 io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
-    socket.emit("session", socket.sessionID);
-    resendRoomIfExists(socket.sessionID);
+    socket.emit("playerID", socket.playerID);
+    resendRoomIfExists(socket.playerID);
 
     socket.on('host:create-room', () => {
         const roomID = generateRoomID();
-        const hostID = socket.sessionID;
+        const hostID = socket.playerID;
         const room = new Room(roomID, hostID);
         roomMap.set(roomID, room);
         sendHostRoomDTO(room);
@@ -99,7 +101,7 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('player:join-room', (roomID) => {
-        const playerID = socket.sessionID;
+        const playerID = socket.playerID;
         const room = roomMap.get(roomID);
         if (!room) {
             socket.emit('player:invalid-room');
@@ -122,9 +124,17 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('player:send-image', (imageInputDTO) => {
-        const room = getRoomBySessionID(socket.sessionID);
+        const room = getRoomByPlayerID(socket.playerID);
         if (room) {
-            room.addPhoto(socket.sessionID, imageInputDTO);
+            room.addPhoto(socket.playerID, imageInputDTO);
+            sendEveryoneRoomDTO(room);
+        }
+    })
+
+    socket.on('player:set-name', (newName) => {
+        const room = getRoomByPlayerID(socket.playerID);
+        if (room) {
+            room.setPlayerName(socket.playerID, newName);
             sendEveryoneRoomDTO(room);
         }
     })
