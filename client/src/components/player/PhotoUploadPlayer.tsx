@@ -1,5 +1,5 @@
 import { useState } from "react";
-import socket from '../../socket';
+import { sendFile as Service_sendFile } from '../../service/SocketService';
 
 function PhotoUploadPlayer() {
 
@@ -11,14 +11,16 @@ function PhotoUploadPlayer() {
         }
     }
 
-    function sendFile() {
-        socket.emit('player:send-image', file);
+    function handleSendFile() {
+        if (file) {
+            Service_sendFile(file);
+        }
     }
 
     return (
         <div>
             <h1>Photo uploading phase</h1>
-            <input onChange={selectFile} type="file"></input><button className="px-4 py-2 rounded font-bold bg-white" onClick={sendFile}>Use this image</button>
+            <input onChange={selectFile} type="file"></input><button className="px-4 py-2 rounded font-bold bg-white" onClick={handleSendFile}>Use this image</button>
         </div>
     )
 }
