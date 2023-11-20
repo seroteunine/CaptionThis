@@ -34,4 +34,5 @@ jobs:
             # Run server
             cd ../server
             npm install
-            npm run dev
+            npx tsc
+            pm2 start dist/main.js --name "Backend"
