@@ -9,7 +9,7 @@ import { generateRoomID, generatePlayerID } from './utils';
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "http://teunvandalen.nl",
         methods: ["GET", "POST"]
     }
 });
