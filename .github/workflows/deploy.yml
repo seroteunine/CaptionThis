@@ -25,13 +25,11 @@ jobs:
         working-directory: ./client
         run: npm run build
       - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/scp-action@v0.1.4
         with: 
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu/CaptionThis/frontend
-            rm -rf *
-            scp -r -i ${{ secrets.PRIVATE_KEY }} $GITHUB_WORKSPACE/client/dist/* ${{ secrets.DEPLOY_USERNAME }}@${{ secrets.DEPLOY_HOST }}:/home/ubuntu/CaptionThis/frontend
-      
+          port: 22
+          source: ./client/dist/*
+          target: "/home/ubuntu/CaptionThis/frontend"
