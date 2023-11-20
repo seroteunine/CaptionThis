@@ -70,6 +70,11 @@ function resendRoomIfExists(playerID: string) {
     }
 }
 
+function removeConnectionIfDead(playerID: string) {
+    const socketID = socketIDMap.get(playerID);
+    // TODO: ping the user and remove the playerID if this user doesnt send a pong in 5 seconds.
+}
+
 
 const socketIDMap = new Map<string, string>();
 const roomMap = new Map<string, Room>();
@@ -147,6 +152,10 @@ io.on('connection', (socket_before) => {
             room.setPlayerName(socket.playerID, newName);
             sendEveryoneRoomDTO(room);
         }
+    })
+
+    socket.on('disconnect', () => {
+        removeConnectionIfDead(socket.playerID);
     })
 
 })
