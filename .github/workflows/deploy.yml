@@ -33,5 +33,6 @@ jobs:
           script: |
             cd /home/ubuntu/CaptionThis/frontend
             rm -rf *
+            ls -R $GITHUB_WORKSPACE
             cp -r $GITHUB_WORKSPACE/CaptionThis/client/dist/* .
       
