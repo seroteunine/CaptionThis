@@ -33,6 +33,8 @@ jobs:
           script: |
             cd /home/ubuntu/CaptionThis/frontend
             rm -rf *
-            ls -R $GITHUB_WORKSPACE
-            cp -r $GITHUB_WORKSPACE/CaptionThis/client/dist/* .
+            rsync -r -e "ssh -i deploy_key" \
+            --delete-after \
+            $GITHUB_WORKSPACE/client/dist/ \
+            ${{ secrets.DEPLOY_USERNAME }}@${{ secrets.DEPLOY_HOST }}:/home/ubuntu/CaptionThis/frontend
       
