@@ -34,7 +34,6 @@ function App() {
     //For reconnections
     if (playerID) {
       socket.auth = { playerID };
-      sessionStorage.setItem("sessionID", playerID);
     }
     socket.on("playerID", (playerID) => {
       socket.auth = { playerID };
