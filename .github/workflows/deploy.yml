@@ -33,3 +33,4 @@ jobs:
           port: 22
           source: ./client/dist/*
           target: "/home/ubuntu/CaptionThis/frontend"
+          strip_components: 2
