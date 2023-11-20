@@ -17,20 +17,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
-      - name: Install dependencies frontend
-        working-directory: ./client
-        run: npm install
-      - name: Build client
-        working-directory: ./client
-        run: npm run build
-      - name: Deploy to server
-        uses: appleboy/scp-action@v0.1.4
-        with: 
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
-          port: 22
-          source: ./client/dist/*
-          target: "/home/ubuntu/CaptionThis/frontend"
-          strip_components: 2
+      
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/CaptionThis 
+            git pull origin master
+            # Build client
+            cd client
+            npm install
+            npm run build
+            # Run server
+            cd ../server
+            npm install
+            npm run dev
