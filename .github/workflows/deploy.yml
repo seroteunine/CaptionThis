@@ -33,5 +33,5 @@ jobs:
           script: |
             cd /home/ubuntu/CaptionThis/frontend
             rm -rf *
-            cp -r $GITHUB_WORKSPACE/client/dist/* .
+            cp -r $GITHUB_WORKSPACE/CaptionThis/client/dist/* .
       
