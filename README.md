@@ -1,10 +1,20 @@
-## The core idea of your project. What will users be able to do? Which problems does your project solve?
-'Caption This' is an online multi-player party game where players caption eachother photos. Funniest caption wins!
+## Caption This
+'Caption This' is a web-based game where players get to caption photos shared by others in real-time, inspired by the Jackbox TV party-games. Each round,players come up with the funniest, quirkiest, or most relevant captions. All players then vote on the caption the like the most. The funniest caption wins the round, and the game continues, ensuring endless laughter and enjoyment. 
 
-## Running the application. Which commands do you need to start the software?
-One client creates a room, that device will act as the host/presentation view. Players can join the room with the room code via their mobile phone. Both of these connect with the socket.io server in the server folder.
+## Getting started. 
+Go to teunvandalen.nl to play the game. No installing needed. One client creates a room, that device will act as the host/presentation view. Players can join the room with the room code via their mobile phone. Both of these connect with the socket.io server in the server folder.
 
-## Install instructions. Which software do you need to install? How should those be configured?
-See the specific folders for install instructions.
+## Optional: Install instructions.
+You can also run the server yourself on your local device, see the specific folders for install instructions. You could also run the vite development server for the front-end locally. 
 
-## Running (unit) tests
+## Back-end technologies
+- Typescript
+- Socket.io
+
+## Front-end technologies
+- Typescript
+- Vite (Development server)
+- Socket.io - client
+- React
+- Tailwind
+
