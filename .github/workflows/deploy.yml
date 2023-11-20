@@ -23,7 +23,7 @@ jobs:
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USERNAME }}
-          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/CaptionThis 
             git pull origin master
