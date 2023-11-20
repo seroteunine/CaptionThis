@@ -35,4 +35,5 @@ jobs:
             cd ../server
             npm install
             npx tsc
+            pm2 kill
             pm2 start dist/main.js --name "Backend"
