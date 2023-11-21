@@ -40,6 +40,8 @@ export class Game {
         switch (this.gamePhase) {
             case Phase.PHOTO_UPLOAD:
                 if (this.checkAllPlayersHavePhoto()) {
+                    console.log('true apparently', this.photos);
+
                     this.gamePhase = Phase.CAPTION;
                 }
                 break;
