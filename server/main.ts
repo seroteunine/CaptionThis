@@ -173,7 +173,6 @@ io.on('connection', (socket_before) => {
             const authorPlayername = room.playersIDToName.get(socket.playerID)!;
             game.addCaption(authorPlayername, captionInput.caption, captionInput.ownerOfPhoto);
             sendHostRoomDTO(room);
-            console.log(game);
         }
     })
 
