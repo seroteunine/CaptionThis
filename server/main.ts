@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express();
 const http = require('http')
+import dotenv from 'dotenv';
+dotenv.config();
 
 import { Server, Socket } from 'socket.io'
 import { Room } from './domain/room';
@@ -9,7 +11,7 @@ import { generateRoomID, generatePlayerID } from './utils';
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
-        origin: "http://teunvandalen.nl",
+        origin: process.env.MY_SERVICE_URL,
         methods: ["GET", "POST"]
     }
 });
