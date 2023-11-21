@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express();
 const http = require('http')
+import dotenv from 'dotenv';
+dotenv.config();
 
 import { Server, Socket } from 'socket.io'
 import { Room } from './domain/room';
@@ -9,7 +11,7 @@ import { generateRoomID, generatePlayerID } from './utils';
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
-        origin: "http://teunvandalen.nl",
+        origin: process.env.MY_SERVICE_URL,
         methods: ["GET", "POST"]
     }
 });
@@ -68,6 +70,11 @@ function resendRoomIfExists(playerID: string) {
     if (room) {
         sendEveryoneRoomDTO(room);
     }
+}
+
+function removeConnectionIfDead(playerID: string) {
+    const socketID = socketIDMap.get(playerID);
+    // TODO: ping the user and remove the playerID if this user doesnt send a pong in 5 seconds.
 }
 
 
@@ -147,6 +154,10 @@ io.on('connection', (socket_before) => {
             room.setPlayerName(socket.playerID, newName);
             sendEveryoneRoomDTO(room);
         }
+    })
+
+    socket.on('disconnect', () => {
+        removeConnectionIfDead(socket.playerID);
     })
 
 })
