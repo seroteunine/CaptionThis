@@ -4,6 +4,7 @@ type GameDTO = {
     phase: string;
     playerNames: string[];
     photos: { [k: string]: ArrayBuffer };
+    captions: { [owner: string]: { [author: string]: string } };
 }
 
 type RoomDTO = {

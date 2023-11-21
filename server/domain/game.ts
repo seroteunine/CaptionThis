@@ -10,11 +10,13 @@ export class Game {
     gamePhase: Phase;
     playerNames: string[];
     photos: Map<string, ArrayBuffer>;
+    captions: Map<string, Map<string, string>>; //Map<ownerOfPhoto(=photo_identifier), Map<authorOfCaption, caption>>
 
     constructor() {
         this.gamePhase = Phase.PHOTO_UPLOAD;
         this.playerNames = [];
         this.photos = new Map<string, ArrayBuffer>();
+        this.captions = new Map<string, Map<string, string>>();
     };
 
     getPlayers() {
@@ -39,10 +41,14 @@ export class Game {
     nextPhase() {
         switch (this.gamePhase) {
             case Phase.PHOTO_UPLOAD:
-                this.gamePhase = Phase.CAPTION;
+                if (this.checkAllPlayersHavePhoto()) {
+                    this.gamePhase = Phase.CAPTION;
+                }
                 break;
             case Phase.CAPTION:
-                this.gamePhase = Phase.VOTING;
+                if (this.checkAllPhotosHaveCaption()) {
+                    this.gamePhase = Phase.VOTING;
+                }
                 break;
             case Phase.VOTING:
                 this.gamePhase = Phase.END;
@@ -54,11 +60,52 @@ export class Game {
         }
     }
 
+    checkAllPlayersHavePhoto() {
+        return this.playerNames.every(playerName => this.photos.has(playerName));
+    }
+
+    checkAllPhotosHaveCaption() {
+        for (const [ownerOfPhoto] of this.photos) {
+            const captionsForPhoto = this.captions.get(ownerOfPhoto);
+
+            if (!captionsForPhoto) {
+                return false;
+            }
+
+            const otherPlayers = this.playerNames.filter(player => player !== ownerOfPhoto);
+            for (const player of otherPlayers) {
+                if (!captionsForPhoto.has(player)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    addCaption(author: string, caption: string, ownerOfPhoto: string) {
+        this.checkValidCaption(author, ownerOfPhoto);
+        let captionsForPhoto = this.captions.get(ownerOfPhoto);
+        if (!captionsForPhoto) {
+            captionsForPhoto = new Map<string, string>();
+            this.captions.set(ownerOfPhoto, captionsForPhoto);
+        }
+        captionsForPhoto.set(author, caption);
+    }
+
+    checkValidCaption(author: string, ownerOfPhoto: string) {
+        if (author === ownerOfPhoto) {
+            throw new Error('Not allowed to caption your own photo.');
+        }
+    }
+
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),
             playerNames: this.playerNames,
-            photos: Object.fromEntries(this.photos.entries())
+            photos: Object.fromEntries(this.photos.entries()),
+            captions: Object.fromEntries(
+                Array.from(this.captions.entries()).map(([owner, captionsMap]) =>
+                    [owner, Object.fromEntries(captionsMap)]))
         }
     }
 

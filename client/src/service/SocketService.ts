@@ -25,3 +25,9 @@ export function goNextPhase(roomID: string) {
     socket.emit('host:next-phase', roomID)
 }
 
+export function sendCaption(caption: string, ownerOfPhoto: string) {
+    socket.emit('player:send-caption', {
+        caption: caption,
+        ownerOfPhoto: ownerOfPhoto
+    })
+}
