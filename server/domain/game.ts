@@ -39,7 +39,9 @@ export class Game {
     nextPhase() {
         switch (this.gamePhase) {
             case Phase.PHOTO_UPLOAD:
-                this.gamePhase = Phase.CAPTION;
+                if (this.checkAllPlayersHavePhoto()) {
+                    this.gamePhase = Phase.CAPTION;
+                }
                 break;
             case Phase.CAPTION:
                 this.gamePhase = Phase.VOTING;
@@ -52,6 +54,10 @@ export class Game {
             default:
                 throw new Error("Invalid game phase");
         }
+    }
+
+    checkAllPlayersHavePhoto() {
+        return this.playerNames.every(playerName => this.photos.has(playerName));
     }
 
     getGameDTO() {
