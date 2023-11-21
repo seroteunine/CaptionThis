@@ -34,6 +34,7 @@ jobs:
             # Run server
             cd ../server
             npm install
+            rm -rf .env
             echo "MY_SERVICE_URL=${{ secrets.PRODUCTION_MY_SERVICE_URL }}" >> .env
             npx tsc
             pm2 kill
