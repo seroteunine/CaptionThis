@@ -9,6 +9,8 @@ import { Room } from './domain/room';
 import { generateRoomID, generatePlayerID } from './utils';
 
 console.log(process.env.MY_SERVICE_URL);
+console.log('test');
+
 
 const server = http.Server(app)
 const io = new Server(server, {
