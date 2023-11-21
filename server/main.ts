@@ -160,6 +160,10 @@ io.on('connection', (socket_before) => {
         }
     })
 
+    socket.on('player:send-caption', (captionInput) => {
+        console.log(captionInput);
+    })
+
     socket.on('disconnect', () => {
         removeConnectionIfDead(socket.playerID);
     })
