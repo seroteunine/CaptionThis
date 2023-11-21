@@ -34,7 +34,7 @@ jobs:
             # Run server
             cd ../server
             npm install
-            echo "MY_SERVICE_URL='http://teunvandalen.nltest2'" >> .env
+            echo "MY_SERVICE_URL=${{ secrets.MY_SERVICE_URL }}" >> .env
             npx tsc
             pm2 kill
             pm2 start dist/main.js --name "Backend"
