@@ -168,11 +168,11 @@ io.on('connection', (socket_before) => {
 
     socket.on('player:send-caption', (captionInput: CaptionInputDTO) => {
         const room = getRoomByPlayerID(socket.playerID);
-        if (room && room.hasGame()) {
+        if (room && room.hasGame() && room.playersIDToName.get(socket.playerID)) {
             const game = room.game!;
-            game.addCaption(socket.playerID, captionInput.caption, captionInput.ownerOfPhoto);
+            const authorPlayername = room.playersIDToName.get(socket.playerID)!;
+            game.addCaption(authorPlayername, captionInput.caption, captionInput.ownerOfPhoto);
             sendHostRoomDTO(room);
-            console.log(game);
         }
     })
 
