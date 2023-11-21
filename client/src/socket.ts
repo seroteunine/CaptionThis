@@ -1,7 +1,6 @@
 import { io } from "socket.io-client";
 
-const URL = window.location.href + ":5000";
-const socket = io(URL);
+const socket = io(":5000");
 
 socket.onAny((event, ...args) => {
     console.log(event, args);
