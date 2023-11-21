@@ -14,7 +14,7 @@ console.log(process.env.MY_SERVICE_URL);
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost",
+        origin: process.env.PRODUCTION ? "http://teunvandalen.nl" : "http://localhost:5173",
         methods: ["GET", "POST"]
     }
 });
