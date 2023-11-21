@@ -10,11 +10,13 @@ export class Game {
     gamePhase: Phase;
     playerNames: string[];
     photos: Map<string, ArrayBuffer>;
+    captions: Map<string, Map<string, string>>; //Map<ownerOfPhoto(=photo_identifier), Map<authorOfCaption, caption>>
 
     constructor() {
         this.gamePhase = Phase.PHOTO_UPLOAD;
         this.playerNames = [];
         this.photos = new Map<string, ArrayBuffer>();
+        this.captions = new Map<string, Map<string, string>>();
     };
 
     getPlayers() {
@@ -44,7 +46,9 @@ export class Game {
                 }
                 break;
             case Phase.CAPTION:
-                this.gamePhase = Phase.VOTING;
+                if (this.checkAllPhotosHaveCaption()) {
+                    this.gamePhase = Phase.VOTING;
+                }
                 break;
             case Phase.VOTING:
                 this.gamePhase = Phase.END;
@@ -60,11 +64,27 @@ export class Game {
         return this.playerNames.every(playerName => this.photos.has(playerName));
     }
 
+    checkAllPhotosHaveCaption() {
+        return true;
+    }
+
+    addCaption(author: string, caption: string, ownerOfPhoto: string) {
+        let captionsForPhoto = this.captions.get(ownerOfPhoto);
+        if (!captionsForPhoto) {
+            captionsForPhoto = new Map<string, string>();
+            this.captions.set(ownerOfPhoto, captionsForPhoto);
+        }
+        captionsForPhoto.set(author, caption);
+    }
+
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),
             playerNames: this.playerNames,
-            photos: Object.fromEntries(this.photos.entries())
+            photos: Object.fromEntries(this.photos.entries()),
+            captions: Object.fromEntries(
+                Array.from(this.captions.entries()).map(([owner, captionsMap]) =>
+                    [owner, Object.fromEntries(captionsMap)]))
         }
     }
 

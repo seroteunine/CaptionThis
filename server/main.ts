@@ -29,6 +29,7 @@ type GameDTO = {
     phase: string;
     playerNames: string[];
     photos: { [k: string]: ArrayBuffer };
+    captions: { [owner: string]: { [author: string]: string } };
 }
 
 type RoomDTO = {
@@ -36,6 +37,11 @@ type RoomDTO = {
     hostID: string,
     playersIDToName: { [k: string]: string };
     game: GameDTO | undefined
+}
+
+type CaptionInputDTO = {
+    caption: string,
+    ownerOfPhoto: string
 }
 
 
@@ -160,8 +166,14 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('player:send-caption', (captionInput) => {
-        console.log(captionInput);
+    socket.on('player:send-caption', (captionInput: CaptionInputDTO) => {
+        const room = getRoomByPlayerID(socket.playerID);
+        if (room && room.hasGame()) {
+            const game = room.game!;
+            game.addCaption(socket.playerID, captionInput.caption, captionInput.ownerOfPhoto);
+            sendHostRoomDTO(room);
+            console.log(game);
+        }
     })
 
     socket.on('disconnect', () => {
