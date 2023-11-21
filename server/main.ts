@@ -10,11 +10,10 @@ import { generateRoomID, generatePlayerID } from './utils';
 
 console.log(process.env.MY_SERVICE_URL);
 
-
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
-        origin: process.env.MY_SERVICE_URL ? process.env.MY_SERVICE_URL : "http://localhost:5174",
+        origin: process.env.MY_SERVICE_URL,
         methods: ["GET", "POST"]
     }
 });
