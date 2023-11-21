@@ -65,16 +65,37 @@ export class Game {
     }
 
     checkAllPhotosHaveCaption() {
+        for (const [ownerOfPhoto] of this.photos) {
+            const captionsForPhoto = this.captions.get(ownerOfPhoto);
+
+            if (!captionsForPhoto) {
+                return false;
+            }
+
+            const otherPlayers = this.playerNames.filter(player => player !== ownerOfPhoto);
+            for (const player of otherPlayers) {
+                if (!captionsForPhoto.has(player)) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
     addCaption(author: string, caption: string, ownerOfPhoto: string) {
+        this.checkValidCaption(author, ownerOfPhoto);
         let captionsForPhoto = this.captions.get(ownerOfPhoto);
         if (!captionsForPhoto) {
             captionsForPhoto = new Map<string, string>();
             this.captions.set(ownerOfPhoto, captionsForPhoto);
         }
         captionsForPhoto.set(author, caption);
+    }
+
+    checkValidCaption(author: string, ownerOfPhoto: string) {
+        if (author === ownerOfPhoto) {
+            throw new Error('Not allowed to caption your own photo.');
+        }
     }
 
     getGameDTO() {
