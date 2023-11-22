@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { sendName } from "../service/SocketService";
 import { useRoom } from "../context/RoomContext";
 
@@ -6,6 +6,17 @@ import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
 import CaptionPlayer from "../components/player/CaptionPlayer";
 import VotingPlayer from "../components/player/VotingPlayer";
 import EndPlayer from "../components/player/EndPlayer";
+import socket from "../socket";
+
+type Caption = {
+    authorPlayerID: string,
+    captionText: string
+}
+
+type CaptionedPhotoDTO = {
+    owner: string,
+    captions: Caption[]
+}
 
 function Player() {
 
@@ -21,6 +32,28 @@ function Player() {
         sendName(username);
     }
 
+    
+    const [isOwnPhoto, setIsOwnPhoto] = useState(false);
+    const [captions, setCaptions] = useState<Caption[]>();
+
+    useEffect(() => {
+        socket.on('player:captioned-photo', (captionDTO: CaptionedPhotoDTO) => {
+            setCaptions(captionDTO.captions);
+            setIsOwnPhoto(false);
+        })
+
+        socket.on('player:own-photo', () => {
+            setCaptions(undefined);
+            setIsOwnPhoto(true);
+        })
+
+        return () => {
+            socket.off('player:captioned-photo');
+            socket.off('player:own-photo');
+        }
+
+    }, [])
+
     return (
         <>
             <h1>Room: {roomDTO!.roomID} - You're a player</h1>
@@ -30,7 +63,7 @@ function Player() {
                     {{
                         "PHOTO_UPLOAD": <PhotoUploadPlayer></PhotoUploadPlayer>,
                         "CAPTION": <CaptionPlayer></CaptionPlayer>,
-                        "VOTING": <VotingPlayer></VotingPlayer>,
+                        "VOTING": <VotingPlayer captions={captions!} isOwnPhoto={isOwnPhoto}></VotingPlayer>,
                         "END": <EndPlayer></EndPlayer>
                     }[roomDTO!.game.phase]}
                 </div>

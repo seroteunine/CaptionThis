@@ -82,7 +82,11 @@ function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO
     const players = room.getPlayers();
     for (const playerID of players.keys()) {
         const playerSocketID = socketIDMap.get(playerID);
-        io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhoto);
+        if (players.get(playerID) === captionedPhoto.owner){
+            io.to(playerSocketID || '').emit('player:own-photo');
+        } else {
+            io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhoto);
+        }
     }
 }
 
