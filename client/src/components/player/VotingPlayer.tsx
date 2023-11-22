@@ -5,6 +5,10 @@ type Caption = {
 
 function VotingPlayer({captions, isOwnPhoto} : {captions: Caption[], isOwnPhoto: Boolean}) {
 
+    const handleVote = (authorOfCaptionPlayerID: string) => {
+        console.log('voted on :', authorOfCaptionPlayerID);
+    };
+
     return (
         <div>
             <h1>Voting phase</h1>
@@ -19,7 +23,7 @@ function VotingPlayer({captions, isOwnPhoto} : {captions: Caption[], isOwnPhoto:
                         <div>
                             <h2>Vote on your favourite caption:</h2>
                             {captions.map((caption) => (
-                                <h3 key={caption.authorPlayerID}>{caption.captionText}</h3>
+                                <button onClick={() => handleVote(caption.authorPlayerID)} className="bg-white p-2 m-2" key={caption.authorPlayerID}>{caption.captionText}</button>
                             ))}
                         </div>
                     )}
