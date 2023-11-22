@@ -194,10 +194,13 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('host:request-next-photo', (currentIndex: number) => {
+
         const room = getRoomByPlayerID(socket.playerID);
         if (room && room.hasGame()){
             const game = room.game!;
             const captionedPhoto = game.getCaptionedPhoto(currentIndex);
+            console.log(currentIndex, captionedPhoto);
+            
             sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
             // sendPlayersCaptionedPhoto(captionedPhoto);
         }
