@@ -25,11 +25,18 @@ interface CustomSocket extends Socket {
     playerID: string;
 }
 
+type Caption = {
+    authorPlayerID: string;
+    ownerPlayerID: string;
+    captionText: string;
+    votedBy: string[];
+}
+
 type GameDTO = {
     phase: string;
     playerNames: string[];
     photos: { [k: string]: ArrayBuffer };
-    captions: { [owner: string]: { [author: string]: string } };
+    captions: Caption[];
 }
 
 type RoomDTO = {
