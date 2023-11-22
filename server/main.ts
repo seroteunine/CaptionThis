@@ -78,6 +78,14 @@ function sendPlayersRoomDTO(room: Room) {
     }
 }
 
+function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO){
+    const players = room.getPlayers();
+    for (const playerID of players.keys()) {
+        const playerSocketID = socketIDMap.get(playerID);
+        io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhoto);
+    }
+}
+
 function sendEveryoneRoomDTO(room: Room) {
     sendHostRoomDTO(room);
     sendPlayersRoomDTO(room);
@@ -202,7 +210,7 @@ io.on('connection', (socket_before) => {
             console.log(currentIndex, captionedPhoto);
             
             sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
-            // sendPlayersCaptionedPhoto(captionedPhoto);
+            sendPlayersCaptionedPhoto(room, captionedPhoto);
         }
     })
 
