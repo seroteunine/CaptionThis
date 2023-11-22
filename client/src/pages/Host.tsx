@@ -9,7 +9,7 @@ function Host() {
 
     const { roomDTO } = useRoom();
 
-    const isStartingDisallowed = Object.keys(roomDTO!.playersIDToName).length < 3 || Object.keys(roomDTO!.playersIDToName).length > 8;
+    const isStartingDisallowed = Object.keys(roomDTO!.playersIDToName).length < 4 || Object.keys(roomDTO!.playersIDToName).length > 8;
 
     function handleStartGame() {
         if (roomDTO) {
