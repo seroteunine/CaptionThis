@@ -110,6 +110,21 @@ export class Game {
         }
     }
 
+    getCaptionedPhoto(currentIndex: number){
+        const photoOwner = Array.from(this.photos.keys())[currentIndex];
+        const captions = this.captions
+            .filter((caption) => caption.ownerPlayerID === photoOwner)
+            .map(({ authorPlayerID, captionText }) => ({
+                authorPlayerID,
+                captionText,
+            }));
+        const captionedPhoto = {
+            owner: photoOwner,
+            captions: captions
+        }
+        return captionedPhoto;
+    }
+
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),

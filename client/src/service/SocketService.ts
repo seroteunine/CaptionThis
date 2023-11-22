@@ -31,3 +31,7 @@ export function sendCaption(caption: string, ownerOfPhoto: string) {
         ownerOfPhoto: ownerOfPhoto
     })
 }
+
+export function sendNextPhotoRequest(currentIndex: number){
+    socket.emit('host:request-next-photo', currentIndex);
+}

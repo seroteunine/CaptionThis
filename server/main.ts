@@ -51,12 +51,22 @@ type CaptionInputDTO = {
     ownerOfPhoto: string
 }
 
+type CaptionedPhotoDTO = {
+    owner: string,
+    captions: {authorPlayerID:string, captionText:string}[]
+}
+
 
 function sendHostRoomDTO(room: Room) {
     const roomDTO: RoomDTO = room.getRoomDTO();
     const hostID = room.getHostID();
     const hostSocketID = socketIDMap.get(hostID);
     io.to(hostSocketID || '').emit('host:room-update', roomDTO);
+}
+
+function sendHostCaptionedPhoto(hostID: string, captionedPhoto: CaptionedPhotoDTO){
+    const hostSocketID = socketIDMap.get(hostID);
+    io.to(hostSocketID || '').emit('host:captioned-photo', captionedPhoto)
 }
 
 function sendPlayersRoomDTO(room: Room) {
@@ -180,6 +190,16 @@ io.on('connection', (socket_before) => {
             const authorPlayername = room.playersIDToName.get(socket.playerID)!;
             game.addCaption(authorPlayername, captionInput.caption, captionInput.ownerOfPhoto);
             sendHostRoomDTO(room);
+        }
+    })
+
+    socket.on('host:request-next-photo', (currentIndex: number) => {
+        const room = getRoomByPlayerID(socket.playerID);
+        if (room && room.hasGame()){
+            const game = room.game!;
+            const captionedPhoto = game.getCaptionedPhoto(currentIndex);
+            sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
+            // sendPlayersCaptionedPhoto(captionedPhoto);
         }
     })
 
