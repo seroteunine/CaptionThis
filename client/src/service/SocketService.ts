@@ -35,3 +35,7 @@ export function sendCaption(caption: string, ownerOfPhoto: string) {
 export function sendNextPhotoRequest(currentIndex: number){
     socket.emit('host:request-next-photo', currentIndex);
 }
+
+export function sendVote(authorPlayerID: string){
+    socket.emit('player:send-vote', authorPlayerID);
+}

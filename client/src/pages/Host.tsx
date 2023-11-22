@@ -40,7 +40,7 @@ function Host() {
                     className={`px-4 py-2 rounded font-bold text-white
                         ${isStartingDisallowed ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'}`}
                     onClick={handleStartGame}
-                    disabled={isStartingDisallowed}> Start game (you need 3 to 8 players) </button>
+                    disabled={isStartingDisallowed}> Start game (you need 4 to 8 players) </button>
             }
         </>
     )

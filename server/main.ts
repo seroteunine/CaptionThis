@@ -82,11 +82,13 @@ function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO
     const players = room.getPlayers();
     for (const playerID of players.keys()) {
         const playerSocketID = socketIDMap.get(playerID);
-        if (players.get(playerID) === captionedPhoto.owner){
-            io.to(playerSocketID || '').emit('player:own-photo');
-        } else {
-            io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhoto);
-        }
+
+        const captionedPhotoOwnExcluded = {
+            owner: captionedPhoto.owner,
+            captions: captionedPhoto.captions.filter(caption => caption.authorPlayerID !== players.get(playerID))
+        }; //To make sure that you cant vote on yourself
+
+        io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhotoOwnExcluded);
     }
 }
 
@@ -206,17 +208,19 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('host:request-next-photo', (currentIndex: number) => {
-
         const room = getRoomByPlayerID(socket.playerID);
         if (room && room.hasGame()){
             const game = room.game!;
             const captionedPhoto = game.getCaptionedPhoto(currentIndex);
-            console.log(currentIndex, captionedPhoto);
-            
             sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
             sendPlayersCaptionedPhoto(room, captionedPhoto);
         }
     })
+
+    socket.on('player:send-vote', (authorOfCaption) => {
+        console.log(socket.playerID, authorOfCaption);
+        
+    })  
 
     socket.on('disconnect', () => {
         removeConnectionIfDead(socket.playerID);

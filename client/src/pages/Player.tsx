@@ -32,24 +32,16 @@ function Player() {
         sendName(username);
     }
 
-    
-    const [isOwnPhoto, setIsOwnPhoto] = useState(false);
+
     const [captions, setCaptions] = useState<Caption[]>();
 
     useEffect(() => {
         socket.on('player:captioned-photo', (captionDTO: CaptionedPhotoDTO) => {
             setCaptions(captionDTO.captions);
-            setIsOwnPhoto(false);
-        })
-
-        socket.on('player:own-photo', () => {
-            setCaptions(undefined);
-            setIsOwnPhoto(true);
         })
 
         return () => {
             socket.off('player:captioned-photo');
-            socket.off('player:own-photo');
         }
 
     }, [])
@@ -63,7 +55,7 @@ function Player() {
                     {{
                         "PHOTO_UPLOAD": <PhotoUploadPlayer></PhotoUploadPlayer>,
                         "CAPTION": <CaptionPlayer></CaptionPlayer>,
-                        "VOTING": <VotingPlayer captions={captions!} isOwnPhoto={isOwnPhoto}></VotingPlayer>,
+                        "VOTING": <VotingPlayer captions={captions!}></VotingPlayer>,
                         "END": <EndPlayer></EndPlayer>
                     }[roomDTO!.game.phase]}
                 </div>

@@ -49,7 +49,7 @@ export class Room {
     }
 
     tryStartGame() {
-        if (this.playersIDToName.size >= 3 && this.playersIDToName.size <= 8) {
+        if (this.playersIDToName.size >= 4 && this.playersIDToName.size <= 8) {
             this.game = new Game();
             for (const playerName of this.playersIDToName.values()) {
                 this.game.addPlayer(playerName);
