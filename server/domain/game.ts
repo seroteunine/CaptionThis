@@ -141,6 +141,21 @@ export class Game {
         return voteCount >= photoRound;
     }
 
+    hasEveryoneVoted(photoRound: number) {
+        for (const playerID of this.playerIDs) {
+            let voteCount = 0;
+
+            for (const caption of this.captions) {
+                voteCount += caption.votedBy.filter(voterID => voterID === playerID).length;
+            }
+
+            if (voteCount < photoRound) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),

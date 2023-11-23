@@ -207,9 +207,11 @@ io.on('connection', (socket_before) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
-            const captionedPhoto = game.getCaptionedPhoto(currentIndex);
-            sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
-            sendPlayersCaptionedPhoto(room, captionedPhoto);
+            if (game.hasEveryoneVoted(currentIndex)) {
+                const captionedPhoto = game.getCaptionedPhoto(currentIndex);
+                sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
+                sendPlayersCaptionedPhoto(room, captionedPhoto);
+            }
         }
     })
 
