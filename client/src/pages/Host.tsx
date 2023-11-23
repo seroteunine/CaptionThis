@@ -15,9 +15,12 @@ function Host() {
 
     function handleStartGame() {
         if (roomDTO) {
-            startGame(roomDTO.roomID);
+            startGame();
         }
     }
+
+    console.log(nameMap);
+
 
     return (
         <>

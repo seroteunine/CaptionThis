@@ -94,10 +94,10 @@ function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO
     }
 }
 
-function sendRoomNameUpdate(room: Room, playerID: string, newName: string) {
+function sendRoomNameUpdate(room: Room, playerID: string, username: string) {
     const host = room.getHostID();
     const hostSocketID = socketIDMap.get(host);
-    io.to(hostSocketID || '').emit('host:name-update', { playerID: playerID, name: newName });
+    io.to(hostSocketID || '').emit('host:name-update', { playerID: playerID, username: username });
 }
 
 function sendEveryoneRoomDTO(room: Room) {
@@ -131,12 +131,10 @@ const roomMap = new Map<string, Room>();
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
     let playerID = socket.handshake.auth.playerID;
-    let roomID = socket.handshake.auth.roomID;
     if (!playerID) {
         playerID = generatePlayerID();
     }
     socket.playerID = playerID;
-    socket.roomID = roomID;
     socketIDMap.set(socket.playerID, socket.id);
     next();
 });
@@ -144,8 +142,8 @@ io.use((socket_before, next) => {
 io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
 
-    sendSessionInfo(socket.playerID, socket.roomID);
     //For reconnecting clients
+    sendSessionInfo(socket.playerID, socket.roomID);
     resendRoomIfExists(socket);
 
     socket.on('host:create-room', () => {
@@ -158,7 +156,7 @@ io.on('connection', (socket_before) => {
         console.log(`host ${hostID} created room ${roomID}`);
     })
 
-    socket.on('player:join-room', (roomID: string) => {
+    socket.on('player:join-room', (roomID) => {
         const room = roomMap.get(roomID);
         if (!room) {
             socket.emit('player:invalid-room');
@@ -169,8 +167,8 @@ io.on('connection', (socket_before) => {
         sendSessionInfo(socket.playerID, roomID);
     })
 
-    socket.on('host:start-game', () => {
-        const room = roomMap.get(socket.roomID);
+    socket.on('host:start-game', (roomID) => {
+        const room = roomMap.get(roomID);
         if (room) {
             room.tryStartGame();
             if (!room.hasGame()) {
@@ -181,31 +179,31 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('host:next-phase', () => {
-        const room = roomMap.get(socket.roomID);
+    socket.on('host:next-phase', (roomID) => {
+        const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             room.game!.nextPhase();
             sendEveryoneRoomDTO(room);
         }
     })
 
-    socket.on('player:send-image', (imageInputDTO) => {
-        const room = roomMap.get(socket.roomID);
+    socket.on('player:send-image', ({ roomID, imageInputDTO }) => {
+        const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             room.game!.addPhoto(socket.playerID, imageInputDTO);
             sendEveryoneRoomDTO(room);
         }
     })
 
-    socket.on('player:set-name', (newName) => {
-        const room = roomMap.get(socket.roomID)
+    socket.on('player:set-name', ({ roomID, username }) => {
+        const room = roomMap.get(roomID)
         if (room) {
-            sendRoomNameUpdate(room, socket.playerID, newName);
+            sendRoomNameUpdate(room, socket.playerID, username);
         }
     })
 
-    socket.on('player:send-caption', (captionInput: CaptionInputDTO) => {
-        const room = roomMap.get(socket.roomID);
+    socket.on('player:send-caption', ({ roomID, captionInput }) => {
+        const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;;
             game.addCaption(socket.playerID, captionInput.caption, captionInput.ownerOfPhoto);
@@ -213,8 +211,8 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('host:request-next-photo', (currentIndex: number) => {
-        const room = roomMap.get(socket.roomID);
+    socket.on('host:request-next-photo', ({ roomID, currentIndex }) => {
+        const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
             const captionedPhoto = game.getCaptionedPhoto(currentIndex);
@@ -223,9 +221,9 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('player:send-vote', (captionID) => {
+    socket.on('player:send-vote', ({ roomID, captionID }) => {
         console.log(socket.playerID, captionID);
-        const room = roomMap.get(socket.roomID);
+        const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
             game.addVote(socket.playerID, captionID);

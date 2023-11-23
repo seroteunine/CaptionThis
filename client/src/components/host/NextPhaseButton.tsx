@@ -1,12 +1,9 @@
-import { useRoom } from "../../context/RoomContext";
 import { goNextPhase } from "../../service/SocketService"
 
 function NextPhaseButton({ nextPhase }: { nextPhase: string }) {
 
-    const { roomDTO } = useRoom();
-
     function handleNextPhase() {
-        goNextPhase(roomDTO!.roomID)
+        goNextPhase()
     }
 
     return (

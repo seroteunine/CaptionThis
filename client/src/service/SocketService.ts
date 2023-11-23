@@ -10,32 +10,33 @@ export function joinRoom(roomCode: string) {
 }
 
 export function sendName(username: string) {
-    socket.emit('player:set-name', username);
+    socket.emit('player:set-name', { roomID: sessionStorage.getItem('roomID'), username: username });
 }
 
 export function sendFile(file: File) {
-    socket.emit('player:send-image', file);
+    socket.emit('player:send-image', { roomID: sessionStorage.getItem('roomID'), file: file });
 }
 
-export function startGame(roomID: string) {
-    socket.emit('host:start-game', roomID);
+export function startGame() {
+    socket.emit('host:start-game', sessionStorage.getItem('roomID'));
 }
 
-export function goNextPhase(roomID: string) {
-    socket.emit('host:next-phase', roomID)
+export function goNextPhase() {
+    socket.emit('host:next-phase', sessionStorage.getItem('roomID'))
 }
 
 export function sendCaption(caption: string, ownerOfPhoto: string) {
     socket.emit('player:send-caption', {
+        roomID: sessionStorage.getItem('roomID'),
         caption: caption,
         ownerOfPhoto: ownerOfPhoto
     })
 }
 
 export function sendNextPhotoRequest(currentIndex: number) {
-    socket.emit('host:request-next-photo', currentIndex);
+    socket.emit('host:request-next-photo', { roomID: sessionStorage.getItem('roomID'), currentIndex: currentIndex });
 }
 
 export function sendVote(ID: number) {
-    socket.emit('player:send-vote', ID);
+    socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), ID: ID });
 }

@@ -14,7 +14,7 @@ function App() {
   const roomID = sessionStorage.getItem("roomID");
 
   const { roomDTO, setRoomDTO } = useRoom();
-  const { nameMap, setNameMap } = useNameContext();
+  const { setNameMap } = useNameContext();
 
   useEffect(() => {
 
@@ -22,8 +22,8 @@ function App() {
       setRoomDTO(roomDTO);
     })
 
-    socket.on('host:name-update', ({ playerID, name }) => {
-      setNameMap(new Map(nameMap).set(playerID, name));
+    socket.on('host:name-update', ({ playerID, username }) => {
+      setNameMap((nameMap) => new Map<string, string>(nameMap).set(playerID, username));
     });
 
     socket.on('player:room-update', (roomDTO) => {
