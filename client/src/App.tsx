@@ -11,6 +11,7 @@ function App() {
 
   const [codeInvalid, setCodeInvalid] = useState(false);
   const playerID = sessionStorage.getItem("playerID");
+  const roomID = sessionStorage.getItem("roomID");
 
   const { roomDTO, setRoomDTO } = useRoom();
   const { nameMap, setNameMap } = useNameContext();
@@ -39,13 +40,15 @@ function App() {
 
     //For reconnections
     if (playerID) {
-      socket.auth = { playerID };
+      socket.auth = { playerID, roomID };
       sessionStorage.setItem("playerID", playerID);
     }
 
-    socket.on("playerID", (playerID) => {
-      socket.auth = { playerID };
+    socket.on("session", ({ playerID, roomID }) => {
+      socket.auth = { playerID, roomID };
+      console.log(playerID, roomID);
       sessionStorage.setItem("playerID", playerID);
+      sessionStorage.setItem("roomID", roomID);
     });
 
     return () => {

@@ -105,17 +105,8 @@ function sendEveryoneRoomDTO(room: Room) {
     sendPlayersRoomDTO(room);
 }
 
-function getRoomByPlayerID(playerID: string) {
-    for (let room of roomMap.values()) {
-        const players = room.getPlayers();
-        if (players.has(playerID) || room.getHostID() === playerID) {
-            return room;
-        }
-    }
-}
-
-function resendRoomIfExists(playerID: string) {
-    const room = getRoomByPlayerID(playerID);
+function resendRoomIfExists(playerID: string, roomID: string) {
+    const room = roomMap.get(roomID);
     if (room) {
         const playerSocketID = socketIDMap.get(playerID);
         const roomDTO: RoomDTO = room.getRoomDTO();
@@ -132,14 +123,15 @@ function removeConnectionIfDead(playerID: string) {
 const socketIDMap = new Map<string, string>();
 const roomMap = new Map<string, Room>();
 
-
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
     let playerID = socket.handshake.auth.playerID;
+    let roomID = socket.handshake.auth.roomID;
     if (!playerID) {
         playerID = generatePlayerID();
     }
     socket.playerID = playerID;
+    socket.roomID = roomID;
     socketIDMap.set(socket.playerID, socket.id);
     next();
 });
@@ -148,8 +140,8 @@ io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
 
     //For reconnected clients
-    socket.emit("playerID", socket.playerID);
-    resendRoomIfExists(socket.playerID);
+    socket.emit("session", { playerID: socket.playerID, roomID: socket.roomID });
+    resendRoomIfExists(socket.playerID, socket.roomID);
 
     socket.on('host:create-room', () => {
         const roomID = generateRoomID();
@@ -158,6 +150,7 @@ io.on('connection', (socket_before) => {
         roomMap.set(roomID, room);
         sendHostRoomDTO(room);
         console.log(`host ${hostID} created room ${roomID}`);
+        socket.emit('session', { playerID: socket.playerID, roomID: roomID });
     })
 
     socket.on('player:join-room', (roomID) => {
@@ -168,6 +161,7 @@ io.on('connection', (socket_before) => {
             return;
         }
         room.addPlayer(playerID);
+        socket.emit('session', { playerID: socket.playerID, roomID: roomID });
         sendEveryoneRoomDTO(room);
     })
 
@@ -192,7 +186,7 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('player:send-image', (imageInputDTO) => {
-        const room = getRoomByPlayerID(socket.playerID);
+        const room = roomMap.get(socket.roomID);
         if (room && room.hasGame()) {
             room.game!.addPhoto(socket.playerID, imageInputDTO);
             sendEveryoneRoomDTO(room);
@@ -200,14 +194,14 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('player:set-name', (newName) => {
-        const room = getRoomByPlayerID(socket.playerID)
+        const room = roomMap.get(socket.roomID)
         if (room) {
             sendRoomNameUpdate(room, socket.playerID, newName);
         }
     })
 
     socket.on('player:send-caption', (captionInput: CaptionInputDTO) => {
-        const room = getRoomByPlayerID(socket.playerID);
+        const room = roomMap.get(socket.roomID);
         if (room && room.hasGame()) {
             const game = room.game!;;
             game.addCaption(socket.playerID, captionInput.caption, captionInput.ownerOfPhoto);
@@ -216,7 +210,7 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('host:request-next-photo', (currentIndex: number) => {
-        const room = getRoomByPlayerID(socket.playerID);
+        const room = roomMap.get(socket.roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
             const captionedPhoto = game.getCaptionedPhoto(currentIndex);
@@ -227,7 +221,7 @@ io.on('connection', (socket_before) => {
 
     socket.on('player:send-vote', (captionID) => {
         console.log(socket.playerID, captionID);
-        const room = getRoomByPlayerID(socket.playerID);
+        const room = roomMap.get(socket.roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
             game.addVote(socket.playerID, captionID);
