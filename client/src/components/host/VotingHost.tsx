@@ -48,7 +48,7 @@ function VotingHost() {
                     <ImageComponent arrayBuffer={photos[captionedPhoto.owner]}></ImageComponent>
 
                     {captionedPhoto.captions.map((caption) => (
-                        <h2 key={caption.captionText}>{caption.captionText}</h2>
+                        <h2 key={caption.ID}>{caption.captionText}</h2>
                     ))}
 
                     {isLastPhoto ?

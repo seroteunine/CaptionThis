@@ -32,7 +32,6 @@ export class Room {
         if (this.game) {
             throw new Error('Name could not be set because the game already started.');
         }
-        this.playerIDs.add(playerID);
     }
 
     getPlayers() {

@@ -195,7 +195,7 @@ io.on('connection', (socket_before) => {
     socket.on('player:set-name', (newName) => {
         const room = getRoomByPlayerID(socket.playerID);
         if (room) {
-            room.setPlayerName(socket.playerID, newName);
+            room.setPlayerName(socket.playerID, newName); //TODO. instead of setting it in room object. send name update to players in room
             sendEveryoneRoomDTO(room);
         }
     })
