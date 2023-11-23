@@ -24,11 +24,12 @@ test('Players can be added to the room', () => {
     expect(room.getPlayers()).toStrictEqual(expectedMap);
 });
 
-test('Game can not be started with 2 people', () => {
+test('Game can not be started with 3 people', () => {
     const room = new Room(roomID, hostID);
 
     room.addPlayer('111');
     room.addPlayer('222');
+    room.addPlayer('333');
 
     room.tryStartGame();
 
@@ -60,25 +61,25 @@ test('Game CAN be started with 5 people', () => {
     room.addPlayer('222');
     room.addPlayer('333');
     room.addPlayer('444');
-    room.addPlayer('555');
 
     room.tryStartGame();
 
     expect(room.hasGame()).toBe(true);
 })
 
-test('Players can not join when the game is already started', () => {
+test('Player amount doesnt change when joining if the game is already started', () => {
     const room = new Room(roomID, hostID);
 
     room.addPlayer('111');
     room.addPlayer('222');
     room.addPlayer('333');
+    room.addPlayer('444');
 
-    expect(room.getPlayers().size).toBe(3);
+    expect(room.getPlayers().size).toBe(4);
 
     room.tryStartGame();
 
-    room.addPlayer('444');
+    room.addPlayer('555');
 
-    expect(room.getPlayers().size).toBe(3);
+    expect(room.getPlayers().size).toBe(4);
 })

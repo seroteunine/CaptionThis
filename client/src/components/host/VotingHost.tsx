@@ -7,12 +7,12 @@ import { sendNextPhotoRequest } from "../../service/SocketService";
 
 type CaptionedPhotoDTO = {
     owner: string,
-    captions: {authorPlayerID:string, captionText:string}[]
+    captions: { ID: number, captionText: string }[]
 }
 
 function VotingHost() {
 
-    const {roomDTO} = useRoom();
+    const { roomDTO } = useRoom();
     const photos = roomDTO!.game!.photos;
 
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);

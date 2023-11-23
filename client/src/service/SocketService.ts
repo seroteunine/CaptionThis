@@ -32,10 +32,10 @@ export function sendCaption(caption: string, ownerOfPhoto: string) {
     })
 }
 
-export function sendNextPhotoRequest(currentIndex: number){
+export function sendNextPhotoRequest(currentIndex: number) {
     socket.emit('host:request-next-photo', currentIndex);
 }
 
-export function sendVote(authorPlayerID: string){
-    socket.emit('player:send-vote', authorPlayerID);
+export function sendVote(ID: number) {
+    socket.emit('player:send-vote', ID);
 }

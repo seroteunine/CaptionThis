@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
 
 type Caption = {
+    ID: number;
     authorPlayerID: string;
-    ownerPlayerID: string;
+    photoOwnerPlayerID: string;
     captionText: string;
     votedBy: string[];
 }

@@ -6,8 +6,9 @@ export enum Phase {
 };
 
 type Caption = {
+    ID: number;
     authorPlayerID: string;
-    ownerPlayerID: string;
+    photoOwnerPlayerID: string;
     captionText: string;
     votedBy: string[];
 }
@@ -73,7 +74,7 @@ export class Game {
 
     checkAllPhotosHaveCaption() {
         for (const [ownerOfPhoto] of this.photos) {
-            const captionsForPhoto = this.captions.filter((caption) => caption.ownerPlayerID === ownerOfPhoto);
+            const captionsForPhoto = this.captions.filter((caption) => caption.photoOwnerPlayerID === ownerOfPhoto);
 
             if (!captionsForPhoto) {
                 return false;
@@ -82,22 +83,23 @@ export class Game {
             const otherPlayers = this.playerNames.filter(player => player !== ownerOfPhoto);
             for (const player of otherPlayers) {
                 const captionExists = captionsForPhoto.some(
-                  (caption) => caption.ownerPlayerID === ownerOfPhoto && caption.authorPlayerID === player
+                    (caption) => caption.photoOwnerPlayerID === ownerOfPhoto && caption.authorPlayerID === player
                 );
-          
+
                 if (!captionExists) {
-                  return false;
+                    return false;
                 }
-              }
             }
-            return true;
+        }
+        return true;
     }
 
     addCaption(author: string, captionText: string, ownerOfPhoto: string) {
         this.checkValidCaption(author, ownerOfPhoto);
         const caption: Caption = {
+            ID: this.captions.length,
             authorPlayerID: author,
-            ownerPlayerID: ownerOfPhoto,
+            photoOwnerPlayerID: ownerOfPhoto,
             captionText: captionText,
             votedBy: [],
         }
@@ -110,10 +112,10 @@ export class Game {
         }
     }
 
-    getCaptionedPhoto(currentIndex: number){
+    getCaptionedPhoto(currentIndex: number) {
         const photoOwner = Array.from(this.photos.keys())[currentIndex];
         const captions = this.captions
-            .filter((caption) => caption.ownerPlayerID === photoOwner)
+            .filter((caption) => caption.photoOwnerPlayerID === photoOwner)
             .map(({ authorPlayerID, captionText }) => ({
                 authorPlayerID,
                 captionText,
@@ -123,6 +125,16 @@ export class Game {
             captions: captions
         }
         return captionedPhoto;
+    }
+
+    addVote(playerName: string, captionID: number) {
+        const caption: Caption = this.captions[captionID];
+        if (caption.authorPlayerID === playerName) {
+            throw new Error('Player can not vote on own caption');
+        }
+        if (!caption.votedBy.includes(playerName)) {
+            caption.votedBy.push(playerName);
+        }
     }
 
     getGameDTO() {

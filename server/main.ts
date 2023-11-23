@@ -26,8 +26,9 @@ interface CustomSocket extends Socket {
 }
 
 type Caption = {
+    ID: number;
     authorPlayerID: string;
-    ownerPlayerID: string;
+    photoOwnerPlayerID: string;
     captionText: string;
     votedBy: string[];
 }
@@ -53,7 +54,7 @@ type CaptionInputDTO = {
 
 type CaptionedPhotoDTO = {
     owner: string,
-    captions: {authorPlayerID:string, captionText:string}[]
+    captions: { authorPlayerID: string, captionText: string }[]
 }
 
 
@@ -64,7 +65,7 @@ function sendHostRoomDTO(room: Room) {
     io.to(hostSocketID || '').emit('host:room-update', roomDTO);
 }
 
-function sendHostCaptionedPhoto(hostID: string, captionedPhoto: CaptionedPhotoDTO){
+function sendHostCaptionedPhoto(hostID: string, captionedPhoto: CaptionedPhotoDTO) {
     const hostSocketID = socketIDMap.get(hostID);
     io.to(hostSocketID || '').emit('host:captioned-photo', captionedPhoto)
 }
@@ -78,7 +79,7 @@ function sendPlayersRoomDTO(room: Room) {
     }
 }
 
-function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO){
+function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO) {
     const players = room.getPlayers();
     for (const playerID of players.keys()) {
         const playerSocketID = socketIDMap.get(playerID);
@@ -109,7 +110,9 @@ function getRoomByPlayerID(playerID: string) {
 function resendRoomIfExists(playerID: string) {
     const room = getRoomByPlayerID(playerID);
     if (room) {
-        sendEveryoneRoomDTO(room);
+        const playerSocketID = socketIDMap.get(playerID);
+        const roomDTO: RoomDTO = room.getRoomDTO();
+        io.to(playerSocketID || '').emit('player:room-update', roomDTO);
     }
 }
 
@@ -209,7 +212,7 @@ io.on('connection', (socket_before) => {
 
     socket.on('host:request-next-photo', (currentIndex: number) => {
         const room = getRoomByPlayerID(socket.playerID);
-        if (room && room.hasGame()){
+        if (room && room.hasGame()) {
             const game = room.game!;
             const captionedPhoto = game.getCaptionedPhoto(currentIndex);
             sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
@@ -219,8 +222,12 @@ io.on('connection', (socket_before) => {
 
     socket.on('player:send-vote', (authorOfCaption) => {
         console.log(socket.playerID, authorOfCaption);
-        
-    })  
+        const room = getRoomByPlayerID(socket.playerID);
+        if (room && room.hasGame()) {
+            const game = room.game!;
+
+        }
+    })
 
     socket.on('disconnect', () => {
         removeConnectionIfDead(socket.playerID);
