@@ -4,10 +4,12 @@ import CaptionHost from "../components/host/CaptionHost";
 import EndHost from "../components/host/EndHost";
 import PhotoUploadHost from "../components/host/PhotoUploadHost";
 import VotingHost from "../components/host/VotingHost";
+import { useNameContext } from "../context/NamesContext";
 
 function Host() {
 
     const { roomDTO } = useRoom();
+    const { nameMap } = useNameContext();
 
     const isStartingDisallowed = roomDTO!.playerIDs.length < 4 || roomDTO!.playerIDs.length > 8;
 
@@ -22,7 +24,7 @@ function Host() {
             <h1>Room: {roomDTO!.roomID} - You're the host {roomDTO!.hostID}</h1>
             <h3>Players:</h3>
             {roomDTO!.playerIDs.map((ID) => (
-                <h3 key={ID}>{ID}</h3>
+                <h3 key={ID}>{nameMap.get(ID)}</h3>
             ))}
 
             {roomDTO!.game

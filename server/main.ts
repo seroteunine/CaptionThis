@@ -23,6 +23,7 @@ const io = new Server(server, {
 
 interface CustomSocket extends Socket {
     playerID: string;
+    roomID: string;
 }
 
 type Caption = {
@@ -91,6 +92,12 @@ function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO
 
         io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhotoOwnExcluded);
     }
+}
+
+function sendRoomNameUpdate(room: Room, playerID: string, newName: string) {
+    const host = room.getHostID();
+    const hostSocketID = socketIDMap.get(host);
+    io.to(hostSocketID || '').emit('host:name-update', { playerID: playerID, name: newName });
 }
 
 function sendEveryoneRoomDTO(room: Room) {
@@ -193,10 +200,9 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('player:set-name', (newName) => {
-        const room = getRoomByPlayerID(socket.playerID);
+        const room = getRoomByPlayerID(socket.playerID)
         if (room) {
-            room.setPlayerName(socket.playerID, newName); //TODO. instead of setting it in room object. send name update to players in room
-            sendEveryoneRoomDTO(room);
+            sendRoomNameUpdate(room, socket.playerID, newName);
         }
     })
 

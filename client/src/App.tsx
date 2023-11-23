@@ -5,6 +5,7 @@ import Host from './pages/Host';
 import Player from './pages/Player';
 import socket from './socket';
 import { useRoom } from './context/RoomContext';
+import { useNameContext } from './context/NamesContext';
 
 function App() {
 
@@ -12,11 +13,16 @@ function App() {
   const playerID = sessionStorage.getItem("playerID");
 
   const { roomDTO, setRoomDTO } = useRoom();
+  const { nameMap, setNameMap } = useNameContext();
 
   useEffect(() => {
 
     socket.on('host:room-update', (roomDTO) => {
       setRoomDTO(roomDTO);
+    })
+
+    socket.on('host:name-update', ({ playerID, name }) => {
+      setNameMap(nameMap.set(playerID, name));
     })
 
     socket.on('player:room-update', (roomDTO) => {
