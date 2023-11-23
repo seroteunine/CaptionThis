@@ -6,12 +6,9 @@ const player1 = 'teun';
 const player2 = 'joep';
 const player3 = 'karel';
 const player4 = 'piet';
+const players = new Set([player1, player2, player3, player4]);
 
 function setGameOnCaptionPhase(game: Game) {
-    game.addPlayer(player1);
-    game.addPlayer(player2);
-    game.addPlayer(player3)
-    game.addPlayer(player4)
 
     game.addPhoto(player1, photo);
     game.addPhoto(player2, photo);
@@ -41,17 +38,12 @@ function addCaptionsAndGoToVotePhase(game: Game) {
 //Tests
 
 test('New gamestate object is on photoUpload phase', () => {
-    const game = new Game();
+    const game = new Game(players);
     expect(game.getCurrentPhase()).toBe(Phase.PHOTO_UPLOAD);
 });
 
 test('Game doesnt go to captioning, if not every player has a photo', () => {
-    const game = new Game();
-
-    game.addPlayer(player1);
-    game.addPlayer(player2);
-    game.addPlayer(player3)
-    game.addPlayer(player4)
+    const game = new Game(players);
 
     game.addPhoto(player1, photo);
     game.addPhoto(player2, photo);
@@ -62,7 +54,7 @@ test('Game doesnt go to captioning, if not every player has a photo', () => {
 })
 
 test('Game goes to captioning, if every player has a photo', () => {
-    const game = new Game();
+    const game = new Game(players);
 
     setGameOnCaptionPhase(game);
 
@@ -70,7 +62,7 @@ test('Game goes to captioning, if every player has a photo', () => {
 })
 
 test('Captioning own photo throws error', () => {
-    const game = new Game();
+    const game = new Game(players);
 
     setGameOnCaptionPhase(game);
 
@@ -80,7 +72,7 @@ test('Captioning own photo throws error', () => {
 })
 
 test('game doesnt go to voting if not every photo has a caption of all players', () => {
-    const game = new Game();
+    const game = new Game(players);
 
     setGameOnCaptionPhase(game);
 
@@ -94,7 +86,7 @@ test('game doesnt go to voting if not every photo has a caption of all players',
 })
 
 test('game goes to voting if every photo has a caption of all players', () => {
-    const game = new Game();
+    const game = new Game(players);
 
     setGameOnCaptionPhase(game);
     addCaptionsAndGoToVotePhase(game);
@@ -103,7 +95,7 @@ test('game goes to voting if every photo has a caption of all players', () => {
 })
 
 test('Caption has 2 votes when 2 people voted on it.', () => {
-    const game = new Game();
+    const game = new Game(players);
 
     setGameOnCaptionPhase(game);
     addCaptionsAndGoToVotePhase(game);
@@ -118,7 +110,7 @@ test('Caption has 2 votes when 2 people voted on it.', () => {
 })
 
 test('Throw error when vote on your own caption. (Frontend should prohibit this)', () => {
-    const game = new Game();
+    const game = new Game(players);
 
     setGameOnCaptionPhase(game);
     addCaptionsAndGoToVotePhase(game);
@@ -132,7 +124,7 @@ test('Throw error when vote on your own caption. (Frontend should prohibit this)
 })
 
 test('Vote array stays the same person votes multiple times', () => {
-    const game = new Game();
+    const game = new Game(players);
 
     setGameOnCaptionPhase(game);
     addCaptionsAndGoToVotePhase(game);

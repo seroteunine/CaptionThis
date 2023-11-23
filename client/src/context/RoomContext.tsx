@@ -10,7 +10,7 @@ type Caption = {
 
 type GameDTO = {
     phase: string;
-    playerNames: string[];
+    playerIDs: string[];
     photos: { [k: string]: ArrayBuffer };
     captions: Caption[];
 }
@@ -18,7 +18,7 @@ type GameDTO = {
 type RoomDTO = {
     roomID: string,
     hostID: string,
-    playersIDToName: { [k: string]: string };
+    playerIDs: string[];
     game: GameDTO | undefined
 }
 

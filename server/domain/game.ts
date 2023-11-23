@@ -16,34 +16,27 @@ type Caption = {
 export class Game {
 
     gamePhase: Phase;
-    playerNames: string[];
+    playerIDs: Set<string>;
     photos: Map<string, ArrayBuffer>;
     captions: Caption[];
 
-    constructor() {
+    constructor(playerIDs: Set<string>) {
         this.gamePhase = Phase.PHOTO_UPLOAD;
-        this.playerNames = [];
+        this.playerIDs = playerIDs;
         this.photos = new Map<string, ArrayBuffer>();
         this.captions = [];
     };
 
     getPlayers() {
-        return this.playerNames;
-    }
-
-    addPlayer(player: string) {
-        if (this.playerNames.includes(player)) {
-            throw new Error();
-        }
-        this.playerNames.push(player);
+        return this.playerIDs;
     }
 
     getCurrentPhase() {
         return this.gamePhase;
     };
 
-    addPhoto(playerName: string, photo: ArrayBuffer) {
-        this.photos.set(playerName, photo);
+    addPhoto(playerID: string, photo: ArrayBuffer) {
+        this.photos.set(playerID, photo);
     }
 
     nextPhase() {
@@ -69,7 +62,7 @@ export class Game {
     }
 
     checkAllPlayersHavePhoto() {
-        return this.playerNames.every(playerName => this.photos.has(playerName));
+        return Array.from(this.playerIDs).every(playerID => this.photos.has(playerID));
     }
 
     checkAllPhotosHaveCaption() {
@@ -80,7 +73,7 @@ export class Game {
                 return false;
             }
 
-            const otherPlayers = this.playerNames.filter(player => player !== ownerOfPhoto);
+            const otherPlayers = Array.from(this.playerIDs).filter(player => player !== ownerOfPhoto);
             for (const player of otherPlayers) {
                 const captionExists = captionsForPhoto.some(
                     (caption) => caption.photoOwnerPlayerID === ownerOfPhoto && caption.authorPlayerID === player
@@ -127,20 +120,20 @@ export class Game {
         return captionedPhoto;
     }
 
-    addVote(playerName: string, captionID: number) {
+    addVote(playerID: string, captionID: number) {
         const caption: Caption = this.captions[captionID];
-        if (caption.authorPlayerID === playerName) {
+        if (caption.authorPlayerID === playerID) {
             throw new Error('Player can not vote on own caption');
         }
-        if (!caption.votedBy.includes(playerName)) {
-            caption.votedBy.push(playerName);
+        if (!caption.votedBy.includes(playerID)) {
+            caption.votedBy.push(playerID);
         }
     }
 
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),
-            playerNames: this.playerNames,
+            playerIDs: Array.from(this.playerIDs),
             photos: Object.fromEntries(this.photos.entries()),
             captions: this.captions
         }

@@ -9,7 +9,7 @@ function Host() {
 
     const { roomDTO } = useRoom();
 
-    const isStartingDisallowed = Object.keys(roomDTO!.playersIDToName).length < 4 || Object.keys(roomDTO!.playersIDToName).length > 8;
+    const isStartingDisallowed = roomDTO!.playerIDs.length < 4 || roomDTO!.playerIDs.length > 8;
 
     function handleStartGame() {
         if (roomDTO) {
@@ -21,8 +21,8 @@ function Host() {
         <>
             <h1>Room: {roomDTO!.roomID} - You're the host {roomDTO!.hostID}</h1>
             <h3>Players:</h3>
-            {Object.entries(roomDTO!.playersIDToName).map(([key, value]) => (
-                <h3 key={key}>{value}</h3>
+            {roomDTO!.playerIDs.map((ID) => (
+                <h3 key={ID}>{ID}</h3>
             ))}
 
             {roomDTO!.game

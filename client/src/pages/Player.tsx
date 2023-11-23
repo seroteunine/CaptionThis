@@ -9,6 +9,7 @@ import EndPlayer from "../components/player/EndPlayer";
 import socket from "../socket";
 
 type Caption = {
+    ID: number,
     authorPlayerID: string,
     captionText: string
 }

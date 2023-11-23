@@ -35,7 +35,7 @@ type Caption = {
 
 type GameDTO = {
     phase: string;
-    playerNames: string[];
+    playerIDs: string[];
     photos: { [k: string]: ArrayBuffer };
     captions: Caption[];
 }
@@ -43,7 +43,7 @@ type GameDTO = {
 type RoomDTO = {
     roomID: string,
     hostID: string,
-    playersIDToName: { [k: string]: string };
+    playerIDs: string[];
     game: GameDTO | undefined
 }
 
@@ -86,8 +86,8 @@ function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO
 
         const captionedPhotoOwnExcluded = {
             owner: captionedPhoto.owner,
-            captions: captionedPhoto.captions.filter(caption => caption.authorPlayerID !== players.get(playerID))
-        }; //To make sure that you cant vote on yourself
+            captions: captionedPhoto.captions.filter(caption => caption.authorPlayerID !== playerID)
+        }; //Exclude own caption to make sure that you cant vote on yourself
 
         io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhotoOwnExcluded);
     }
@@ -186,8 +186,8 @@ io.on('connection', (socket_before) => {
 
     socket.on('player:send-image', (imageInputDTO) => {
         const room = getRoomByPlayerID(socket.playerID);
-        if (room) {
-            room.addPhoto(socket.playerID, imageInputDTO);
+        if (room && room.hasGame()) {
+            room.game!.addPhoto(socket.playerID, imageInputDTO);
             sendEveryoneRoomDTO(room);
         }
     })
@@ -202,10 +202,9 @@ io.on('connection', (socket_before) => {
 
     socket.on('player:send-caption', (captionInput: CaptionInputDTO) => {
         const room = getRoomByPlayerID(socket.playerID);
-        if (room && room.hasGame() && room.playersIDToName.get(socket.playerID)) {
-            const game = room.game!;
-            const authorPlayername = room.playersIDToName.get(socket.playerID)!;
-            game.addCaption(authorPlayername, captionInput.caption, captionInput.ownerOfPhoto);
+        if (room && room.hasGame()) {
+            const game = room.game!;;
+            game.addCaption(socket.playerID, captionInput.caption, captionInput.ownerOfPhoto);
             sendHostRoomDTO(room);
         }
     })
