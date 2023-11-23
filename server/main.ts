@@ -113,9 +113,9 @@ function sendSessionInfo(playerID: string, roomID: string) {
 function resendRoomIfExists(socket: CustomSocket) {
     const room = roomMap.get(socket.roomID);
     if (room) {
-        const playerSocketID = socketIDMap.get(socket.playerID);
+        const socketID = socketIDMap.get(socket.playerID);
         const roomDTO: RoomDTO = room.getRoomDTO();
-        io.to(playerSocketID || '').emit('player:room-update', roomDTO);
+        io.to(socketID || '').emit('player:room-update', roomDTO);
     }
 }
 
@@ -123,7 +123,6 @@ function removeConnectionIfDead(playerID: string) {
     const socketID = socketIDMap.get(playerID);
     // TODO: ping the user and remove the playerID if this user doesnt send a pong in 5 seconds.
 }
-
 
 
 const socketIDMap = new Map<string, string>();
@@ -145,8 +144,8 @@ io.use((socket_before, next) => {
 io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
 
-    //For reconnected clients
     sendSessionInfo(socket.playerID, socket.roomID);
+    //For reconnecting clients
     resendRoomIfExists(socket);
 
     socket.on('host:create-room', () => {
