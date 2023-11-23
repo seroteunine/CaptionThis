@@ -15,7 +15,7 @@ function PhotoUploadHost() {
             <h3>Photos</h3>
             {Object.entries(roomDTO!.game!.photos).map(([ownerID, value]) => (
                 <div key={ownerID}>
-                    <h4> {nameMap.get(ownerID)} uploaded this photo: </h4>
+                    <h4> {nameMap.get(ownerID) || ownerID} uploaded this photo: </h4>
                     <ImageComponent arrayBuffer={value}></ImageComponent>
                 </div>
             ))}

@@ -24,7 +24,7 @@ function Host() {
             <h1>Room: {roomDTO!.roomID} - You're the host {roomDTO!.hostID}</h1>
             <h3>Players:</h3>
             {roomDTO!.playerIDs.map((ID) => (
-                <h3 key={ID}>{nameMap.get(ID)}</h3>
+                <h3 key={ID}>{nameMap.get(ID) || ID}</h3>
             ))}
 
             {roomDTO!.game
