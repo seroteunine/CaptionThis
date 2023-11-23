@@ -187,10 +187,10 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('player:send-image', ({ roomID, imageInputDTO }) => {
+    socket.on('player:send-image', ({ roomID, file }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
-            room.game!.addPhoto(socket.playerID, imageInputDTO);
+            room.game!.addPhoto(socket.playerID, file);
             sendEveryoneRoomDTO(room);
         }
     })
@@ -202,11 +202,11 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('player:send-caption', ({ roomID, captionInput }) => {
+    socket.on('player:send-caption', ({ roomID, caption, ownerOfPhoto }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;;
-            game.addCaption(socket.playerID, captionInput.caption, captionInput.ownerOfPhoto);
+            game.addCaption(socket.playerID, caption, ownerOfPhoto);
             sendHostRoomDTO(room);
         }
     })

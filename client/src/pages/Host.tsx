@@ -19,9 +19,6 @@ function Host() {
         }
     }
 
-    console.log(nameMap);
-
-
     return (
         <>
             <h1>Room: {roomDTO!.roomID} - You're the host {roomDTO!.hostID}</h1>
