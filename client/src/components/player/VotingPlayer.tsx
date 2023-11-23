@@ -13,8 +13,6 @@ function VotingPlayer({ captions, photoRound }: { captions: Caption[], photoRoun
         sendVote(ID, photoRound);
     };
 
-    console.log(captions);
-
 
     return (
         <div>

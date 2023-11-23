@@ -16,7 +16,7 @@ function VotingHost() {
     const photos = roomDTO!.game!.photos;
 
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-    const isLastPhoto = (currentPhotoIndex === Object.keys(photos).length);
+    const isLastPhoto = (currentPhotoIndex === Object.keys(photos).length + 1);
 
     const [captionedPhoto, setCaptionedPhoto] = useState<CaptionedPhotoDTO>();
 
