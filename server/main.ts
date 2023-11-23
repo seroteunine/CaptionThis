@@ -220,12 +220,13 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('player:send-vote', (authorOfCaption) => {
-        console.log(socket.playerID, authorOfCaption);
+    socket.on('player:send-vote', (captionID) => {
+        console.log(socket.playerID, captionID);
         const room = getRoomByPlayerID(socket.playerID);
         if (room && room.hasGame()) {
             const game = room.game!;
-
+            game.addVote(socket.playerID, captionID);
+            sendEveryoneRoomDTO(room);
         }
     })
 
