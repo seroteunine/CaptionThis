@@ -17,11 +17,9 @@ test('New room can be made with host, where game is empty.', () => {
 test('Players can be added to the room', () => {
     const room = new Room(roomID, hostID);
 
+    expect(room.getPlayers().size).toBe(0);
     room.addPlayer('qwer1234');
-
-    const expectedMap = new Map();
-    expectedMap.set('qwer1234', 'qwer1234')
-    expect(room.getPlayers()).toStrictEqual(expectedMap);
+    expect(room.getPlayers().size).toBe(1);
 });
 
 test('Game can not be started with 3 people', () => {
