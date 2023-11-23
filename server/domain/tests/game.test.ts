@@ -101,8 +101,8 @@ test('Caption has 2 votes when 2 people voted on it.', () => {
     addCaptionsAndGoToVotePhase(game);
 
     const captionID = 10;
-    game.addVote(player1, captionID);
-    game.addVote(player2, captionID);
+    game.addVote(player1, captionID, 1);
+    game.addVote(player2, captionID, 1);
 
     const Caption10 = game.captions[captionID];
     expect(Caption10.votedBy).toStrictEqual([player1, player2]);
@@ -118,7 +118,7 @@ test('Throw error when vote on your own caption. (Frontend should prohibit this)
     const captionID = 1;
 
     expect(() => {
-        game.addVote(player1, captionID);
+        game.addVote(player1, captionID, 1);
     }).toThrow();
 
 })
@@ -131,10 +131,10 @@ test('Vote array stays the same person votes multiple times', () => {
 
     const captionID = 10;
 
-    game.addVote(player1, captionID);
-    game.addVote(player1, captionID);
-    game.addVote(player1, captionID);
-    game.addVote(player2, captionID);
+    game.addVote(player1, captionID, 1);
+    game.addVote(player1, captionID, 1);
+    game.addVote(player1, captionID, 1);
+    game.addVote(player2, captionID, 1);
 
     const Caption10 = game.captions[captionID];
 

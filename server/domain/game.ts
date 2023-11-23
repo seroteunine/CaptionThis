@@ -121,14 +121,24 @@ export class Game {
         return captionedPhoto;
     }
 
-    addVote(playerID: string, captionID: number) {
+    addVote(playerID: string, captionID: number, photoRound: number) {
         const caption: Caption = this.captions[captionID];
         if (caption.authorPlayerID === playerID) {
             throw new Error('Player can not vote on own caption');
         }
-        if (!caption.votedBy.includes(playerID)) {
+        if (!caption.votedBy.includes(playerID) && !this.hasAlreadyVotedThisRound(playerID, photoRound)) {
             caption.votedBy.push(playerID);
         }
+    }
+
+    hasAlreadyVotedThisRound(playerID: string, photoRound: number) {
+        let voteCount = 0;
+        for (const caption of this.captions) {
+            if (caption.votedBy.includes(playerID)) {
+                voteCount++;
+            }
+        }
+        return voteCount >= photoRound;
     }
 
     getGameDTO() {

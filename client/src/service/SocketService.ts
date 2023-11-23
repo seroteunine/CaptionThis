@@ -38,6 +38,6 @@ export function sendNextPhotoRequest(currentIndex: number) {
     socket.emit('host:request-next-photo', { roomID: sessionStorage.getItem('roomID'), currentIndex: currentIndex });
 }
 
-export function sendVote(ID: number) {
-    socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), captionID: ID });
+export function sendVote(ID: number, photoRound: number) {
+    socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), captionID: ID, photoRound: photoRound });
 }

@@ -6,11 +6,11 @@ type Caption = {
     captionText: string
 }
 
-function VotingPlayer({ captions }: { captions: Caption[] }) {
+function VotingPlayer({ captions, photoRound }: { captions: Caption[], photoRound: number }) {
 
     const handleVote = (ID: number) => {
         console.log('voted on :', ID);
-        sendVote(ID);
+        sendVote(ID, photoRound);
     };
 
     console.log(captions);

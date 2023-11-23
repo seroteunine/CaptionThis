@@ -35,10 +35,12 @@ function Player() {
 
 
     const [captions, setCaptions] = useState<Caption[]>();
+    const [photoRound, setPhotoRound] = useState(0);
 
     useEffect(() => {
         socket.on('player:captioned-photo', (captionDTO: CaptionedPhotoDTO) => {
             setCaptions(captionDTO.captions);
+            setPhotoRound((prevRound) => prevRound + 1);
         })
 
         return () => {
@@ -56,7 +58,7 @@ function Player() {
                     {{
                         "PHOTO_UPLOAD": <PhotoUploadPlayer></PhotoUploadPlayer>,
                         "CAPTION": <CaptionPlayer></CaptionPlayer>,
-                        "VOTING": <VotingPlayer captions={captions!}></VotingPlayer>,
+                        "VOTING": <VotingPlayer captions={captions!} photoRound={photoRound}></VotingPlayer>,
                         "END": <EndPlayer></EndPlayer>
                     }[roomDTO!.game.phase]}
                 </div>

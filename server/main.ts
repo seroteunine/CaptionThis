@@ -48,11 +48,6 @@ type RoomDTO = {
     game: GameDTO | undefined
 }
 
-type CaptionInputDTO = {
-    caption: string,
-    ownerOfPhoto: string
-}
-
 type CaptionedPhotoDTO = {
     owner: string,
     captions: { authorPlayerID: string, captionText: string }[]
@@ -218,11 +213,11 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('player:send-vote', ({ roomID, captionID }) => {
+    socket.on('player:send-vote', ({ roomID, captionID, photoRound }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
-            game.addVote(socket.playerID, captionID);
+            game.addVote(socket.playerID, captionID, photoRound);
             sendEveryoneRoomDTO(room);
         }
     })
