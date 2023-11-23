@@ -222,7 +222,6 @@ io.on('connection', (socket_before) => {
     })
 
     socket.on('player:send-vote', ({ roomID, captionID }) => {
-        console.log(socket.playerID, captionID);
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;

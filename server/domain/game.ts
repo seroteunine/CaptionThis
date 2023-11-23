@@ -109,7 +109,8 @@ export class Game {
         const photoOwner = Array.from(this.photos.keys())[currentIndex];
         const captions = this.captions
             .filter((caption) => caption.photoOwnerPlayerID === photoOwner)
-            .map(({ authorPlayerID, captionText }) => ({
+            .map(({ ID, authorPlayerID, captionText }) => ({
+                ID,
                 authorPlayerID,
                 captionText,
             }));

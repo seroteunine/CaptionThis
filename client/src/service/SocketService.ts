@@ -26,11 +26,12 @@ export function goNextPhase() {
 }
 
 export function sendCaption(caption: string, ownerOfPhoto: string) {
-    socket.emit('player:send-caption', {
+    const captionDTO = {
         roomID: sessionStorage.getItem('roomID'),
         caption: caption,
         ownerOfPhoto: ownerOfPhoto
-    })
+    }
+    socket.emit('player:send-caption', captionDTO)
 }
 
 export function sendNextPhotoRequest(currentIndex: number) {
@@ -38,5 +39,5 @@ export function sendNextPhotoRequest(currentIndex: number) {
 }
 
 export function sendVote(ID: number) {
-    socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), ID: ID });
+    socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), captionID: ID });
 }

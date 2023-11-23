@@ -2,6 +2,7 @@ import { sendVote } from "../../service/SocketService";
 
 type Caption = {
     ID: number,
+    authorPlayerID: string,
     captionText: string
 }
 
@@ -11,6 +12,9 @@ function VotingPlayer({ captions }: { captions: Caption[] }) {
         console.log('voted on :', ID);
         sendVote(ID);
     };
+
+    console.log(captions);
+
 
     return (
         <div>
