@@ -105,10 +105,15 @@ function sendEveryoneRoomDTO(room: Room) {
     sendPlayersRoomDTO(room);
 }
 
-function resendRoomIfExists(playerID: string, roomID: string) {
-    const room = roomMap.get(roomID);
+function sendSessionInfo(playerID: string, roomID: string) {
+    const socketID = socketIDMap.get(playerID);
+    io.to(socketID || '').emit("session", { playerID, roomID });
+}
+
+function resendRoomIfExists(socket: CustomSocket) {
+    const room = roomMap.get(socket.roomID);
     if (room) {
-        const playerSocketID = socketIDMap.get(playerID);
+        const playerSocketID = socketIDMap.get(socket.playerID);
         const roomDTO: RoomDTO = room.getRoomDTO();
         io.to(playerSocketID || '').emit('player:room-update', roomDTO);
     }
@@ -118,6 +123,7 @@ function removeConnectionIfDead(playerID: string) {
     const socketID = socketIDMap.get(playerID);
     // TODO: ping the user and remove the playerID if this user doesnt send a pong in 5 seconds.
 }
+
 
 
 const socketIDMap = new Map<string, string>();
@@ -140,8 +146,8 @@ io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
 
     //For reconnected clients
-    socket.emit("session", { playerID: socket.playerID, roomID: socket.roomID });
-    resendRoomIfExists(socket.playerID, socket.roomID);
+    sendSessionInfo(socket.playerID, socket.roomID);
+    resendRoomIfExists(socket);
 
     socket.on('host:create-room', () => {
         const roomID = generateRoomID();
@@ -149,24 +155,23 @@ io.on('connection', (socket_before) => {
         const room = new Room(roomID, hostID);
         roomMap.set(roomID, room);
         sendHostRoomDTO(room);
+        sendSessionInfo(socket.playerID, roomID);
         console.log(`host ${hostID} created room ${roomID}`);
-        socket.emit('session', { playerID: socket.playerID, roomID: roomID });
     })
 
-    socket.on('player:join-room', (roomID) => {
-        const playerID = socket.playerID;
+    socket.on('player:join-room', (roomID: string) => {
         const room = roomMap.get(roomID);
         if (!room) {
             socket.emit('player:invalid-room');
             return;
         }
-        room.addPlayer(playerID);
-        socket.emit('session', { playerID: socket.playerID, roomID: roomID });
+        room.addPlayer(socket.playerID);
         sendEveryoneRoomDTO(room);
+        sendSessionInfo(socket.playerID, roomID);
     })
 
-    socket.on('host:start-game', (roomID) => {
-        const room = roomMap.get(roomID);
+    socket.on('host:start-game', () => {
+        const room = roomMap.get(socket.roomID);
         if (room) {
             room.tryStartGame();
             if (!room.hasGame()) {
@@ -177,8 +182,8 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('host:next-phase', (roomID) => {
-        const room = roomMap.get(roomID);
+    socket.on('host:next-phase', () => {
+        const room = roomMap.get(socket.roomID);
         if (room && room.hasGame()) {
             room.game!.nextPhase();
             sendEveryoneRoomDTO(room);
