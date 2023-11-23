@@ -131,10 +131,12 @@ const roomMap = new Map<string, Room>();
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
     let playerID = socket.handshake.auth.playerID;
+    let roomID = socket.handshake.auth.roomID;
     if (!playerID) {
         playerID = generatePlayerID();
     }
     socket.playerID = playerID;
+    socket.roomID = roomID;
     socketIDMap.set(socket.playerID, socket.id);
     next();
 });
