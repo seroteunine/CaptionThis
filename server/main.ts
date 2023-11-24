@@ -244,8 +244,8 @@ io.on('connection', (socket_before) => {
 
             if (game.hasEveryoneVotedThisRound()) {
                 game.nextVotingRound()
-                game.tryNextPhase();
 
+                game.tryNextPhase();
                 if (game.gamePhase === Phase.END) {
                     sendEveryoneRoomDTO(room);
                 }

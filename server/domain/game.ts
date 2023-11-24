@@ -164,7 +164,7 @@ export class Game {
     }
 
     VotingPhaseDone() {
-        return this.votingRound === this.votes.size;
+        return this.votingRound === this.votes.size + 1;
     }
 
     getScore() {
