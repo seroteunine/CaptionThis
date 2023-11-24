@@ -13,6 +13,8 @@ type Caption = {
     votedBy: string[];
 }
 
+const POINTS_PER_VOTE = 100;
+
 export class Game {
 
     gamePhase: Phase;
@@ -154,6 +156,21 @@ export class Game {
             }
         }
         return true;
+    }
+
+    getScore() {
+        const scores: Record<string, number> = {};
+
+        this.playerIDs.forEach(playerID => {
+            scores[playerID] = 0;
+        });
+
+        this.captions.forEach(caption => {
+            const author = caption.authorPlayerID;
+            scores[author] += caption.votedBy.length * POINTS_PER_VOTE;
+        });
+
+        return scores;
     }
 
     getGameDTO() {

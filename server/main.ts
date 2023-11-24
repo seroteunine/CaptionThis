@@ -114,6 +114,18 @@ function resendRoomIfExists(socket: CustomSocket) {
     }
 }
 
+function removeRoomAndSockets(roomID: string) {
+    const room = roomMap.get(roomID);
+    if (!room) {
+        return;
+    }
+    const players = room.getPlayers();
+    players.forEach((player) => socketIDMap.delete(player));
+    const host = room.getHostID();
+    socketIDMap.delete(host);
+    roomMap.delete(roomID);
+}
+
 
 const socketIDMap = new Map<string, string>();
 const roomMap = new Map<string, Room>();
@@ -222,6 +234,19 @@ io.on('connection', (socket_before) => {
             game.addVote(socket.playerID, captionID, photoRound);
             sendEveryoneRoomDTO(room);
         }
+    })
+
+    socket.on('host:get-score', (roomID) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame()) {
+            const game = room.game!;
+            const scoreDTO = game.getScore();
+            socket.emit('host:score', scoreDTO);
+        }
+    })
+
+    socket.on('host:delete-room', (roomID) => {
+        removeRoomAndSockets(roomID);
     })
 
 })
