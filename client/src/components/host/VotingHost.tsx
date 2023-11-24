@@ -15,8 +15,7 @@ function VotingHost() {
     const { roomDTO } = useRoom();
     const photos = roomDTO!.game!.photos;
 
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-    const isLastPhoto = (currentPhotoIndex === Object.keys(photos).length + 1);
+    const isLastPhoto = false;
 
     const [captionedPhoto, setCaptionedPhoto] = useState<CaptionedPhotoDTO>();
 
@@ -32,11 +31,10 @@ function VotingHost() {
 
     const handleCaptionedPhoto = useCallback((captionedPhoto: CaptionedPhotoDTO) => {
         setCaptionedPhoto(captionedPhoto);
-        setCurrentPhotoIndex((prevIndex) => prevIndex + 1);
     }, [photos]);
 
     const askNextPhoto = () => {
-        sendNextPhotoRequest(currentPhotoIndex);
+        sendNextPhotoRequest();
     }
 
     return (

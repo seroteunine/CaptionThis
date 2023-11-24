@@ -32,7 +32,6 @@ type Caption = {
     authorPlayerID: string;
     photoOwnerPlayerID: string;
     captionText: string;
-    votedBy: string[];
 }
 
 type GameDTO = {
@@ -62,7 +61,8 @@ function sendHostRoomDTO(room: Room) {
     io.to(hostSocketID || '').emit('host:room-update', roomDTO);
 }
 
-function sendHostCaptionedPhoto(hostID: string, captionedPhoto: CaptionedPhotoDTO) {
+function sendHostCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO) {
+    const hostID = room.getHostID();
     const hostSocketID = socketIDMap.get(hostID);
     io.to(hostSocketID || '').emit('host:captioned-photo', captionedPhoto)
 }
@@ -222,24 +222,45 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('host:request-next-photo', ({ roomID, currentIndex }) => {
+    socket.on('host:request-first-photo', (roomID) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
-            if (game.hasEveryoneVoted(currentIndex)) {
-                const captionedPhoto = game.getCaptionedPhoto(currentIndex);
-                sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
-                sendPlayersCaptionedPhoto(room, captionedPhoto);
-            }
+            const captionedPhoto = game.getCaptionedPhoto();
+            sendHostCaptionedPhoto(room, captionedPhoto);
+            sendPlayersCaptionedPhoto(room, captionedPhoto);
         }
     })
 
-    socket.on('player:send-vote', ({ roomID, captionID, photoRound }) => {
+    // socket.on('host:request-next-photo', (roomID) => {
+    //     const room = roomMap.get(roomID);
+    //     if (room && room.hasGame()) {
+    //         const game = room.game!;
+    //         if (game.hasEveryoneVotedThisRound()) {
+    //             const captionedPhoto = game.getCaptionedPhoto();
+    //             sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
+    //             sendPlayersCaptionedPhoto(room, captionedPhoto);
+    //         }
+    //     }
+    // })
+
+    socket.on('player:send-vote', ({ roomID, captionID }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
-            game.addVote(socket.playerID, captionID, photoRound);
-            sendEveryoneRoomDTO(room);
+            game.addVote(socket.playerID, captionID);
+            console.log(game.votingRound);
+            if (game.hasEveryoneVotedThisRound()) {
+
+                game.nextVotingRound()
+                const captionedPhoto = game.getCaptionedPhoto();
+                console.log(game.votingRound);
+
+                console.log(captionedPhoto);
+
+                sendHostCaptionedPhoto(room, captionedPhoto);
+                sendPlayersCaptionedPhoto(room, captionedPhoto);
+            }
         }
     })
 

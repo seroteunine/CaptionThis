@@ -10,7 +10,11 @@ type Caption = {
     authorPlayerID: string;
     photoOwnerPlayerID: string;
     captionText: string;
-    votedBy: string[];
+}
+
+type Vote = {
+    playerID: string;
+    captionID: number;
 }
 
 const POINTS_PER_VOTE = 100;
@@ -21,12 +25,21 @@ export class Game {
     playerIDs: Set<string>;
     photos: Map<string, ArrayBuffer>;
     captions: Caption[];
+    votes: Map<number, Vote[]>;
+    votingRound: number;
 
     constructor(playerIDs: Set<string>) {
         this.gamePhase = Phase.PHOTO_UPLOAD;
         this.playerIDs = playerIDs;
         this.photos = new Map<string, ArrayBuffer>();
         this.captions = [];
+        this.votes = new Map<number, Vote[]>();
+        this.votingRound = 1;
+
+        const numberOfRounds = playerIDs.size;
+        for (let round = 1; round <= numberOfRounds; round++) {
+            this.votes.set(round, []);
+        }
     };
 
     getPlayers() {
@@ -96,7 +109,6 @@ export class Game {
             authorPlayerID: author,
             photoOwnerPlayerID: ownerOfPhoto,
             captionText: captionText,
-            votedBy: [],
         }
         this.captions.push(caption);
     }
@@ -107,8 +119,8 @@ export class Game {
         }
     }
 
-    getCaptionedPhoto(currentIndex: number) {
-        const photoOwner = Array.from(this.photos.keys())[currentIndex];
+    getCaptionedPhoto() {
+        const photoOwner = Array.from(this.photos.keys())[this.votingRound - 1];
         const captions = this.captions
             .filter((caption) => caption.photoOwnerPlayerID === photoOwner)
             .map(({ ID, authorPlayerID, captionText }) => ({
@@ -123,51 +135,45 @@ export class Game {
         return captionedPhoto;
     }
 
-    addVote(playerID: string, captionID: number, photoRound: number) {
+    addVote(playerID: string, captionID: number) {
         const caption: Caption = this.captions[captionID];
         if (caption.authorPlayerID === playerID) {
             throw new Error('Player can not vote on own caption');
         }
-        if (!caption.votedBy.includes(playerID) && !this.hasAlreadyVotedThisRound(playerID, photoRound)) {
-            caption.votedBy.push(playerID);
+        const votes = this.votes.get(this.votingRound);
+        const vote = { playerID, captionID };
+        if (!this.playerHasAlreadyVotedThisRound(playerID)) {
+            votes?.push(vote);
         }
     }
 
-    hasAlreadyVotedThisRound(playerID: string, photoRound: number) {
-        let voteCount = 0;
-        for (const caption of this.captions) {
-            if (caption.votedBy.includes(playerID)) {
-                voteCount++;
-            }
-        }
-        return voteCount >= photoRound;
+    playerHasAlreadyVotedThisRound(playerID: string) {
+        const votes = this.votes.get(this.votingRound);
+        return votes?.some((vote) => vote.playerID === playerID);
     }
 
-    hasEveryoneVoted(photoRound: number) {
-        for (const playerID of this.playerIDs) {
-            let voteCount = 0;
+    nextVotingRound() {
+        this.votingRound += 1;
+    }
 
-            for (const caption of this.captions) {
-                voteCount += caption.votedBy.filter(voterID => voterID === playerID).length;
-            }
-
-            if (voteCount < photoRound) {
-                return false;
-            }
-        }
-        return true;
+    hasEveryoneVotedThisRound() {
+        const votes = this.votes.get(this.votingRound);
+        return votes?.length === this.playerIDs.size;
     }
 
     getScore() {
         const scores: Record<string, number> = {};
-
         this.playerIDs.forEach(playerID => {
             scores[playerID] = 0;
         });
 
-        this.captions.forEach(caption => {
-            const author = caption.authorPlayerID;
-            scores[author] += caption.votedBy.length * POINTS_PER_VOTE;
+        this.votes.forEach((votesInRound) => {
+            votesInRound.forEach(vote => {
+                const caption = this.captions.find(caption => caption.ID === vote.captionID);
+                if (caption) {
+                    scores[caption.authorPlayerID] += POINTS_PER_VOTE;
+                }
+            });
         });
 
         return scores;
