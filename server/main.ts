@@ -23,25 +23,34 @@ const io = new Server(server, {
 
 interface CustomSocket extends Socket {
     playerID: string;
+    roomID: string;
+}
+
+type Caption = {
+    ID: number;
+    authorPlayerID: string;
+    photoOwnerPlayerID: string;
+    captionText: string;
+    votedBy: string[];
 }
 
 type GameDTO = {
     phase: string;
-    playerNames: string[];
+    playerIDs: string[];
     photos: { [k: string]: ArrayBuffer };
-    captions: { [owner: string]: { [author: string]: string } };
+    captions: Caption[];
 }
 
 type RoomDTO = {
     roomID: string,
     hostID: string,
-    playersIDToName: { [k: string]: string };
+    playerIDs: string[];
     game: GameDTO | undefined
 }
 
-type CaptionInputDTO = {
-    caption: string,
-    ownerOfPhoto: string
+type CaptionedPhotoDTO = {
+    owner: string,
+    captions: { authorPlayerID: string, captionText: string }[]
 }
 
 
@@ -50,6 +59,11 @@ function sendHostRoomDTO(room: Room) {
     const hostID = room.getHostID();
     const hostSocketID = socketIDMap.get(hostID);
     io.to(hostSocketID || '').emit('host:room-update', roomDTO);
+}
+
+function sendHostCaptionedPhoto(hostID: string, captionedPhoto: CaptionedPhotoDTO) {
+    const hostSocketID = socketIDMap.get(hostID);
+    io.to(hostSocketID || '').emit('host:captioned-photo', captionedPhoto)
 }
 
 function sendPlayersRoomDTO(room: Room) {
@@ -61,44 +75,58 @@ function sendPlayersRoomDTO(room: Room) {
     }
 }
 
+function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO) {
+    const players = room.getPlayers();
+    for (const playerID of players.keys()) {
+        const playerSocketID = socketIDMap.get(playerID);
+
+        const captionedPhotoOwnExcluded = {
+            owner: captionedPhoto.owner,
+            captions: captionedPhoto.captions.filter(caption => caption.authorPlayerID !== playerID)
+        }; //Exclude own caption to make sure that you cant vote on yourself
+
+        io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhotoOwnExcluded);
+    }
+}
+
+function sendRoomNameUpdate(room: Room, playerID: string, username: string) {
+    const host = room.getHostID();
+    const hostSocketID = socketIDMap.get(host);
+    io.to(hostSocketID || '').emit('host:name-update', { playerID: playerID, username: username });
+}
+
 function sendEveryoneRoomDTO(room: Room) {
     sendHostRoomDTO(room);
     sendPlayersRoomDTO(room);
 }
 
-function getRoomByPlayerID(playerID: string) {
-    for (let room of roomMap.values()) {
-        const players = room.getPlayers();
-        if (players.has(playerID) || room.getHostID() === playerID) {
-            return room;
-        }
-    }
-}
-
-function resendRoomIfExists(playerID: string) {
-    const room = getRoomByPlayerID(playerID);
-    if (room) {
-        sendEveryoneRoomDTO(room);
-    }
-}
-
-function removeConnectionIfDead(playerID: string) {
+function sendSessionInfo(playerID: string, roomID: string) {
     const socketID = socketIDMap.get(playerID);
-    // TODO: ping the user and remove the playerID if this user doesnt send a pong in 5 seconds.
+    io.to(socketID || '').emit("session", { playerID, roomID });
+}
+
+function resendRoomIfExists(socket: CustomSocket) {
+    const room = roomMap.get(socket.roomID);
+    if (room) {
+        const socketID = socketIDMap.get(socket.playerID);
+        const roomDTO: RoomDTO = room.getRoomDTO();
+        io.to(socketID || '').emit('player:room-update', roomDTO);
+    }
 }
 
 
 const socketIDMap = new Map<string, string>();
 const roomMap = new Map<string, Room>();
 
-
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
     let playerID = socket.handshake.auth.playerID;
+    let roomID = socket.handshake.auth.roomID;
     if (!playerID) {
         playerID = generatePlayerID();
     }
     socket.playerID = playerID;
+    socket.roomID = roomID;
     socketIDMap.set(socket.playerID, socket.id);
     next();
 });
@@ -106,9 +134,9 @@ io.use((socket_before, next) => {
 io.on('connection', (socket_before) => {
     const socket = socket_before as CustomSocket;
 
-    //For reconnected clients
-    socket.emit("playerID", socket.playerID);
-    resendRoomIfExists(socket.playerID);
+    //For reconnecting clients
+    sendSessionInfo(socket.playerID, socket.roomID);
+    resendRoomIfExists(socket);
 
     socket.on('host:create-room', () => {
         const roomID = generateRoomID();
@@ -116,18 +144,19 @@ io.on('connection', (socket_before) => {
         const room = new Room(roomID, hostID);
         roomMap.set(roomID, room);
         sendHostRoomDTO(room);
+        sendSessionInfo(socket.playerID, roomID);
         console.log(`host ${hostID} created room ${roomID}`);
     })
 
     socket.on('player:join-room', (roomID) => {
-        const playerID = socket.playerID;
         const room = roomMap.get(roomID);
         if (!room) {
             socket.emit('player:invalid-room');
             return;
         }
-        room.addPlayer(playerID);
+        room.addPlayer(socket.playerID);
         sendEveryoneRoomDTO(room);
+        sendSessionInfo(socket.playerID, roomID);
     })
 
     socket.on('host:start-game', (roomID) => {
@@ -150,34 +179,49 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('player:send-image', (imageInputDTO) => {
-        const room = getRoomByPlayerID(socket.playerID);
-        if (room) {
-            room.addPhoto(socket.playerID, imageInputDTO);
+    socket.on('player:send-image', ({ roomID, file }) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame()) {
+            room.game!.addPhoto(socket.playerID, file);
             sendEveryoneRoomDTO(room);
         }
     })
 
-    socket.on('player:set-name', (newName) => {
-        const room = getRoomByPlayerID(socket.playerID);
+    socket.on('player:set-name', ({ roomID, username }) => {
+        const room = roomMap.get(roomID)
         if (room) {
-            room.setPlayerName(socket.playerID, newName);
-            sendEveryoneRoomDTO(room);
+            sendRoomNameUpdate(room, socket.playerID, username);
         }
     })
 
-    socket.on('player:send-caption', (captionInput: CaptionInputDTO) => {
-        const room = getRoomByPlayerID(socket.playerID);
-        if (room && room.hasGame() && room.playersIDToName.get(socket.playerID)) {
-            const game = room.game!;
-            const authorPlayername = room.playersIDToName.get(socket.playerID)!;
-            game.addCaption(authorPlayername, captionInput.caption, captionInput.ownerOfPhoto);
+    socket.on('player:send-caption', ({ roomID, caption, ownerOfPhoto }) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame()) {
+            const game = room.game!;;
+            game.addCaption(socket.playerID, caption, ownerOfPhoto);
             sendHostRoomDTO(room);
         }
     })
 
-    socket.on('disconnect', () => {
-        removeConnectionIfDead(socket.playerID);
+    socket.on('host:request-next-photo', ({ roomID, currentIndex }) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame()) {
+            const game = room.game!;
+            if (game.hasEveryoneVoted(currentIndex)) {
+                const captionedPhoto = game.getCaptionedPhoto(currentIndex);
+                sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
+                sendPlayersCaptionedPhoto(room, captionedPhoto);
+            }
+        }
+    })
+
+    socket.on('player:send-vote', ({ roomID, captionID, photoRound }) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame()) {
+            const game = room.game!;
+            game.addVote(socket.playerID, captionID, photoRound);
+            sendEveryoneRoomDTO(room);
+        }
     })
 
 })

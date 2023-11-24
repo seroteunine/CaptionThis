@@ -1,16 +1,24 @@
 import React, { createContext, useContext, useState } from 'react';
 
+type Caption = {
+    ID: number;
+    authorPlayerID: string;
+    photoOwnerPlayerID: string;
+    captionText: string;
+    votedBy: string[];
+}
+
 type GameDTO = {
     phase: string;
-    playerNames: string[];
+    playerIDs: string[];
     photos: { [k: string]: ArrayBuffer };
-    captions: { [owner: string]: { [author: string]: string } };
+    captions: Caption[];
 }
 
 type RoomDTO = {
     roomID: string,
     hostID: string,
-    playersIDToName: { [k: string]: string };
+    playerIDs: string[];
     game: GameDTO | undefined
 }
 

@@ -5,37 +5,38 @@ export enum Phase {
     END = "END",
 };
 
+type Caption = {
+    ID: number;
+    authorPlayerID: string;
+    photoOwnerPlayerID: string;
+    captionText: string;
+    votedBy: string[];
+}
+
 export class Game {
 
     gamePhase: Phase;
-    playerNames: string[];
+    playerIDs: Set<string>;
     photos: Map<string, ArrayBuffer>;
-    captions: Map<string, Map<string, string>>; //Map<ownerOfPhoto(=photo_identifier), Map<authorOfCaption, caption>>
+    captions: Caption[];
 
-    constructor() {
+    constructor(playerIDs: Set<string>) {
         this.gamePhase = Phase.PHOTO_UPLOAD;
-        this.playerNames = [];
+        this.playerIDs = playerIDs;
         this.photos = new Map<string, ArrayBuffer>();
-        this.captions = new Map<string, Map<string, string>>();
+        this.captions = [];
     };
 
     getPlayers() {
-        return this.playerNames;
-    }
-
-    addPlayer(player: string) {
-        if (this.playerNames.includes(player)) {
-            throw new Error();
-        }
-        this.playerNames.push(player);
+        return this.playerIDs;
     }
 
     getCurrentPhase() {
         return this.gamePhase;
     };
 
-    addPhoto(playerName: string, photo: ArrayBuffer) {
-        this.photos.set(playerName, photo);
+    addPhoto(playerID: string, photo: ArrayBuffer) {
+        this.photos.set(playerID, photo);
     }
 
     nextPhase() {
@@ -61,20 +62,24 @@ export class Game {
     }
 
     checkAllPlayersHavePhoto() {
-        return this.playerNames.every(playerName => this.photos.has(playerName));
+        return Array.from(this.playerIDs).every(playerID => this.photos.has(playerID));
     }
 
     checkAllPhotosHaveCaption() {
         for (const [ownerOfPhoto] of this.photos) {
-            const captionsForPhoto = this.captions.get(ownerOfPhoto);
+            const captionsForPhoto = this.captions.filter((caption) => caption.photoOwnerPlayerID === ownerOfPhoto);
 
             if (!captionsForPhoto) {
                 return false;
             }
 
-            const otherPlayers = this.playerNames.filter(player => player !== ownerOfPhoto);
+            const otherPlayers = Array.from(this.playerIDs).filter(player => player !== ownerOfPhoto);
             for (const player of otherPlayers) {
-                if (!captionsForPhoto.has(player)) {
+                const captionExists = captionsForPhoto.some(
+                    (caption) => caption.photoOwnerPlayerID === ownerOfPhoto && caption.authorPlayerID === player
+                );
+
+                if (!captionExists) {
                     return false;
                 }
             }
@@ -82,14 +87,16 @@ export class Game {
         return true;
     }
 
-    addCaption(author: string, caption: string, ownerOfPhoto: string) {
+    addCaption(author: string, captionText: string, ownerOfPhoto: string) {
         this.checkValidCaption(author, ownerOfPhoto);
-        let captionsForPhoto = this.captions.get(ownerOfPhoto);
-        if (!captionsForPhoto) {
-            captionsForPhoto = new Map<string, string>();
-            this.captions.set(ownerOfPhoto, captionsForPhoto);
+        const caption: Caption = {
+            ID: this.captions.length,
+            authorPlayerID: author,
+            photoOwnerPlayerID: ownerOfPhoto,
+            captionText: captionText,
+            votedBy: [],
         }
-        captionsForPhoto.set(author, caption);
+        this.captions.push(caption);
     }
 
     checkValidCaption(author: string, ownerOfPhoto: string) {
@@ -98,14 +105,63 @@ export class Game {
         }
     }
 
+    getCaptionedPhoto(currentIndex: number) {
+        const photoOwner = Array.from(this.photos.keys())[currentIndex];
+        const captions = this.captions
+            .filter((caption) => caption.photoOwnerPlayerID === photoOwner)
+            .map(({ ID, authorPlayerID, captionText }) => ({
+                ID,
+                authorPlayerID,
+                captionText,
+            }));
+        const captionedPhoto = {
+            owner: photoOwner,
+            captions: captions
+        }
+        return captionedPhoto;
+    }
+
+    addVote(playerID: string, captionID: number, photoRound: number) {
+        const caption: Caption = this.captions[captionID];
+        if (caption.authorPlayerID === playerID) {
+            throw new Error('Player can not vote on own caption');
+        }
+        if (!caption.votedBy.includes(playerID) && !this.hasAlreadyVotedThisRound(playerID, photoRound)) {
+            caption.votedBy.push(playerID);
+        }
+    }
+
+    hasAlreadyVotedThisRound(playerID: string, photoRound: number) {
+        let voteCount = 0;
+        for (const caption of this.captions) {
+            if (caption.votedBy.includes(playerID)) {
+                voteCount++;
+            }
+        }
+        return voteCount >= photoRound;
+    }
+
+    hasEveryoneVoted(photoRound: number) {
+        for (const playerID of this.playerIDs) {
+            let voteCount = 0;
+
+            for (const caption of this.captions) {
+                voteCount += caption.votedBy.filter(voterID => voterID === playerID).length;
+            }
+
+            if (voteCount < photoRound) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     getGameDTO() {
         return {
             phase: this.gamePhase.toString(),
-            playerNames: this.playerNames,
+            playerIDs: Array.from(this.playerIDs),
             photos: Object.fromEntries(this.photos.entries()),
-            captions: Object.fromEntries(
-                Array.from(this.captions.entries()).map(([owner, captionsMap]) =>
-                    [owner, Object.fromEntries(captionsMap)]))
+            captions: this.captions
         }
     }
 

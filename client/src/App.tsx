@@ -5,19 +5,26 @@ import Host from './pages/Host';
 import Player from './pages/Player';
 import socket from './socket';
 import { useRoom } from './context/RoomContext';
+import { useNameContext } from './context/NamesContext';
 
 function App() {
 
   const [codeInvalid, setCodeInvalid] = useState(false);
   const playerID = sessionStorage.getItem("playerID");
+  const roomID = sessionStorage.getItem("roomID");
 
   const { roomDTO, setRoomDTO } = useRoom();
+  const { setNameMap } = useNameContext();
 
   useEffect(() => {
 
     socket.on('host:room-update', (roomDTO) => {
       setRoomDTO(roomDTO);
     })
+
+    socket.on('host:name-update', ({ playerID, username }) => {
+      setNameMap((nameMap) => new Map<string, string>(nameMap).set(playerID, username));
+    });
 
     socket.on('player:room-update', (roomDTO) => {
       setRoomDTO(roomDTO);
@@ -33,13 +40,12 @@ function App() {
 
     //For reconnections
     if (playerID) {
-      socket.auth = { playerID };
-      sessionStorage.setItem("playerID", playerID);
+      socket.auth = { playerID, roomID };
     }
-
-    socket.on("playerID", (playerID) => {
-      socket.auth = { playerID };
+    socket.on("session", ({ playerID, roomID }) => {
+      socket.auth = { playerID, roomID };
       sessionStorage.setItem("playerID", playerID);
+      sessionStorage.setItem("roomID", roomID);
     });
 
     return () => {

@@ -1,27 +1,66 @@
+import { useCallback, useEffect, useState } from "react";
 import { useRoom } from "../../context/RoomContext";
 import ImageComponent from "../ImageComponent";
 import NextPhaseButton from "./NextPhaseButton";
+import socket from "../../socket";
+import { sendNextPhotoRequest } from "../../service/SocketService";
+
+type CaptionedPhotoDTO = {
+    owner: string,
+    captions: { ID: number, captionText: string }[]
+}
 
 function VotingHost() {
 
     const { roomDTO } = useRoom();
+    const photos = roomDTO!.game!.photos;
+
+    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+    const isLastPhoto = (currentPhotoIndex === Object.keys(photos).length + 1);
+
+    const [captionedPhoto, setCaptionedPhoto] = useState<CaptionedPhotoDTO>();
+
+    useEffect(() => {
+        socket.on('host:captioned-photo', handleCaptionedPhoto);
+
+        askNextPhoto();
+
+        return () => {
+            socket.off('host:captioned-photo', handleCaptionedPhoto);
+        }
+    }, []);
+
+    const handleCaptionedPhoto = useCallback((captionedPhoto: CaptionedPhotoDTO) => {
+        setCaptionedPhoto(captionedPhoto);
+        setCurrentPhotoIndex((prevIndex) => prevIndex + 1);
+    }, [photos]);
+
+    const askNextPhoto = () => {
+        sendNextPhotoRequest(currentPhotoIndex);
+    }
 
     return (
         <div>
             <h1>Voting phase</h1>
-            <NextPhaseButton nextPhase="End"></NextPhaseButton>
-            {Object.entries(roomDTO!.game!.captions).map(([photoOwner, captions]) => (
-                <div key={photoOwner}>
-                    <ImageComponent arrayBuffer={roomDTO!.game!.photos[photoOwner]}></ImageComponent>
-                    <ul>
-                        {Object.entries(captions).map(([author, caption]) => (
-                            <li key={author}>
-                                <strong>{author}:</strong> {caption}
-                            </li>
-                        ))}
-                    </ul>
+
+            {captionedPhoto ? (
+                <div key={captionedPhoto.owner}>
+                    <ImageComponent arrayBuffer={photos[captionedPhoto.owner]}></ImageComponent>
+
+                    {captionedPhoto.captions.map((caption) => (
+                        <h2 key={caption.ID}>{caption.captionText}</h2>
+                    ))}
+
+                    {isLastPhoto ?
+                        <NextPhaseButton nextPhase="End"></NextPhaseButton>
+                        :
+                        <button className="bg-white" onClick={askNextPhoto}>Next photo</button>
+                    }
                 </div>
-            ))}
+            ) : (
+                <p>Loading...</p>
+            )}
+
         </div>
     )
 }

@@ -8,13 +8,12 @@ function CaptionPlayer() {
 
     const { roomDTO } = useRoom();
     const playerID = sessionStorage.getItem('playerID')!;
-    const playerName = roomDTO!.playersIDToName[playerID];
 
     const [caption, setCaption] = useState('');
 
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [isLastPhoto, setIsLastPhoto] = useState(false);
-    const photos = Object.entries(roomDTO!.game!.photos).filter(([key]) => playerName !== key);
+    const photos = Object.entries(roomDTO!.game!.photos).filter(([key]) => playerID !== key);
 
     const [key, value] = photos[currentPhotoIndex];
 
