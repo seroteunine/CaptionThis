@@ -17,8 +17,8 @@ function ImageComponent({ arrayBuffer }: { arrayBuffer: ArrayBuffer }) {
     }, [arrayBuffer]);
 
     return (
-        <div>
-            {imageUrl && <img className='w-1/4 h-auto' src={imageUrl} alt="Loaded from ArrayBuffer" />}
+        <div className='flex justify-center items-center h-full'>
+            {imageUrl && <img className='w-1/4 md:w-3/4 h-auto' src={imageUrl} alt="Loaded from ArrayBuffer" />}
         </div>
     );
 }
