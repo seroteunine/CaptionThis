@@ -121,7 +121,7 @@ export class Game {
         }
     }
 
-    getCaptionedPhoto() {
+    getCaptionsForVoting() {
         const photoOwner = Array.from(this.photos.keys())[this.votingRound - 1];
         const captions = this.captions
             .filter((caption) => caption.photoOwnerPlayerID === photoOwner)
@@ -130,11 +130,11 @@ export class Game {
                 authorPlayerID,
                 captionText,
             }));
-        const captionedPhoto = {
+        const captionsForVoting = {
             owner: photoOwner,
             captions: captions
         }
-        return captionedPhoto;
+        return captionsForVoting;
     }
 
     addVote(playerID: string, captionID: number) {

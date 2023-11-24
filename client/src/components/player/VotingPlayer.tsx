@@ -6,11 +6,11 @@ type Caption = {
     captionText: string
 }
 
-function VotingPlayer({ captions, photoRound, hasVoted, setHasVoted }: { captions: Caption[], photoRound: number, hasVoted: Boolean, setHasVoted: React.Dispatch<React.SetStateAction<boolean>> }) {
+function VotingPlayer({ captions, hasVoted, setHasVoted }: { captions: Caption[], hasVoted: Boolean, setHasVoted: React.Dispatch<React.SetStateAction<boolean>> }) {
 
     const handleVote = (ID: number) => {
         console.log('voted on :', ID);
-        sendVote(ID, photoRound);
+        sendVote(ID);
         setHasVoted(true);
     };
 

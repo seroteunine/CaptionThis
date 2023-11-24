@@ -34,12 +34,12 @@ export function sendCaption(caption: string, ownerOfPhoto: string) {
     socket.emit('player:send-caption', captionDTO)
 }
 
-export function sendNextPhotoRequest() {
+export function sendFirstPhotoRequest() {
     socket.emit('host:request-first-photo', (sessionStorage.getItem('roomID')));
 }
 
-export function sendVote(ID: number, photoRound: number) {
-    socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), captionID: ID, photoRound: photoRound });
+export function sendVote(captionID: number) {
+    socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), captionID: captionID });
 }
 
 export function getScore() {

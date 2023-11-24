@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRoom } from "../../context/RoomContext";
 import ImageComponent from "../ImageComponent";
 import socket from "../../socket";
-import { sendNextPhotoRequest } from "../../service/SocketService";
+import { sendFirstPhotoRequest } from "../../service/SocketService";
 
-type CaptionedPhotoDTO = {
+type captionsForVotingDTO = {
     owner: string,
     captions: { ID: number, captionText: string }[]
 }
@@ -14,35 +14,29 @@ function VotingHost() {
     const { roomDTO } = useRoom();
     const photos = roomDTO!.game!.photos;
 
-    const [captionedPhoto, setCaptionedPhoto] = useState<CaptionedPhotoDTO>();
+    const [captionsForVoting, setCaptionsForVoting] = useState<captionsForVotingDTO>();
 
     useEffect(() => {
-        socket.on('host:captioned-photo', handleCaptionedPhoto);
+        socket.on('host:captions-for-voting', (captionsForVotingDTO) => {
+            setCaptionsForVoting(captionsForVotingDTO);
+        });
 
-        askNextPhoto();
+        sendFirstPhotoRequest();
 
         return () => {
-            socket.off('host:captioned-photo', handleCaptionedPhoto);
+            socket.off('host:captions-for-voting');
         }
     }, []);
-
-    const handleCaptionedPhoto = useCallback((captionedPhoto: CaptionedPhotoDTO) => {
-        setCaptionedPhoto(captionedPhoto);
-    }, [photos]);
-
-    const askNextPhoto = () => {
-        sendNextPhotoRequest();
-    }
 
     return (
         <div>
             <h1>Voting phase</h1>
 
-            {captionedPhoto ? (
-                <div key={captionedPhoto.owner}>
-                    <ImageComponent arrayBuffer={photos[captionedPhoto.owner]}></ImageComponent>
+            {captionsForVoting ? (
+                <div key={captionsForVoting.owner}>
+                    <ImageComponent arrayBuffer={photos[captionsForVoting.owner]}></ImageComponent>
 
-                    {captionedPhoto.captions.map((caption) => (
+                    {captionsForVoting.captions.map((caption) => (
                         <h2 key={caption.ID}>{caption.captionText}</h2>
                     ))}
                 </div>

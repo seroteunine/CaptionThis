@@ -48,7 +48,7 @@ type RoomDTO = {
     game: GameDTO | undefined
 }
 
-type CaptionedPhotoDTO = {
+type captionsForVotingDTO = {
     owner: string,
     captions: { authorPlayerID: string, captionText: string }[]
 }
@@ -61,10 +61,10 @@ function sendHostRoomDTO(room: Room) {
     io.to(hostSocketID || '').emit('host:room-update', roomDTO);
 }
 
-function sendHostCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO) {
+function sendHostCaptionsForVoting(room: Room, captionsForVoting: captionsForVotingDTO) {
     const hostID = room.getHostID();
     const hostSocketID = socketIDMap.get(hostID);
-    io.to(hostSocketID || '').emit('host:captioned-photo', captionedPhoto)
+    io.to(hostSocketID || '').emit('host:captions-for-voting', captionsForVoting)
 }
 
 function sendPlayersRoomDTO(room: Room) {
@@ -76,17 +76,17 @@ function sendPlayersRoomDTO(room: Room) {
     }
 }
 
-function sendPlayersCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO) {
+function sendPlayersCaptionsForVoting(room: Room, captionsForVoting: captionsForVotingDTO) {
     const players = room.getPlayers();
     for (const playerID of players.keys()) {
         const playerSocketID = socketIDMap.get(playerID);
 
-        const captionedPhotoOwnExcluded = {
-            owner: captionedPhoto.owner,
-            captions: captionedPhoto.captions.filter(caption => caption.authorPlayerID !== playerID)
-        }; //Exclude own caption to make sure that you cant vote on yourself
+        const captionsForVotingOwnExcluded = {
+            owner: captionsForVoting.owner,
+            captions: captionsForVoting.captions.filter(caption => caption.authorPlayerID !== playerID)
+        };
 
-        io.to(playerSocketID || '').emit('player:captioned-photo', captionedPhotoOwnExcluded);
+        io.to(playerSocketID || '').emit('player:captions-for-voting', captionsForVotingOwnExcluded);
     }
 }
 
@@ -218,23 +218,11 @@ io.on('connection', (socket_before) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
-            const captionedPhoto = game.getCaptionedPhoto();
-            sendHostCaptionedPhoto(room, captionedPhoto);
-            sendPlayersCaptionedPhoto(room, captionedPhoto);
+            const captionsForVoting = game.getCaptionsForVoting();
+            sendHostCaptionsForVoting(room, captionsForVoting);
+            sendPlayersCaptionsForVoting(room, captionsForVoting);
         }
     })
-
-    // socket.on('host:request-next-photo', (roomID) => {
-    //     const room = roomMap.get(roomID);
-    //     if (room && room.hasGame()) {
-    //         const game = room.game!;
-    //         if (game.hasEveryoneVotedThisRound()) {
-    //             const captionedPhoto = game.getCaptionedPhoto();
-    //             sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
-    //             sendPlayersCaptionedPhoto(room, captionedPhoto);
-    //         }
-    //     }
-    // })
 
     socket.on('player:send-vote', ({ roomID, captionID }) => {
         const room = roomMap.get(roomID);
@@ -250,9 +238,9 @@ io.on('connection', (socket_before) => {
                     sendEveryoneRoomDTO(room);
                 }
                 else {
-                    const captionedPhoto = game.getCaptionedPhoto();
-                    sendHostCaptionedPhoto(room, captionedPhoto);
-                    sendPlayersCaptionedPhoto(room, captionedPhoto);
+                    const captionsForVotingDTO = game.getCaptionsForVoting();
+                    sendHostCaptionsForVoting(room, captionsForVotingDTO);
+                    sendPlayersCaptionsForVoting(room, captionsForVotingDTO);
                 }
             }
         }

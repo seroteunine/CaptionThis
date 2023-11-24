@@ -21,12 +21,7 @@ function Host() {
 
     return (
         <>
-            <h1>Room: {roomDTO!.roomID} - You're the host {roomDTO!.hostID}</h1>
-            <h3>Players:</h3>
-            {roomDTO!.playerIDs.map((ID) => (
-                <h3 key={ID}>{nameMap.get(ID) || ID}</h3>
-            ))}
-
+            <h1>Room: {roomDTO!.roomID} - You're the host</h1>
             {roomDTO!.game
                 ?
                 <div>
@@ -38,11 +33,18 @@ function Host() {
                     }[roomDTO!.game.phase]}
                 </div>
                 :
-                <button
-                    className={`px-4 py-2 rounded font-bold text-white
+                <div>
+                    <h3>Players:</h3>
+                    {roomDTO!.playerIDs.map((ID) => (
+                        <h3 key={ID}>{nameMap.get(ID) || ID}</h3>
+                    ))}
+                    <button
+                        className={`px-4 py-2 rounded font-bold text-white
                         ${isStartingDisallowed ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'}`}
-                    onClick={handleStartGame}
-                    disabled={isStartingDisallowed}> Start game (you need 4 to 8 players) </button>
+                        onClick={handleStartGame}
+                        disabled={isStartingDisallowed}> Start game (you need 4 to 8 players)
+                    </button>
+                </div>
             }
         </>
     )

@@ -35,18 +35,16 @@ function Player() {
 
 
     const [captions, setCaptions] = useState<Caption[]>();
-    const [photoRound, setPhotoRound] = useState(0);
     const [hasVoted, setHasVoted] = useState(false);
 
     useEffect(() => {
-        socket.on('player:captioned-photo', (captionDTO: CaptionedPhotoDTO) => {
+        socket.on('player:captions-for-voting', (captionDTO: CaptionedPhotoDTO) => {
             setCaptions(captionDTO.captions);
-            setPhotoRound((prevRound) => prevRound + 1);
             setHasVoted(false);
         })
 
         return () => {
-            socket.off('player:captioned-photo');
+            socket.off('player:captions-for-voting');
         }
 
     }, [])
@@ -60,7 +58,7 @@ function Player() {
                     {{
                         "PHOTO_UPLOAD": <PhotoUploadPlayer></PhotoUploadPlayer>,
                         "CAPTION": <CaptionPlayer></CaptionPlayer>,
-                        "VOTING": <VotingPlayer captions={captions!} photoRound={photoRound} hasVoted={hasVoted} setHasVoted={setHasVoted}></VotingPlayer>,
+                        "VOTING": <VotingPlayer captions={captions!} hasVoted={hasVoted} setHasVoted={setHasVoted}></VotingPlayer>,
                         "END": <EndPlayer></EndPlayer>
                     }[roomDTO!.game.phase]}
                 </div>
