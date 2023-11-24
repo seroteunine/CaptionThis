@@ -7,6 +7,7 @@ dotenv.config();
 import { Server, Socket } from 'socket.io'
 import { Room } from './domain/room';
 import { generateRoomID, generatePlayerID } from './utils';
+import { Phase } from './domain/game';
 
 console.log(process.env.MY_SERVICE_URL);
 console.log('test');
@@ -183,18 +184,20 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('host:next-phase', (roomID) => {
-        const room = roomMap.get(roomID);
-        if (room && room.hasGame()) {
-            room.game!.nextPhase();
-            sendEveryoneRoomDTO(room);
-        }
-    })
+    // socket.on('host:next-phase', (roomID) => {
+    //     const room = roomMap.get(roomID);
+    //     if (room && room.hasGame()) {
+    //         room.game!.nextPhase();
+    //         sendEveryoneRoomDTO(room);
+    //     }
+    // })
 
     socket.on('player:send-image', ({ roomID, file }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
-            room.game!.addPhoto(socket.playerID, file);
+            const game = room.game!;
+            game.addPhoto(socket.playerID, file);
+            game.tryNextPhase();
             sendEveryoneRoomDTO(room);
         }
     })
@@ -209,9 +212,13 @@ io.on('connection', (socket_before) => {
     socket.on('player:send-caption', ({ roomID, caption, ownerOfPhoto }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
-            const game = room.game!;;
+            const game = room.game!;
             game.addCaption(socket.playerID, caption, ownerOfPhoto);
+            game.tryNextPhase();
             sendHostRoomDTO(room);
+            if (game.gamePhase === Phase.VOTING) {
+                sendPlayersRoomDTO(room);
+            }
         }
     })
 

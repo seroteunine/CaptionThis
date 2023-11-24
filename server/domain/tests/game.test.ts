@@ -15,7 +15,7 @@ function setGameOnCaptionPhase(game: Game) {
     game.addPhoto(player3, photo);
     game.addPhoto(player4, photo);
 
-    game.nextPhase();
+    game.tryNextPhase();
 }
 
 function addCaptionsAndGoToVotePhase(game: Game) {
@@ -32,7 +32,7 @@ function addCaptionsAndGoToVotePhase(game: Game) {
     game.addCaption(player4, 'a second caption', player1);
     game.addCaption(player4, 'a third caption', player3);
 
-    game.nextPhase();
+    game.tryNextPhase();
 }
 
 //Tests
@@ -48,7 +48,7 @@ test('Game doesnt go to captioning, if not every player has a photo', () => {
     game.addPhoto(player1, photo);
     game.addPhoto(player2, photo);
 
-    game.nextPhase();
+    game.tryNextPhase();
 
     expect(game.gamePhase).toBe(Phase.PHOTO_UPLOAD);
 })
@@ -79,7 +79,7 @@ test('game doesnt go to voting if not every photo has a caption of all players',
     game.addCaption(player1, 'a caption', player2);
     game.addCaption(player3, 'a caption', player2);
 
-    game.nextPhase();
+    game.tryNextPhase();
 
     expect(game.getCurrentPhase()).toBe(Phase.CAPTION);
 

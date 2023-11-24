@@ -41,7 +41,7 @@ export class Game {
         this.photos.set(playerID, photo);
     }
 
-    nextPhase() {
+    tryNextPhase() {
         switch (this.gamePhase) {
             case Phase.PHOTO_UPLOAD:
                 if (this.checkAllPlayersHavePhoto()) {
