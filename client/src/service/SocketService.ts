@@ -34,8 +34,8 @@ export function sendCaption(caption: string, ownerOfPhoto: string) {
     socket.emit('player:send-caption', captionDTO)
 }
 
-export function sendNextPhotoRequest(currentIndex: number) {
-    socket.emit('host:request-next-photo', { roomID: sessionStorage.getItem('roomID'), currentIndex: currentIndex });
+export function sendNextPhotoRequest() {
+    socket.emit('host:request-first-photo', (sessionStorage.getItem('roomID')));
 }
 
 export function sendVote(ID: number, photoRound: number) {

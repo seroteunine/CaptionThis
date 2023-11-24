@@ -1,7 +1,6 @@
 import { useNameContext } from "../../context/NamesContext";
 import { useRoom } from "../../context/RoomContext";
 import ImageComponent from "../ImageComponent";
-import NextPhaseButton from "./NextPhaseButton";
 
 function PhotoUploadHost() {
 
@@ -11,7 +10,6 @@ function PhotoUploadHost() {
     return (
         <div>
             <h1>Photo uploading phase</h1>
-            <NextPhaseButton nextPhase={"Captioning"}></NextPhaseButton>
             <h3>Photos</h3>
             {Object.entries(roomDTO!.game!.photos).map(([ownerID, value]) => (
                 <div key={ownerID}>

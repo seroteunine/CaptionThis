@@ -7,6 +7,7 @@ dotenv.config();
 import { Server, Socket } from 'socket.io'
 import { Room } from './domain/room';
 import { generateRoomID, generatePlayerID } from './utils';
+import { Phase } from './domain/game';
 
 console.log(process.env.MY_SERVICE_URL);
 console.log('test');
@@ -31,7 +32,6 @@ type Caption = {
     authorPlayerID: string;
     photoOwnerPlayerID: string;
     captionText: string;
-    votedBy: string[];
 }
 
 type GameDTO = {
@@ -61,7 +61,8 @@ function sendHostRoomDTO(room: Room) {
     io.to(hostSocketID || '').emit('host:room-update', roomDTO);
 }
 
-function sendHostCaptionedPhoto(hostID: string, captionedPhoto: CaptionedPhotoDTO) {
+function sendHostCaptionedPhoto(room: Room, captionedPhoto: CaptionedPhotoDTO) {
+    const hostID = room.getHostID();
     const hostSocketID = socketIDMap.get(hostID);
     io.to(hostSocketID || '').emit('host:captioned-photo', captionedPhoto)
 }
@@ -183,18 +184,12 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('host:next-phase', (roomID) => {
-        const room = roomMap.get(roomID);
-        if (room && room.hasGame()) {
-            room.game!.nextPhase();
-            sendEveryoneRoomDTO(room);
-        }
-    })
-
     socket.on('player:send-image', ({ roomID, file }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
-            room.game!.addPhoto(socket.playerID, file);
+            const game = room.game!;
+            game.addPhoto(socket.playerID, file);
+            game.tryNextPhase();
             sendEveryoneRoomDTO(room);
         }
     })
@@ -209,30 +204,57 @@ io.on('connection', (socket_before) => {
     socket.on('player:send-caption', ({ roomID, caption, ownerOfPhoto }) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
-            const game = room.game!;;
-            game.addCaption(socket.playerID, caption, ownerOfPhoto);
-            sendHostRoomDTO(room);
-        }
-    })
-
-    socket.on('host:request-next-photo', ({ roomID, currentIndex }) => {
-        const room = roomMap.get(roomID);
-        if (room && room.hasGame()) {
             const game = room.game!;
-            if (game.hasEveryoneVoted(currentIndex)) {
-                const captionedPhoto = game.getCaptionedPhoto(currentIndex);
-                sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
-                sendPlayersCaptionedPhoto(room, captionedPhoto);
+            game.addCaption(socket.playerID, caption, ownerOfPhoto);
+            game.tryNextPhase();
+            sendHostRoomDTO(room);
+            if (game.gamePhase === Phase.VOTING) {
+                sendPlayersRoomDTO(room);
             }
         }
     })
 
-    socket.on('player:send-vote', ({ roomID, captionID, photoRound }) => {
+    socket.on('host:request-first-photo', (roomID) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
-            game.addVote(socket.playerID, captionID, photoRound);
-            sendEveryoneRoomDTO(room);
+            const captionedPhoto = game.getCaptionedPhoto();
+            sendHostCaptionedPhoto(room, captionedPhoto);
+            sendPlayersCaptionedPhoto(room, captionedPhoto);
+        }
+    })
+
+    // socket.on('host:request-next-photo', (roomID) => {
+    //     const room = roomMap.get(roomID);
+    //     if (room && room.hasGame()) {
+    //         const game = room.game!;
+    //         if (game.hasEveryoneVotedThisRound()) {
+    //             const captionedPhoto = game.getCaptionedPhoto();
+    //             sendHostCaptionedPhoto(socket.playerID, captionedPhoto);
+    //             sendPlayersCaptionedPhoto(room, captionedPhoto);
+    //         }
+    //     }
+    // })
+
+    socket.on('player:send-vote', ({ roomID, captionID }) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame()) {
+            const game = room.game!;
+            game.addVote(socket.playerID, captionID);
+
+            if (game.hasEveryoneVotedThisRound()) {
+                game.nextVotingRound()
+
+                game.tryNextPhase();
+                if (game.gamePhase === Phase.END) {
+                    sendEveryoneRoomDTO(room);
+                }
+                else {
+                    const captionedPhoto = game.getCaptionedPhoto();
+                    sendHostCaptionedPhoto(room, captionedPhoto);
+                    sendPlayersCaptionedPhoto(room, captionedPhoto);
+                }
+            }
         }
     })
 

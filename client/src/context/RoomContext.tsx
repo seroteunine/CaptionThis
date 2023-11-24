@@ -5,7 +5,6 @@ type Caption = {
     authorPlayerID: string;
     photoOwnerPlayerID: string;
     captionText: string;
-    votedBy: string[];
 }
 
 type GameDTO = {
