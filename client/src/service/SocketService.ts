@@ -41,3 +41,11 @@ export function sendNextPhotoRequest(currentIndex: number) {
 export function sendVote(ID: number, photoRound: number) {
     socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), captionID: ID, photoRound: photoRound });
 }
+
+export function getScore() {
+    socket.emit('host:get-score', sessionStorage.getItem('roomID'));
+}
+
+export function emitDeleteGame() {
+    socket.emit('host:delete-room', sessionStorage.getItem('roomID'));
+}
