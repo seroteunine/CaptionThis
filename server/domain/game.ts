@@ -67,7 +67,9 @@ export class Game {
                 }
                 break;
             case Phase.VOTING:
-                this.gamePhase = Phase.END;
+                if (this.VotingPhaseDone()) {
+                    this.gamePhase = Phase.END;
+                }
                 break;
             case Phase.END:
                 throw new Error("Game is already in the final phase");
@@ -159,6 +161,10 @@ export class Game {
     hasEveryoneVotedThisRound() {
         const votes = this.votes.get(this.votingRound);
         return votes?.length === this.playerIDs.size;
+    }
+
+    VotingPhaseDone() {
+        return this.votingRound === this.votes.size;
     }
 
     getScore() {
