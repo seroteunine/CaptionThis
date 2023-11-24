@@ -1,4 +1,3 @@
-import { SetStateAction } from "react";
 import { sendVote } from "../../service/SocketService";
 
 type Caption = {
