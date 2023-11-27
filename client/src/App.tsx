@@ -38,6 +38,12 @@ function App() {
       setCodeInvalid(true);
     })
 
+    socket.on('alert:removed', () => {
+      alert('This session has been removed due to inactivity. Please start a game in a new tab.')
+      sessionStorage.removeItem("playerID");
+      sessionStorage.removeItem("roomID");
+    });
+
     //For reconnections
     if (playerID) {
       socket.auth = { playerID, roomID };
