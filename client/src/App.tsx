@@ -23,7 +23,7 @@ function App() {
     })
 
     socket.on('host:name-update', ({ playerID, username }) => {
-      setNameMap((nameMap) => new Map<string, string>(nameMap).set(playerID, username));
+      setNameMap((nameMap) => !Array.from(nameMap.values()).includes(username) ? new Map<string, string>(nameMap).set(playerID, username) : nameMap);
     });
 
     socket.on('player:room-update', (roomDTO) => {
