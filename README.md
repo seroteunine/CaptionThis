@@ -11,6 +11,7 @@ You can run the vite development server for the front-end locally as well.
 ## Back-end technologies
 - Typescript
 - Socket.io
+- MongoDB
 
 ## Front-end technologies
 - Typescript
