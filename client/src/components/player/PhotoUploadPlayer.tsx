@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { sendFile } from '../../service/SocketService';
+import socket from "../../socket";
 
 function PhotoUploadPlayer() {
 
-    const [file, setFile] = useState<File>();
+    const [photoReceived, setPhotoReceived] = useState(false);
+
+    useEffect(() => {
+        socket.on('player:photo-received', () => {
+            setPhotoReceived(true);
+        })
+    }, [])
 
     function selectFile(e: React.ChangeEvent<HTMLInputElement>) {
         if (e.target.files) {
-            setFile(e.target.files[0]);
-        }
-    }
-
-    function handleSendFile() {
-        if (file) {
+            const file = e.target.files[0];
             sendFile(file);
         }
     }
@@ -20,7 +22,13 @@ function PhotoUploadPlayer() {
     return (
         <div>
             <h1>Photo uploading phase</h1>
-            <input onChange={selectFile} type="file"></input><button className="px-4 py-2 rounded font-bold bg-white" onClick={handleSendFile}>Use this image</button>
+
+            {photoReceived ?
+                <h3>Your photo has been uploaded succesfully.</h3>
+                :
+                <input onChange={selectFile} type="file"></input>
+            }
+
         </div>
     )
 }

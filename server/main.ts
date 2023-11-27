@@ -222,6 +222,7 @@ io.on('connection', (socket_before) => {
         if (room && room.hasGame()) {
             const game = room.game!;
             game.addPhoto(socket.playerID, file);
+            socket.emit('player:photo-received');
             game.tryNextPhase();
             sendEveryoneRoomDTO(room);
         }
