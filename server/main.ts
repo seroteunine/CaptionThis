@@ -9,10 +9,7 @@ import { Room } from './domain/room';
 import { generateRoomID, generatePlayerID } from './utils';
 import { Phase } from './domain/game';
 
-console.log(process.env.MY_SERVICE_URL);
-console.log('test');
-
-
+//Setup Http & socket.io server
 const server = http.Server(app)
 const io = new Server(server, {
     cors: {
@@ -53,7 +50,25 @@ type captionsForVotingDTO = {
     captions: { authorPlayerID: string, captionText: string }[]
 }
 
+//Mongo DB for logging
+import connectToDB from './database/setup';
+const LOGGING_COLLECTION_NAME = 'game-logging';
 
+async function logRoomEnd(roomID: string) {
+    const room = roomMap.get(roomID);
+    if (room) {
+        const gameData = {
+            roomID: roomID,
+            duration_s: (Date.now() - room.datetime_created) / 1000,
+            amount_of_players: room.game?.playerIDs.size
+        }
+        const db = await connectToDB();
+        const collection = db.collection(LOGGING_COLLECTION_NAME);
+        await collection.insertOne(gameData);
+    }
+}
+
+//Helper functions for communicating with clients
 function sendHostRoomDTO(room: Room) {
     const roomDTO: RoomDTO = room.getRoomDTO();
     const hostID = room.getHostID();
@@ -115,19 +130,39 @@ function resendRoomIfExists(socket: CustomSocket) {
     }
 }
 
+//Remove rooms and sockets that have been inactive 
+// (otherwise the roommap and socketIDmap will get crowded and increase collision)
 function removeRoomAndSockets(roomID: string) {
     const room = roomMap.get(roomID);
-    if (!room) {
-        return;
+    if (room) {
+        const players = room.getPlayers();
+        players.forEach((player) => {
+            notifyRemoving(socketIDMap.get(player) || '');
+            socketIDMap.delete(player)
+        });
+        const host = room.getHostID();
+        notifyRemoving(socketIDMap.get(host) || '');
+        socketIDMap.delete(host);
+        roomMap.delete(roomID);
     }
-    const players = room.getPlayers();
-    players.forEach((player) => socketIDMap.delete(player));
-    const host = room.getHostID();
-    socketIDMap.delete(host);
-    roomMap.delete(roomID);
 }
 
+function notifyRemoving(socketID: string) {
+    io.to(socketID).emit('alert:removed');
+}
 
+function removeExpiredRooms() {
+    const datetime_oneHourAgo = Date.now() - 3600000;
+    for (const [roomID, room] of roomMap) {
+        if (room.datetime_created < datetime_oneHourAgo) {
+            removeRoomAndSockets(roomID);
+            console.log(`Room ${roomID} removed due to expiration.`);
+        }
+    }
+}
+setInterval(removeExpiredRooms, 600000); //Checks every 10 minutes
+
+//Mapping the roomIDs to Room objects and PlayerIDs to socketIDs
 const socketIDMap = new Map<string, string>();
 const roomMap = new Map<string, Room>();
 
@@ -158,7 +193,6 @@ io.on('connection', (socket_before) => {
         roomMap.set(roomID, room);
         sendHostRoomDTO(room);
         sendSessionInfo(socket.playerID, roomID);
-        console.log(`host ${hostID} created room ${roomID}`);
     })
 
     socket.on('player:join-room', (roomID) => {
@@ -236,6 +270,7 @@ io.on('connection', (socket_before) => {
                 game.tryNextPhase();
                 if (game.gamePhase === Phase.END) {
                     sendEveryoneRoomDTO(room);
+                    logRoomEnd(roomID);
                 }
                 else {
                     const captionsForVotingDTO = game.getCaptionsForVoting();
@@ -253,10 +288,6 @@ io.on('connection', (socket_before) => {
             const scoreDTO = game.getScore();
             socket.emit('host:score', scoreDTO);
         }
-    })
-
-    socket.on('host:delete-room', (roomID) => {
-        removeRoomAndSockets(roomID);
     })
 
 })
