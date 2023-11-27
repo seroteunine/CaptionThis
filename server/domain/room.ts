@@ -5,6 +5,7 @@ export class Room {
     roomID: string;
     hostID: string;
     playerIDs: Set<string>;
+    datetime_created: number;
 
     game: Game | undefined;
 
@@ -13,6 +14,7 @@ export class Room {
         this.hostID = hostID;
         this.playerIDs = new Set();
         this.game = undefined;
+        this.datetime_created = Date.now();
     }
 
     getHostID() {
