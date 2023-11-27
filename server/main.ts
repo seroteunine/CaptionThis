@@ -52,7 +52,7 @@ type captionsForVotingDTO = {
 
 //Mongo DB for logging
 import connectToDB from './database/setup';
-const LOGGING_COLLECTION_NAME = 'game-logging';
+const LOGGING_COLLECTION_NAME = 'gameLogging';
 
 async function logRoomEnd(roomID: string) {
     const room = roomMap.get(roomID);
