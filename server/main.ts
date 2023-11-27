@@ -156,7 +156,6 @@ function removeExpiredRooms() {
     for (const [roomID, room] of roomMap) {
         if (room.datetime_created < datetime_oneHourAgo) {
             removeRoomAndSockets(roomID);
-            console.log(`Room ${roomID} removed due to expiration.`);
         }
     }
 }
