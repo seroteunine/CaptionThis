@@ -1,4 +1,4 @@
-import './index.css';
+import './index.scss';
 import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import Host from './pages/Host';
@@ -64,7 +64,7 @@ function App() {
   }, []);
 
   return (
-    <div className='min-h-screen bg-blue-100 font-bold'>
+    <div className='bg-secondary ' style={{ height: '100vh' }}>
       {!roomDTO ?
         <Home codeInvalid={codeInvalid}></Home>
         :

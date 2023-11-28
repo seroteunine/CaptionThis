@@ -23,10 +23,13 @@ function Player() {
 
     return (
         <>
-            <h1>Room: {roomDTO!.roomID} - You're a player</h1>
+            <div className="bg-primary text-white text-center p-3 shadow-sm">
+                <h2 className="">Roomcode: <span className="badge bg-success">{roomDTO!.roomID}</span></h2>
+                <h4>You're a player</h4>
+            </div>
 
             {roomDTO!.game ?
-                <div>
+                <div className="container mt-4">
                     {{
                         "PHOTO_UPLOAD": <PhotoUploadPlayer></PhotoUploadPlayer>,
                         "CAPTION": <CaptionPlayer></CaptionPlayer>,
@@ -35,9 +38,12 @@ function Player() {
                     }[roomDTO!.game.phase]}
                 </div>
                 :
-                <div>
-                    <h2>Wait for game to start.</h2>
-                    <input type="text" placeholder="New name" onChange={(e) => setValue(e)}></input><button onClick={handleSendName} disabled={!username.trim()}>Change name</button>
+                <div className="container mt-4 text-center">
+                    <h4>Wait for game to start.</h4>
+                    <div className="d-flex justify-content-center align-items-center mt-3">
+                        <input className="form-control me-2" type="text" placeholder="New name" onChange={(e) => setValue(e)}></input>
+                        <button className="btn btn-primary" onClick={handleSendName} disabled={!username.trim()}>Change</button>
+                    </div>
                 </div>
             }
         </>

@@ -21,11 +21,15 @@ function Host() {
     }
 
     return (
-        <>
-            <h1>Room: {roomDTO!.roomID} - You're the host</h1>
+        <div className="container">
+
+            <div className="bg-primary text-center text-white mb-2 p-3 shadow-sm rounded-bottom">
+                <h2 className="display-4">Roomcode: <span className="badge bg-success">{roomDTO!.roomID}</span></h2>
+                <h4>You're the host</h4>
+            </div>
             {roomDTO!.game
                 ?
-                <div>
+                <div className="container mt-4">
                     {{
                         "PHOTO_UPLOAD": <PhotoUploadHost></PhotoUploadHost>,
                         "CAPTION": <CaptionHost></CaptionHost>,
@@ -34,21 +38,28 @@ function Host() {
                     }[roomDTO!.game.phase]}
                 </div>
                 :
-                <div>
-                    <h3>Players:</h3>
-                    {roomDTO!.playerIDs.map((ID) => (
-                        <h3 key={ID}>{nameMap.get(ID) || ID}</h3>
-                    ))}
-                    <button
-                        className={`px-4 py-2 rounded font-bold text-white
-                        ${isStartingDisallowed ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'}`}
-                        onClick={handleStartGame}
-                        disabled={isStartingDisallowed}> Start game
-                    </button>
-                    {isStartingDisallowed && <span> (to start you need 4 to 8 players and everyone needs to change their name.) </span>}
+                <div className="container mt-4 text-center ">
+                    <div>
+                        <button
+                            className='btn btn-success text-white'
+                            onClick={handleStartGame}
+                            disabled={isStartingDisallowed}> Start game
+                        </button>
+                        {isStartingDisallowed && <p> (to start you need 4 to 8 players and everyone needs to change their name.) </p>}
+                    </div>
+
+                    <div className="w-25 mx-auto">
+                        <ul className="list-group mt-3 ">
+                            {roomDTO!.playerIDs.length > 0 && <li className="list-group-item active">Players:</li>}
+                            {roomDTO!.playerIDs.map((ID) => (
+                                <li className="list-group-item" key={ID}>{nameMap.get(ID) || ID}</li>
+                            ))}
+                        </ul>
+                    </div>
+
                 </div>
             }
-        </>
+        </div>
     )
 }
 
