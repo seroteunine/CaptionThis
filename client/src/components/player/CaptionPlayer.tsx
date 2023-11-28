@@ -11,30 +11,21 @@ function CaptionPlayer() {
 
     const [caption, setCaption] = useState('');
 
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-    const [isLastPhoto, setIsLastPhoto] = useState(false);
+    const captionCountOfThisPlayer = roomDTO!.game?.captions.filter(caption => caption.authorPlayerID === playerID).length || 0;
+    const currentPhotoIndex = captionCountOfThisPlayer;
+
     const photos = Object.entries(roomDTO!.game!.photos).filter(([key]) => playerID !== key);
-
-    const [key, value] = photos[currentPhotoIndex];
-
-    const nextPhoto = () => {
-        if (currentPhotoIndex < photos.length - 1) {
-            setCurrentPhotoIndex(currentPhotoIndex + 1);
-        } else {
-            setIsLastPhoto(true);
-        }
-    };
+    const [key, value] = photos[currentPhotoIndex] || [undefined, undefined];
 
     const submitCaption = () => {
         sendCaption(caption, key);
-        nextPhoto();
     }
 
     return (
         <div>
             <h1>Captioning phase</h1>
 
-            {isLastPhoto ?
+            {(captionCountOfThisPlayer === photos.length) ?
                 <h2>Wait for the others to finish.</h2>
                 :
                 <div key={key}>
