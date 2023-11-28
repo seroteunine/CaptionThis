@@ -236,8 +236,8 @@ io.on('connection', (socket_before) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame()) {
             const game = room.game!;
+
             game.addVote(socket.playerID, captionID);
-            socket.emit('player:received-vote');
 
             if (game.hasEveryoneVotedThisRound()) {
                 game.nextVotingRound()
@@ -245,9 +245,9 @@ io.on('connection', (socket_before) => {
                 if (game.gamePhase === Phase.END) {
                     logRoomEnd(roomID);
                 }
-                sendEveryoneRoomDTO(room);
             }
-            sendHostRoomDTO(room);
+
+            sendEveryoneRoomDTO(room);
         }
     })
 

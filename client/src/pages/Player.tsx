@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { sendName } from "../service/SocketService";
 import { useRoom } from "../context/RoomContext";
 

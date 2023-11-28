@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
 import { useRoom } from "../../context/RoomContext";
 import { sendVote } from "../../service/SocketService";
-import socket from "../../socket";
+
 
 function VotingPlayer() {
 
     const { roomDTO } = useRoom();
     const ownPlayerID = sessionStorage.getItem('playerID');
-    const [hasVoted, setHasVoted] = useState(false);
+    const votingRound = roomDTO!.game!.votingRound;
 
     const handleVote = (ID: number) => {
         console.log('voted on :', ID);
@@ -15,24 +14,11 @@ function VotingPlayer() {
     };
 
     const photos = Object.entries(roomDTO!.game!.photos);
-    const votingRound = roomDTO!.game!.votingRound;
-
     const [playerID] = photos[votingRound - 1];
+
     const captions = roomDTO!.game!.captions.filter((caption) => caption.photoOwnerPlayerID === playerID && caption.authorPlayerID != ownPlayerID);
 
-    useEffect(() => {
-        socket.on('player:received-vote', () => {
-            setHasVoted(true);
-        });
-
-        return () => {
-            socket.off('player:received-vote');
-        }
-    })
-
-    useEffect(() => {
-        setHasVoted(false);
-    }, [votingRound]); //To reset hasvoted when the next voting round happens.
+    const hasVoted = roomDTO!.game!.votes[votingRound].some((vote) => vote.playerID === ownPlayerID)
 
     return (
         <div>

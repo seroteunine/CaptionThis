@@ -15,8 +15,6 @@ function CaptionPlayer() {
     const currentPhotoIndex = captionCountOfThisPlayer;
 
     const photos = Object.entries(roomDTO!.game!.photos).filter(([key]) => playerID !== key);
-    const isLastPhoto = captionCountOfThisPlayer === photos.length;
-
     const [key, value] = photos[currentPhotoIndex] || [undefined, undefined];
 
     const submitCaption = () => {
@@ -27,7 +25,7 @@ function CaptionPlayer() {
         <div>
             <h1>Captioning phase</h1>
 
-            {isLastPhoto ?
+            {(captionCountOfThisPlayer === photos.length) ?
                 <h2>Wait for the others to finish.</h2>
                 :
                 <div key={key}>
