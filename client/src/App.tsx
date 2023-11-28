@@ -64,7 +64,7 @@ function App() {
   }, []);
 
   return (
-    <div style={{ height: '100vh' }}>
+    <div className='bg-secondary ' style={{ height: '100vh' }}>
       {!roomDTO ?
         <Home codeInvalid={codeInvalid}></Home>
         :

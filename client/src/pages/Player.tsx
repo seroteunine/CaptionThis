@@ -23,8 +23,8 @@ function Player() {
 
     return (
         <>
-            <div className="text-center p-3 shadow-sm">
-                <h2 className="">Roomcode: <span className="badge badge-secondary">{roomDTO!.roomID}</span></h2>
+            <div className="bg-primary text-white text-center p-3 shadow-sm">
+                <h2 className="">Roomcode: <span className="badge bg-success">{roomDTO!.roomID}</span></h2>
                 <h4>You're a player</h4>
             </div>
 

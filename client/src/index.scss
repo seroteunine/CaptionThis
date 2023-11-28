@@ -1,7 +1,14 @@
-$primary: #83bfff; // Your preferred blue
-$success: #28a745; // Your preferred green
+$primary: #3a578b;
+$secondary: #fff3c0;
 
+$success: #50a385;
 
+.bg-third {
+    background-color: #f2c65f;
+}
 
+.bg-fourth {
+    background-color: #d68033;
+}
 
 @import 'node_modules/bootstrap/scss/bootstrap';
