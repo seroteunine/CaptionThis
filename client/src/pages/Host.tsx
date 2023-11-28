@@ -23,7 +23,7 @@ function Host() {
     return (
         <div className="container">
             <div className="text-center mb-2 p-3 shadow-sm">
-                <h2 className="display-4">Roomcode: <span className="badge badge-light">{roomDTO!.roomID}</span></h2>
+                <h2 className="display-4">Roomcode: <span className="badge badge-dark">{roomDTO!.roomID}</span></h2>
                 <h4>You're the host</h4>
             </div>
             {roomDTO!.game
@@ -37,18 +37,25 @@ function Host() {
                     }[roomDTO!.game.phase]}
                 </div>
                 :
-                <div className="container mt-4">
-                    <h3>Players:</h3>
-                    {roomDTO!.playerIDs.map((ID) => (
-                        <h3 key={ID}>{nameMap.get(ID) || ID}</h3>
-                    ))}
-                    <button
-                        className={`px-4 py-2 rounded font-bold text-white
-                        ${isStartingDisallowed ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'}`}
-                        onClick={handleStartGame}
-                        disabled={isStartingDisallowed}> Start game
-                    </button>
-                    {isStartingDisallowed && <span> (to start you need 4 to 8 players and everyone needs to change their name.) </span>}
+                <div className="container mt-4 text-center ">
+                    <div>
+                        <button
+                            className='btn btn-primary'
+                            onClick={handleStartGame}
+                            disabled={isStartingDisallowed}> Start game
+                        </button>
+                        {isStartingDisallowed && <p> (to start you need 4 to 8 players and everyone needs to change their name.) </p>}
+                    </div>
+
+                    <div className="w-50 mx-auto">
+                        <ul className="list-group mt-3 ">
+                            <li className="list-group-item active">Players:</li>
+                            {roomDTO!.playerIDs.map((ID) => (
+                                <li className="list-group-item" key={ID}>{nameMap.get(ID) || ID}</li>
+                            ))}
+                        </ul>
+                    </div>
+
                 </div>
             }
         </div>

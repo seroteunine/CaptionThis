@@ -24,7 +24,7 @@ function Player() {
     return (
         <>
             <div className="text-center p-3 shadow-sm">
-                <h2 className="">Roomcode: <span className="badge badge-light">{roomDTO!.roomID}</span></h2>
+                <h2 className="">Roomcode: <span className="badge badge-secondary">{roomDTO!.roomID}</span></h2>
                 <h4>You're a player</h4>
             </div>
 
@@ -38,11 +38,11 @@ function Player() {
                     }[roomDTO!.game.phase]}
                 </div>
                 :
-                <div className="container mt-4">
+                <div className="container mt-4 text-center">
                     <h4>Wait for game to start.</h4>
                     <div className="d-flex justify-content-center align-items-center mt-3">
-                        <input className="form-control" type="text" placeholder="New name" onChange={(e) => setValue(e)}></input>
-                        <button className="btn btn-primary" onClick={handleSendName} disabled={!username.trim()}>Change name</button>
+                        <input className="form-control mr-2" type="text" placeholder="New name" onChange={(e) => setValue(e)}></input>
+                        <button className="btn btn-primary" onClick={handleSendName} disabled={!username.trim()}>Change</button>
                     </div>
                 </div>
             }
