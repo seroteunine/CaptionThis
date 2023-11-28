@@ -23,7 +23,7 @@ function Host() {
     return (
         <div className="container">
             <div className="text-center mb-2 p-3 shadow-sm">
-                <h2 className="display-4">Roomcode: <span className="badge badge-dark">{roomDTO!.roomID}</span></h2>
+                <h2 className="display-4">Roomcode: <span className="badge bg-dark">{roomDTO!.roomID}</span></h2>
                 <h4>You're the host</h4>
             </div>
             {roomDTO!.game
@@ -49,7 +49,7 @@ function Host() {
 
                     <div className="w-50 mx-auto">
                         <ul className="list-group mt-3 ">
-                            <li className="list-group-item active">Players:</li>
+                            {roomDTO!.playerIDs.length > 0 && <li className="list-group-item active">Players:</li>}
                             {roomDTO!.playerIDs.map((ID) => (
                                 <li className="list-group-item" key={ID}>{nameMap.get(ID) || ID}</li>
                             ))}

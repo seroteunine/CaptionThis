@@ -41,7 +41,7 @@ function Player() {
                 <div className="container mt-4 text-center">
                     <h4>Wait for game to start.</h4>
                     <div className="d-flex justify-content-center align-items-center mt-3">
-                        <input className="form-control mr-2" type="text" placeholder="New name" onChange={(e) => setValue(e)}></input>
+                        <input className="form-control me-2" type="text" placeholder="New name" onChange={(e) => setValue(e)}></input>
                         <button className="btn btn-primary" onClick={handleSendName} disabled={!username.trim()}>Change</button>
                     </div>
                 </div>
