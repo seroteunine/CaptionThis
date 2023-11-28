@@ -21,11 +21,14 @@ function Host() {
     }
 
     return (
-        <>
-            <h1>Room: {roomDTO!.roomID} - You're the host</h1>
+        <div className="container">
+            <div className="text-center mb-2 p-3 shadow-sm">
+                <h2 className="display-4">Roomcode: <span className="badge badge-light">{roomDTO!.roomID}</span></h2>
+                <h4>You're the host</h4>
+            </div>
             {roomDTO!.game
                 ?
-                <div>
+                <div className="container mt-4">
                     {{
                         "PHOTO_UPLOAD": <PhotoUploadHost></PhotoUploadHost>,
                         "CAPTION": <CaptionHost></CaptionHost>,
@@ -34,7 +37,7 @@ function Host() {
                     }[roomDTO!.game.phase]}
                 </div>
                 :
-                <div>
+                <div className="container mt-4">
                     <h3>Players:</h3>
                     {roomDTO!.playerIDs.map((ID) => (
                         <h3 key={ID}>{nameMap.get(ID) || ID}</h3>
@@ -48,7 +51,7 @@ function Host() {
                     {isStartingDisallowed && <span> (to start you need 4 to 8 players and everyone needs to change their name.) </span>}
                 </div>
             }
-        </>
+        </div>
     )
 }
 

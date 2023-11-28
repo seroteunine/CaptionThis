@@ -1,3 +1,4 @@
+import './index.css';
 import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import Host from './pages/Host';
@@ -63,7 +64,7 @@ function App() {
   }, []);
 
   return (
-    <div className=''>
+    <div className='bg-blue' style={{ height: '100vh' }}>
       {!roomDTO ?
         <Home codeInvalid={codeInvalid}></Home>
         :

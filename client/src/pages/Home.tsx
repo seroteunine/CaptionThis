@@ -10,13 +10,13 @@ function Home({ codeInvalid }: { codeInvalid: boolean }) {
     }
 
     return (
-        <div className='container d-flex justify-content-center align-items'>
+        <div className='container d-flex justify-content-center align-items-center min-vh-100'>
             <div className='card shadow'>
                 <div className='card-body'>
-                    {codeInvalid && <h3 className=''>Invalid roomcode</h3>}
-                    <input className='' type='text' placeholder='room code' onChange={(e) => setRoomCode(e.target.value)} />
-                    <button className='btn btn-primary w-100 mb-2' onClick={handleJoinRoom}>Join Room</button>
-                    <button className='btn btn-success w-100' onClick={createRoom}>Create Room</button>
+                    {codeInvalid && <span className='text-danger'>Invalid roomcode</span>}
+                    <input className='form-control mb-3' type='text' placeholder='room code' onChange={(e) => setRoomCode(e.target.value)} />
+                    <button className='btn w-100 btn-primary mb-2' onClick={handleJoinRoom}>Join Room</button>
+                    <button className='btn w-100 btn-success' onClick={createRoom}>Create Room</button>
                 </div>
             </div>
         </div>
