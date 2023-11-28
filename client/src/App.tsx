@@ -1,4 +1,3 @@
-import './index.css';
 import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import Host from './pages/Host';
@@ -64,7 +63,7 @@ function App() {
   }, []);
 
   return (
-    <div className='min-h-screen bg-blue-100 font-bold'>
+    <div className=''>
       {!roomDTO ?
         <Home codeInvalid={codeInvalid}></Home>
         :
