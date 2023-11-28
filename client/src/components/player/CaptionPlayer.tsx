@@ -11,23 +11,16 @@ function CaptionPlayer() {
 
     const [caption, setCaption] = useState('');
 
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-    const [isLastPhoto, setIsLastPhoto] = useState(false);
+    const captionCountOfThisPlayer = roomDTO!.game?.captions.filter(caption => caption.authorPlayerID === playerID).length || 0;
+    const currentPhotoIndex = captionCountOfThisPlayer;
+
     const photos = Object.entries(roomDTO!.game!.photos).filter(([key]) => playerID !== key);
+    const isLastPhoto = captionCountOfThisPlayer === photos.length;
 
-    const [key, value] = photos[currentPhotoIndex];
-
-    const nextPhoto = () => {
-        if (currentPhotoIndex < photos.length - 1) {
-            setCurrentPhotoIndex(currentPhotoIndex + 1);
-        } else {
-            setIsLastPhoto(true);
-        }
-    };
+    const [key, value] = photos[currentPhotoIndex] || [undefined, undefined];
 
     const submitCaption = () => {
         sendCaption(caption, key);
-        nextPhoto();
     }
 
     return (

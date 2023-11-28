@@ -190,7 +190,9 @@ export class Game {
             phase: this.gamePhase.toString(),
             playerIDs: Array.from(this.playerIDs),
             photos: Object.fromEntries(this.photos.entries()),
-            captions: this.captions
+            captions: this.captions,
+            votes: Object.fromEntries(this.votes.entries()),
+            votingRound: this.votingRound
         }
     }
 

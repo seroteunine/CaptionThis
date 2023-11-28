@@ -7,11 +7,18 @@ type Caption = {
     captionText: string;
 }
 
+type Vote = {
+    playerID: string;
+    captionID: number;
+}
+
 type GameDTO = {
     phase: string;
     playerIDs: string[];
     photos: { [k: string]: ArrayBuffer };
     captions: Caption[];
+    votes: { [k: string]: Vote[] };
+    votingRound: number;
 }
 
 type RoomDTO = {
