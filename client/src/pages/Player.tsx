@@ -37,7 +37,7 @@ function Player() {
                 :
                 <div>
                     <h2>Wait for game to start.</h2>
-                    <input type="text" placeholder="New name" onChange={(e) => setValue(e)}></input><button onClick={handleSendName}>Change name</button>
+                    <input type="text" placeholder="New name" onChange={(e) => setValue(e)}></input><button onClick={handleSendName} disabled={!username.trim()}>Change name</button>
                 </div>
             }
         </>

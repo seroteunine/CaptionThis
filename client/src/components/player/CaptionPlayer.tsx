@@ -18,7 +18,9 @@ function CaptionPlayer() {
     const [key, value] = photos[currentPhotoIndex] || [undefined, undefined];
 
     const submitCaption = () => {
-        sendCaption(caption, key);
+        if (caption.trim()) {
+            sendCaption(caption, key);
+        }
     }
 
     return (
@@ -30,7 +32,7 @@ function CaptionPlayer() {
                 :
                 <div key={key}>
                     <input onChange={(e) => setCaption(e.target.value)} placeholder="Caption for this photo: "></input>
-                    <button onClick={submitCaption}>Submit caption</button>
+                    <button onClick={submitCaption} disabled={!caption.trim()}>Submit caption</button>
                     <ImageComponent arrayBuffer={value}></ImageComponent>
                 </div>
             }
