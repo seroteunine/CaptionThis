@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function ImageComponentHost({ arrayBuffer }: { arrayBuffer: ArrayBuffer }) {
+function ImageComponent({ arrayBuffer }: { arrayBuffer: ArrayBuffer }) {
     const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
@@ -18,9 +18,9 @@ function ImageComponentHost({ arrayBuffer }: { arrayBuffer: ArrayBuffer }) {
 
     return (
         <>
-            {imageUrl && <img src={imageUrl} alt="Loaded from ArrayBuffer" />}
+            {imageUrl && <img className='w-100' src={imageUrl} alt="Loaded from ArrayBuffer" />}
         </>
     );
 }
 
-export default ImageComponentHost;
+export default ImageComponent;

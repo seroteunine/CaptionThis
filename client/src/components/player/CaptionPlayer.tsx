@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRoom } from "../../context/RoomContext";
-import ImageComponent from "../host/ImageComponentHost";
+import ImageComponent from "../player/ImageComponentPlayer";
 import { sendCaption } from "../../service/SocketService";
 
 
@@ -30,10 +30,12 @@ function CaptionPlayer() {
             {(captionCountOfThisPlayer === photos.length) ?
                 <h2>Wait for the others to finish.</h2>
                 :
-                <div key={key} className="image-container">
-                    <input onChange={(e) => setCaption(e.target.value)} placeholder="Caption for this photo: "></input>
-                    <button onClick={submitCaption} disabled={!caption.trim()}>Submit caption</button>
+                <div key={key}>
                     <ImageComponent arrayBuffer={value}></ImageComponent>
+                    <div className="container d-flex">
+                        <input className="form-control m-2" onChange={(e) => setCaption(e.target.value)} placeholder="Caption for this photo: "></input>
+                        <button className="btn btn-success m-2" onClick={submitCaption} disabled={!caption.trim()}>Submit</button>
+                    </div>
                 </div>
             }
 
