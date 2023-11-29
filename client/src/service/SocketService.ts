@@ -45,7 +45,3 @@ export function sendVote(captionID: number) {
 export function getScore() {
     socket.emit('host:get-score', sessionStorage.getItem('roomID'));
 }
-
-export function emitDeleteGame() {
-    socket.emit('host:delete-room', sessionStorage.getItem('roomID'));
-}
