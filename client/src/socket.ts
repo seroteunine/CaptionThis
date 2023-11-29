@@ -7,7 +7,8 @@ const socket = io(":5000", {
     auth: {
       playerID,
       roomID
-    }
+    },
+    secure: true
 });
 
 socket.onAny((event, ...args) => {
