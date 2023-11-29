@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRoom } from "../../context/RoomContext";
-import ImageComponent from "../ImageComponent";
+import ImageComponent from "../host/ImageComponentHost";
 import { sendCaption } from "../../service/SocketService";
 
 

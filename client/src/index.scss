@@ -10,31 +10,11 @@ $success: #50a385;
     background-color: #d68033;
 }
 
-.photo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 2fr));
-    gap: 2px;
+.grid-image {
+    max-height: 30vh;
+    object-fit: contain;
 }
 
-.photo-container {
-    flex-direction: column;
-    display: flex;
-
-    align-items: center;
-}
-
-.photo-container img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-}
-
-.image-container img {
-    max-width: 100%;
-    height: auto;
-    display: block; // Removes any extra space below the image
-    margin: 0 auto; // Center the image if it's smaller than the container
-}
 
 
 @import 'node_modules/bootstrap/scss/bootstrap';

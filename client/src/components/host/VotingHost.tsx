@@ -1,5 +1,5 @@
 import { useRoom } from "../../context/RoomContext";
-import ImageComponent from "../ImageComponent";
+import ImageComponent from "./ImageComponentHost";
 
 function VotingHost() {
 
