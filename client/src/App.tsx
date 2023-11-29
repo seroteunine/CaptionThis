@@ -11,7 +11,6 @@ function App() {
 
   const [codeInvalid, setCodeInvalid] = useState(false);
   const playerID = sessionStorage.getItem("playerID");
-  const roomID = sessionStorage.getItem("roomID");
 
   const { roomDTO, setRoomDTO } = useRoom();
   const { setNameMap } = useNameContext();
@@ -44,12 +43,8 @@ function App() {
       sessionStorage.removeItem("roomID");
     });
 
-    //For reconnections
-    if (playerID) {
-      socket.auth = { playerID, roomID };
-    }
     socket.on("session", ({ playerID, roomID }) => {
-      socket.auth = { playerID, roomID };
+      socket.auth = { playerID: playerID, roomID: roomID };
       sessionStorage.setItem("playerID", playerID);
       sessionStorage.setItem("roomID", roomID);
     });
@@ -59,7 +54,8 @@ function App() {
       socket.off('player:room-update');
       socket.off('host:invalid-gamestart');
       socket.off('player:invalid-room');
-      socket.off('playerID');
+      socket.off('alert:removed');
+      socket.off('session');
     }
   }, []);
 

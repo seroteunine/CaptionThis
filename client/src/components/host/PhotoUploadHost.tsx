@@ -1,6 +1,6 @@
 import { useNameContext } from "../../context/NamesContext";
 import { useRoom } from "../../context/RoomContext";
-import ImageComponent from "../ImageComponent";
+import ImageComponent from "./ImageComponentHost";
 
 function PhotoUploadHost() {
 
@@ -8,15 +8,15 @@ function PhotoUploadHost() {
     const { nameMap } = useNameContext();
 
     return (
-        <div>
-            <h1>Photo uploading phase</h1>
-            <h3>Photos</h3>
+        <div className="photo-container">
+            <h2>Photo uploading phase</h2>
+            <div className="row">
             {Object.entries(roomDTO!.game!.photos).map(([ownerID, value]) => (
-                <div key={ownerID}>
-                    <h4> {nameMap.get(ownerID) || ownerID} uploaded this photo: </h4>
+                <div key={ownerID} className="col-3 m-3" title={nameMap.get(ownerID) || ownerID}>
                     <ImageComponent arrayBuffer={value}></ImageComponent>
                 </div>
             ))}
+            </div>
         </div>
     )
 }
