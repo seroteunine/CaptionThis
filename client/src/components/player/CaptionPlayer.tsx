@@ -30,7 +30,7 @@ function CaptionPlayer() {
             {(captionCountOfThisPlayer === photos.length) ?
                 <h2>Wait for the others to finish.</h2>
                 :
-                <div key={key}>
+                <div key={key} className="image-container">
                     <input onChange={(e) => setCaption(e.target.value)} placeholder="Caption for this photo: "></input>
                     <button onClick={submitCaption} disabled={!caption.trim()}>Submit caption</button>
                     <ImageComponent arrayBuffer={value}></ImageComponent>

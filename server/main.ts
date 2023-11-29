@@ -154,6 +154,7 @@ const roomMap = new Map<string, Room>();
 
 io.use((socket_before, next) => {
     const socket = socket_before as CustomSocket;
+    console.log(socket.handshake.auth)
     let playerID = socket.handshake.auth.playerID;
     let roomID = socket.handshake.auth.roomID;
     if (!playerID) {
