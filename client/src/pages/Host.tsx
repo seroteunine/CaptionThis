@@ -39,13 +39,12 @@ function Host() {
                 </div>
                 :
                 <div className="container mt-4 text-center ">
-                    <div>
+                    <div title={isStartingDisallowed ?  "You need 4 to 8 players and everyone needs to change their name." :  "Ready to start."}>
                         <button
-                            className='btn btn-success text-white'
+                            className='btn btn-lg btn-success text-white'
                             onClick={handleStartGame}
                             disabled={isStartingDisallowed}> Start game
                         </button>
-                        {isStartingDisallowed && <p> (to start you need 4 to 8 players and everyone needs to change their name.) </p>}
                     </div>
 
                     <div className="w-25 mx-auto">
