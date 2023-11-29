@@ -51,7 +51,7 @@ function Host() {
                         <ul className="list-group mt-3 ">
                             {roomDTO!.playerIDs.length > 0 && <li className="list-group-item active">Players:</li>}
                             {roomDTO!.playerIDs.map((ID) => (
-                                <li className="list-group-item" key={ID}>{nameMap.get(ID) || ID}</li>
+                                <li className={"list-group-item " + (nameMap.get(ID) ? " text-success" : " text-warning")} key={ID}>{nameMap.get(ID) || ID}</li>
                             ))}
                         </ul>
                     </div>

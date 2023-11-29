@@ -39,9 +39,9 @@ function Player() {
                     }[roomDTO!.game.phase]}
                 </div>
                 :
-                <div className="container mt-4 text-center">
+                <div className="container mt-4 text-center w-md-50">
                     <h4>Wait for game to start.</h4>
-                    <div className="d-flex justify-content-center align-items-center mt-3">
+                    <div className="d-flex">
                         <input className="form-control me-2" type="text" placeholder="New name" onChange={(e) => setValue(e)} value={username}></input>
                         <button className="btn btn-primary" onClick={handleSendName} disabled={!username.trim()}>Change</button>
                     </div>

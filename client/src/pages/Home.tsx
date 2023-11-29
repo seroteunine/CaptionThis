@@ -11,7 +11,7 @@ function Home({ codeInvalid }: { codeInvalid: boolean }) {
 
     return (
         <div className='container d-flex justify-content-center align-items-center min-vh-100'>
-            <div className='card shadow'>
+            <div className='card shadow col-9 col-md-4 col-lg-3'>
                 <div className='card-body'>
                     {codeInvalid && <span className='text-danger'>Invalid roomcode</span>}
                     <input className='form-control mb-3' type='text' placeholder='room code' onChange={(e) => setRoomCode(e.target.value)} />
