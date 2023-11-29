@@ -1,6 +1,5 @@
 $primary: #3a578b;
 $secondary: #fff3c0;
-
 $success: #50a385;
 
 .bg-third {
@@ -10,5 +9,26 @@ $success: #50a385;
 .bg-fourth {
     background-color: #d68033;
 }
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 2fr));
+    gap: 2px;
+}
+
+.photo-container {
+    flex-direction: column;
+    display: flex;
+
+    align-items: center;
+}
+
+.photo-container img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+
 
 @import 'node_modules/bootstrap/scss/bootstrap';

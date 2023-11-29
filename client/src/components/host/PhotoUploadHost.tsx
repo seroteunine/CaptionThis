@@ -9,14 +9,14 @@ function PhotoUploadHost() {
 
     return (
         <div>
-            <h1>Photo uploading phase</h1>
-            <h3>Photos</h3>
+            <h2>Photo uploading phase</h2>
+            <div className="photo-grid">
             {Object.entries(roomDTO!.game!.photos).map(([ownerID, value]) => (
-                <div key={ownerID}>
-                    <h4> {nameMap.get(ownerID) || ownerID} uploaded this photo: </h4>
+                <div key={ownerID} className="photo-container" title={nameMap.get(ownerID) || ownerID}>
                     <ImageComponent arrayBuffer={value}></ImageComponent>
                 </div>
             ))}
+            </div>
         </div>
     )
 }
