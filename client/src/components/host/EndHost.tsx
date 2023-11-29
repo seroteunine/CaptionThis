@@ -23,8 +23,7 @@ function EndHost() {
     }, [])
 
     return (
-        <div>
-            <h1>End phase</h1>
+        <div className="container">
             {!finalScore ?
                 <h2>Score is loading...</h2>
                 :

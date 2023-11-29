@@ -12,8 +12,8 @@ function Home({ codeInvalid }: { codeInvalid: boolean }) {
 
     return (
         <div className='container d-flex justify-content-center align-items-center min-vh-100'>
-            <div className='card shadow col-9 col-md-4 col-lg-3'>
-                <form onSubmit={handleJoinRoom} className='card-body'>
+            <div className='card shadow col-9 col-md-4 col-lg-3 '>
+                <form onSubmit={handleJoinRoom} className='card-body '>
                     {codeInvalid && <span className='text-danger'>Invalid roomcode</span>}
                     <input className='form-control mb-3' type='text' placeholder='room code' onChange={(e) => setRoomCode(e.target.value)} autoFocus/>
                     <button type='submit' className='btn w-100 btn-primary mb-2'>Join Room</button>
