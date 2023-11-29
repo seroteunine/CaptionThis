@@ -27,8 +27,8 @@ function VotingPlayer() {
             {hasVoted ?
                 <h2>You have voted succesfully.</h2>
                 :
-                <div>
-                    <h2>Vote on your favourite caption:</h2>
+                <div className="d-flex flex-column">
+                    <h4>Vote on your favourite caption:</h4>
                     {captions.map((caption) => (
                         <button onClick={() => handleVote(caption.ID)} className="bg-white p-2 m-2" key={caption.ID}>{caption.captionText}</button>
                     ))}

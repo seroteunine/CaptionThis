@@ -18,12 +18,16 @@ function CaptionHost() {
     });
 
     return (
-        <div>
-            <h1>Captioning phase</h1>
-            <h4>Each player now has to caption the other photos.</h4>
-            {Object.entries(captionCount).map(([playerID, count]) => (
-                <h4 key={playerID}>{nameMap.get(playerID) || playerID}: {(count < roomDTO!.game!.playerIDs.length - 1) ? 'Still captioning..' : 'Done'}</h4>
-            ))}
+        <div className="container text-center">
+            <div className="container mb-4">
+                <h1>Captioning phase</h1>
+                <h4>Each player now has to caption the other photos.</h4>
+            </div>
+            <div>
+                {Object.entries(captionCount).map(([playerID, count]) => (
+                    <h4 key={playerID}>{nameMap.get(playerID) || playerID}: {(count < roomDTO!.game!.playerIDs.length - 1) ? 'Still captioning..' : 'Done'}</h4>
+                ))}
+            </div>
         </div>
     )
 }

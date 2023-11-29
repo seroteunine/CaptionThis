@@ -24,7 +24,7 @@ function Host() {
         <div className="container">
 
             <div className="bg-primary text-center text-white mb-2 p-3 shadow-sm rounded-bottom">
-                <h2 className="display-4">Roomcode: <span className="badge bg-success">{roomDTO!.roomID}</span></h2>
+                <h2 className="display-4">Roomcode: <span className="badge bg-secondary"><span className={roomDTO!.game ? 'text-primary' : "animate-character"}>{roomDTO!.roomID}</span></span></h2>
                 <h4>You're the host</h4>
             </div>
             {roomDTO!.game
@@ -51,7 +51,7 @@ function Host() {
                         <ul className="list-group mt-3 ">
                             {roomDTO!.playerIDs.length > 0 && <li className="list-group-item active">Players:</li>}
                             {roomDTO!.playerIDs.map((ID) => (
-                                <li className="list-group-item" key={ID}>{nameMap.get(ID) || ID}</li>
+                                <li className={"list-group-item " + (nameMap.get(ID) ? " text-success" : " text-warning")} key={ID}>{nameMap.get(ID) || ID}</li>
                             ))}
                         </ul>
                     </div>

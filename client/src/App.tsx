@@ -51,6 +51,7 @@ function App() {
 
     return () => {
       socket.off('host:room-update');
+      socket.off('host:name-update');
       socket.off('player:room-update');
       socket.off('host:invalid-gamestart');
       socket.off('player:invalid-room');

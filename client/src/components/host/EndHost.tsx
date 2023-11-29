@@ -23,8 +23,7 @@ function EndHost() {
     }, [])
 
     return (
-        <div>
-            <h1>End phase</h1>
+        <div className="container">
             {!finalScore ?
                 <h2>Score is loading...</h2>
                 :
@@ -36,12 +35,22 @@ function EndHost() {
                         </tr>
                     </thead>
                     <tbody>
-                        {Object.entries(finalScore).sort((a, b) => b[1] - a[1]).map(([playerID, score]) => (
-                            <tr key={playerID}>
-                                <td>{nameMap.get(playerID) || playerID}</td>
-                                <td>{score}</td>
-                            </tr>
-                        ))}
+                        {Object.entries(finalScore).sort((a, b) => b[1] - a[1]).map(([playerID, score], index, array) => {
+                            const reverseIndex = array.length - 1 - index;
+                            return (
+                                <tr key={playerID}>
+                                <td>
+                                    <span className="caption-enter" style={{ animationDelay: `${reverseIndex * 1}s` }}>
+                                        {nameMap.get(playerID) || playerID}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span className="caption-enter" style={{ animationDelay: `${reverseIndex * 1}s` }}>
+                                        {score}
+                                    </span>
+                                </td>
+                            </tr>)
+                        })}
                     </tbody>
                 </table>
             }
