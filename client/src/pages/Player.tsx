@@ -17,7 +17,8 @@ function Player() {
         setUsername(e.target.value);
     }
 
-    function handleSendName() {
+    function handleSendName(e: React.FormEvent) {
+        e.preventDefault();
         sendName(username);
         setUsername('');
     }
@@ -41,10 +42,10 @@ function Player() {
                 :
                 <div className="container mt-4 text-center w-md-50">
                     <h4>Wait for game to start.</h4>
-                    <div className="d-flex">
-                        <input className="form-control me-2" type="text" placeholder="New name" onChange={(e) => setValue(e)} value={username}></input>
-                        <button className="btn btn-primary" onClick={handleSendName} disabled={!username.trim()}>Change</button>
-                    </div>
+                    <form onSubmit={handleSendName} className="d-flex">
+                        <input className="form-control me-2" type="text" placeholder="New name" onChange={(e) => setValue(e)} value={username} autoFocus></input>
+                        <button type="submit" className="btn btn-primary" disabled={!username.trim()}>Change</button>
+                    </form>
                 </div>
             }
         </>

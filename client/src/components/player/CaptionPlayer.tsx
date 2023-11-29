@@ -17,7 +17,8 @@ function CaptionPlayer() {
     const photos = Object.entries(roomDTO!.game!.photos).filter(([key]) => playerID !== key);
     const [key, value] = photos[currentPhotoIndex] || [undefined, undefined];
 
-    const submitCaption = () => {
+    const submitCaption = (e: React.FormEvent) => {
+        e.preventDefault();
         if (caption.trim()) {
             sendCaption(caption, key);
         }
@@ -32,10 +33,10 @@ function CaptionPlayer() {
                 :
                 <div key={key}>
                     <ImageComponent arrayBuffer={value}></ImageComponent>
-                    <div className="container d-flex">
-                        <input className="form-control m-2" onChange={(e) => setCaption(e.target.value)} placeholder="Caption for this photo: "></input>
-                        <button className="btn btn-success m-2" onClick={submitCaption} disabled={!caption.trim()}>Submit</button>
-                    </div>
+                    <form onSubmit={submitCaption} className="container d-flex">
+                        <input className="form-control m-2" onChange={(e) => setCaption(e.target.value)} placeholder="Caption for this photo" autoFocus></input>
+                        <button type='submit' className="btn btn-success m-2" disabled={!caption.trim()}>Submit</button>
+                    </form>
                 </div>
             }
 
