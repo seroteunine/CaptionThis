@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express();
 const http = require('http')
+const fs = require('fs');
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -10,7 +11,10 @@ import { generateRoomID, generatePlayerID } from './utils';
 import { Phase } from './domain/game';
 
 //Setup Http & socket.io server
-const server = http.Server(app)
+const server = http.Server({
+    key: fs.readFileSync('/etc/letsencrypt/live/teunvandalen.nl/privkey.pem'),     
+    cert: fs.readFileSync('/etc/letsencrypt/live/teunvandalen.nl/cert.pem')
+}, app)
 const io = new Server(server, {
     cors: {
         origin: process.env.MY_SERVICE_URL,
