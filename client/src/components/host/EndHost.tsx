@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { sendAnotherRound } from "../../service/SocketService";
 import { useNameContext } from "../../context/NamesContext";
 import { useRoom } from "../../context/RoomContext";
