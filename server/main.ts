@@ -180,7 +180,7 @@ io.on('connection', (socket_before) => {
 
     socket.on('player:join-room', (roomID) => {
         const room = roomMap.get(roomID);
-        if (!room) {
+        if (!room || room.getPlayers().size >= 8) {
             socket.emit('player:invalid-room');
             return;
         }
