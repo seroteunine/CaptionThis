@@ -17,8 +17,6 @@ type Vote = {
     captionID: number;
 }
 
-const POINTS_PER_VOTE = 100;
-
 export class Game {
 
     gamePhase: Phase;
@@ -28,6 +26,7 @@ export class Game {
     votes: Map<number, Vote[]>;
     votingRound: number;
     score: Map<string, number>;
+    POINTS_PER_VOTE = 100;
 
     constructor(playerIDs: Set<string>, initialScores?: Map<string, number>) {
         this.gamePhase = Phase.PHOTO_UPLOAD;
@@ -188,7 +187,7 @@ export class Game {
     addPoint(playerID: string) {
         if (this.score.has(playerID)) {
             let currentValue = this.score.get(playerID)!;
-            this.score.set(playerID, currentValue + POINTS_PER_VOTE);
+            this.score.set(playerID, currentValue + this.POINTS_PER_VOTE);
         }
     }
 
