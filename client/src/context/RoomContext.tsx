@@ -19,6 +19,7 @@ type GameDTO = {
     captions: Caption[];
     votes: { [k: string]: Vote[] };
     votingRound: number;
+    score: { [k: string]: number };
 }
 
 type RoomDTO = {

@@ -1,4 +1,4 @@
-import { Game, Phase } from "./game";
+import { Game } from "./game";
 
 export class Room {
 
@@ -48,6 +48,16 @@ export class Room {
 
     hasGame() {
         return this.game ? true : false;
+    }
+
+    createNextGame() {
+        const score = this.game?.score;
+        if (score) {
+            this.game = new Game(this.playerIDs, score);
+        } else {
+            this.game = new Game(this.playerIDs);
+        }
+        this.datetime_created = Date.now();
     }
 
 }

@@ -27,20 +27,37 @@ export class Game {
     captions: Caption[];
     votes: Map<number, Vote[]>;
     votingRound: number;
+    score: Map<string, number>;
 
-    constructor(playerIDs: Set<string>) {
+    constructor(playerIDs: Set<string>, initialScores?: Map<string, number>) {
         this.gamePhase = Phase.PHOTO_UPLOAD;
         this.playerIDs = playerIDs;
         this.photos = new Map<string, ArrayBuffer>();
         this.captions = [];
         this.votes = new Map<number, Vote[]>();
         this.votingRound = 1;
+        this.score = new Map<string, number>();
 
-        const numberOfRounds = playerIDs.size;
-        for (let round = 1; round <= numberOfRounds; round++) {
-            this.votes.set(round, []);
+        this.initVotingRounds();
+
+        this.score = initialScores ? new Map(initialScores) : new Map();
+        if (!initialScores) {
+            this.initScore();
         }
+
     };
+
+    initVotingRounds() {
+        for (let round = 1; round <= this.playerIDs.size; round++) {
+            this.votes.set(round, []); //Same amount of voting rounds as amount of players
+        }
+    }
+
+    initScore() {
+        for (let player of this.playerIDs) {
+            this.score.set(player, 0);
+        }
+    }
 
     getPlayers() {
         return this.playerIDs;
@@ -146,6 +163,7 @@ export class Game {
         const vote = { playerID, captionID };
         if (!this.playerHasAlreadyVotedThisRound(playerID)) {
             votes?.push(vote);
+            this.addPoint(caption.authorPlayerID);
         }
     }
 
@@ -167,22 +185,11 @@ export class Game {
         return this.votingRound === this.votes.size + 1;
     }
 
-    getScore() {
-        const scores: Record<string, number> = {};
-        this.playerIDs.forEach(playerID => {
-            scores[playerID] = 0;
-        });
-
-        this.votes.forEach((votesInRound) => {
-            votesInRound.forEach(vote => {
-                const caption = this.captions.find(caption => caption.ID === vote.captionID);
-                if (caption) {
-                    scores[caption.authorPlayerID] += POINTS_PER_VOTE;
-                }
-            });
-        });
-
-        return scores;
+    addPoint(playerID: string) {
+        if (this.score.has(playerID)) {
+            let currentValue = this.score.get(playerID)!;
+            this.score.set(playerID, currentValue + POINTS_PER_VOTE);
+        }
     }
 
     getGameDTO() {
@@ -192,7 +199,8 @@ export class Game {
             photos: Object.fromEntries(this.photos.entries()),
             captions: this.captions,
             votes: Object.fromEntries(this.votes.entries()),
-            votingRound: this.votingRound
+            votingRound: this.votingRound,
+            score: Object.fromEntries(this.score.entries()),
         }
     }
 

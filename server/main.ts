@@ -43,6 +43,7 @@ type GameDTO = {
     captions: Caption[];
     votes: { [k: string]: Vote[] };
     votingRound: number;
+    score: { [k: string]: number };
 }
 
 type RoomDTO = {
@@ -52,10 +53,6 @@ type RoomDTO = {
     game: GameDTO | undefined
 }
 
-type captionsForVotingDTO = {
-    owner: string,
-    captions: { authorPlayerID: string, captionText: string }[]
-}
 
 //Mongo DB for logging
 import connectToDB from './database/setup';
@@ -249,12 +246,11 @@ io.on('connection', (socket_before) => {
         }
     })
 
-    socket.on('host:get-score', (roomID) => {
+    socket.on('host:another-round', (roomID) => {
         const room = roomMap.get(roomID);
-        if (room && room.hasGame()) {
-            const game = room.game!;
-            const scoreDTO = game.getScore();
-            socket.emit('host:score', scoreDTO);
+        if (room && room.hasGame() && room.game!.gamePhase === Phase.END) {
+            room.createNextGame();
+            sendEveryoneRoomDTO(room);
         }
     })
 
