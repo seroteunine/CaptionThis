@@ -6,8 +6,8 @@ function Settings() {
     const { roomDTO } = useRoom();
     const { nameMap } = useNameContext();
 
-    const handleRemovePlayer = (e: React.SyntheticEvent) => {
-        e.preventDefault();
+    const handleRemovePlayer = (playerID: string) => {
+        console.log('delete player: ', playerID);
     }
 
     return (
@@ -19,7 +19,7 @@ function Settings() {
                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                     <li><h6 className="dropdown-header">Remove player: </h6></li>
                     {roomDTO!.playerIDs.map((playerID) => (
-                        <li key={playerID}><button className="dropdown-item  player-item" onClick={handleRemovePlayer}>{nameMap.get(playerID) || playerID}</button></li>
+                        <li key={playerID}><button className="dropdown-item  player-item" onClick={() => handleRemovePlayer(playerID)}>{nameMap.get(playerID) || playerID}</button></li>
                     ))}
                 </ul>
             </div>
