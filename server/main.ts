@@ -193,10 +193,6 @@ io.on('connection', (socket_before) => {
         const room = roomMap.get(roomID);
         if (room) {
             room.tryStartGame();
-            if (!room.hasGame()) {
-                socket.emit('host:invalid-gamestart');
-                return;
-            }
             sendEveryoneRoomDTO(room);
         }
     });
@@ -247,9 +243,7 @@ io.on('connection', (socket_before) => {
         if (room && room.hasGame()) {
             const game = room.game!;
             game.addVote(socket.playerID, captionID);
-
             game.tryNextPhase();
-
             if (game.gamePhase === Phase.END) {
                 logRoomEnd(roomID);
             }
