@@ -83,8 +83,12 @@ export class Game {
                 }
                 break;
             case Phase.VOTING:
-                if (this.VotingPhaseDone()) {
-                    this.gamePhase = Phase.END;
+                if (this.hasEveryoneVotedThisRound()) {
+                    this.nextVotingRound();
+
+                    if (this.VotingPhaseDone()) {
+                        this.gamePhase = Phase.END;
+                    }
                 }
                 break;
             case Phase.END:

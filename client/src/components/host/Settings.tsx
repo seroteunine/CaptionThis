@@ -1,5 +1,6 @@
 import { useNameContext } from "../../context/NamesContext";
 import { useRoom } from "../../context/RoomContext";
+import socket from "../../socket";
 
 function Settings() {
 
@@ -8,6 +9,7 @@ function Settings() {
 
     const handleRemovePlayer = (playerID: string) => {
         console.log('delete player: ', playerID);
+        socket.emit('host:remove-player', ({ roomID: sessionStorage.getItem('roomID'), playerID: playerID }));
     }
 
     return (

@@ -27,6 +27,10 @@ export class Room {
         }
     }
 
+    removePlayer(playerID: string) {
+        this.playerIDs.delete(playerID)
+    }
+
     getPlayers() {
         return this.playerIDs;
     }

@@ -11,9 +11,10 @@ function Host() {
 
     const { roomDTO } = useRoom();
     const { nameMap } = useNameContext();
-    const playerAmount = roomDTO!.playerIDs.length
+    const playerAmount = roomDTO!.playerIDs.length;
+    const allNamesChanged = roomDTO!.playerIDs.every((playerID) => nameMap.get(playerID) && nameMap.get(playerID) != playerID);
 
-    const isStartingDisallowed = playerAmount < 4 || playerAmount > 8 || (nameMap.size != playerAmount);
+    const isStartingDisallowed = playerAmount < 4 || playerAmount > 8 || !allNamesChanged;
 
     function handleStartGame() {
         if (roomDTO) {
