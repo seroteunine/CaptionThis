@@ -11,11 +11,11 @@ function PhotoUploadHost() {
         <div className="photo-container">
             <h2>Photo uploading phase</h2>
             <div className="row">
-            {Object.entries(roomDTO!.game!.photos).map(([ownerID, value]) => (
-                <div key={ownerID} className="col-3 m-3" title={nameMap.get(ownerID) || ownerID}>
-                    <ImageComponent arrayBuffer={value}></ImageComponent>
-                </div>
-            ))}
+                {Object.entries(roomDTO!.game!.photos).map(([ownerID, value]) => (
+                    <div key={ownerID} className="col-3 m-3" title={nameMap.get(ownerID) || ownerID}>
+                        <ImageComponent arrayBuffer={value}></ImageComponent>
+                    </div>
+                ))}
             </div>
         </div>
     )

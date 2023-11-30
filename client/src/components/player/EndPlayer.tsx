@@ -1,8 +1,14 @@
+import { useRoom } from "../../context/RoomContext";
+
 function EndPlayer() {
+
+    const { roomDTO } = useRoom();
+
+    const score = roomDTO!.game!.score[sessionStorage.getItem('playerID')!];
 
     return (
         <div>
-            <h1>End phase</h1>
+            <h3>Your score was {score}</h3>
         </div>
     )
 }
