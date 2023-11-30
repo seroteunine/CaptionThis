@@ -26,8 +26,8 @@ function Player() {
     return (
         <>
             <div className="bg-primary text-white text-center p-3 shadow-sm">
-                <h2 className="">Roomcode: <span className="badge bg-success">{roomDTO!.roomID}</span></h2>
-                <h4>You're a player</h4>
+                <h2>Roomcode: <span className="badge bg-success">{roomDTO!.roomID}</span></h2>
+                <h4>{roomDTO!.game ? (`Your current score is ${roomDTO!.game!.score[sessionStorage.getItem('playerID')!]}`) : 'You are a player'}</h4>
             </div>
 
             {roomDTO!.game ?

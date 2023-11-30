@@ -94,19 +94,19 @@ test('game goes to voting if every photo has a caption of all players', () => {
     expect(game.getCurrentPhase()).toBe(Phase.VOTING);
 })
 
-// test('Caption has 2 votes when 2 people voted on it.', () => {
-//     const game = new Game(players);
+test('Caption has the score of 2 votes when 2 people voted on it.', () => {
+    const game = new Game(players);
 
-//     setGameOnCaptionPhase(game);
-//     addCaptionsAndGoToVotePhase(game);
+    setGameOnCaptionPhase(game);
+    addCaptionsAndGoToVotePhase(game);
 
-//     const captionID = 10;
-//     game.addVote(player1, captionID);
-//     game.addVote(player2, captionID);
+    const captionID = 10; //Belongs to player 4
+    game.addVote(player1, captionID);
+    game.addVote(player2, captionID);
 
-//     const Caption10 = game.captions[captionID];
-//     expect(Caption10.votedBy).toStrictEqual([player1, player2]);
-// })
+    const score_player4 = game.score.get(player4);
+    expect(score_player4).toBe(game.POINTS_PER_VOTE * 2);
+})
 
 test('Throw error when vote on your own caption. (Frontend should prohibit this)', () => {
     const game = new Game(players);
