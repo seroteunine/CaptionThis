@@ -46,6 +46,10 @@ export function getScore() {
     socket.emit('host:get-score', sessionStorage.getItem('roomID'));
 }
 
-export function sendAnotherRound() {
-    socket.emit('host:another-round', sessionStorage.getItem('roomID'));
+export function sendAnotherRoundKeepScore() {
+    socket.emit('host:another-round-keep-score', sessionStorage.getItem('roomID'));
+}
+
+export function sendAnotherRoundResetScore() {
+    socket.emit('host:another-round-reset-score', sessionStorage.getItem('roomID'));
 }

@@ -204,7 +204,6 @@ io.on('connection', (socket_before) => {
     socket.on('host:remove-player', ({ roomID, playerID }) => {
         const room = roomMap.get(roomID);
         if (room) {
-            console.log(`want to remove ${playerID} in room: ${roomID}`);
             room.removePlayer(playerID);
             if (room.hasGame()) {
                 const game = room.game!;
@@ -258,10 +257,18 @@ io.on('connection', (socket_before) => {
         }
     });
 
-    socket.on('host:another-round', (roomID) => {
+    socket.on('host:another-round-keep-score', (roomID) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame() && room.game!.gamePhase === Phase.END) {
-            room.createNextGame();
+            room.createNextGameKeepScore();
+            sendEveryoneRoomDTO(room);
+        }
+    });
+
+    socket.on('host:another-round-reset-score', (roomID) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame() && room.game!.gamePhase === Phase.END) {
+            room.createNextGameResetScore();
             sendEveryoneRoomDTO(room);
         }
     });
