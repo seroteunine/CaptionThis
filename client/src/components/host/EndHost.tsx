@@ -1,4 +1,4 @@
-import { sendAnotherRound } from "../../service/SocketService";
+import { sendAnotherRoundKeepScore, sendAnotherRoundResetScore } from "../../service/SocketService";
 import { useNameContext } from "../../context/NamesContext";
 import { useRoom } from "../../context/RoomContext";
 
@@ -8,8 +8,12 @@ function EndHost() {
     const { nameMap } = useNameContext();
     const finalScore = roomDTO!.game!.score;
 
-    const handleAnotherRound = () => {
-        sendAnotherRound();
+    const handleAnotherRoundKeep = () => {
+        sendAnotherRoundKeepScore();
+    }
+
+    const handleAnotherRoundReset = () => {
+        sendAnotherRoundResetScore();
     }
 
     return (
@@ -45,7 +49,8 @@ function EndHost() {
                         </tbody>
                     </table>
 
-                    <button onClick={handleAnotherRound} className="btn btn-success">Play another round</button>
+                    <button onClick={handleAnotherRoundKeep} className="btn btn-success me-3">Play another round</button>
+                    <button onClick={handleAnotherRoundReset} className="btn btn-success">Play another round (Reset the score)</button>
                 </div>
             }
         </div>

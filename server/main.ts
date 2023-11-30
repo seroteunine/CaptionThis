@@ -176,7 +176,7 @@ io.on('connection', (socket_before) => {
         roomMap.set(roomID, room);
         sendHostRoomDTO(room);
         sendSessionInfo(socket.playerID, roomID);
-    })
+    });
 
     socket.on('player:join-room', (roomID) => {
         const room = roomMap.get(roomID);
@@ -187,7 +187,7 @@ io.on('connection', (socket_before) => {
         room.addPlayer(socket.playerID);
         sendEveryoneRoomDTO(room);
         sendSessionInfo(socket.playerID, roomID);
-    })
+    });
 
     socket.on('host:start-game', (roomID) => {
         const room = roomMap.get(roomID);
@@ -199,7 +199,20 @@ io.on('connection', (socket_before) => {
             }
             sendEveryoneRoomDTO(room);
         }
-    })
+    });
+
+    socket.on('host:remove-player', ({ roomID, playerID }) => {
+        const room = roomMap.get(roomID);
+        if (room) {
+            room.removePlayer(playerID);
+            if (room.hasGame()) {
+                const game = room.game!;
+                game.tryNextPhase();
+            }
+            sendEveryoneRoomDTO(room);
+            notifyRemoving(socketIDMap.get(playerID) || '');
+        }
+    });
 
     socket.on('player:send-image', ({ roomID, file }) => {
         const room = roomMap.get(roomID);
@@ -210,14 +223,14 @@ io.on('connection', (socket_before) => {
             game.tryNextPhase();
             sendEveryoneRoomDTO(room);
         }
-    })
+    });
 
     socket.on('player:set-name', ({ roomID, username }) => {
         const room = roomMap.get(roomID)
         if (room) {
             sendRoomNameUpdate(room, socket.playerID, username);
         }
-    })
+    });
 
     socket.on('player:send-caption', ({ roomID, caption, ownerOfPhoto }) => {
         const room = roomMap.get(roomID);
@@ -227,7 +240,7 @@ io.on('connection', (socket_before) => {
             game.tryNextPhase();
             sendEveryoneRoomDTO(room);
         }
-    })
+    });
 
     socket.on('player:send-vote', ({ roomID, captionID }) => {
         const room = roomMap.get(roomID);
@@ -235,24 +248,30 @@ io.on('connection', (socket_before) => {
             const game = room.game!;
             game.addVote(socket.playerID, captionID);
 
-            if (game.hasEveryoneVotedThisRound()) {
-                game.nextVotingRound()
-                game.tryNextPhase();
-                if (game.gamePhase === Phase.END) {
-                    logRoomEnd(roomID);
-                }
+            game.tryNextPhase();
+
+            if (game.gamePhase === Phase.END) {
+                logRoomEnd(roomID);
             }
             sendEveryoneRoomDTO(room);
         }
-    })
+    });
 
-    socket.on('host:another-round', (roomID) => {
+    socket.on('host:another-round-keep-score', (roomID) => {
         const room = roomMap.get(roomID);
         if (room && room.hasGame() && room.game!.gamePhase === Phase.END) {
-            room.createNextGame();
+            room.createNextGameKeepScore();
             sendEveryoneRoomDTO(room);
         }
-    })
+    });
+
+    socket.on('host:another-round-reset-score', (roomID) => {
+        const room = roomMap.get(roomID);
+        if (room && room.hasGame() && room.game!.gamePhase === Phase.END) {
+            room.createNextGameResetScore();
+            sendEveryoneRoomDTO(room);
+        }
+    });
 
 })
 

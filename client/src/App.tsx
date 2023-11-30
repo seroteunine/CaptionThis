@@ -38,7 +38,7 @@ function App() {
     })
 
     socket.on('alert:removed', () => {
-      alert('This session has been removed due to inactivity. Please start a game in a new tab.')
+      alert('You have been removed from this room, either the room was deleted or the host removed you. Please start a game in a new tab.')
       sessionStorage.removeItem("playerID");
       sessionStorage.removeItem("roomID");
     });

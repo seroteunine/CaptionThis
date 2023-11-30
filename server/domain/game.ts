@@ -37,7 +37,7 @@ export class Game {
         this.votingRound = 1;
         this.score = new Map<string, number>();
 
-        this.initVotingRounds();
+        this.votes.set(this.votingRound, [])
 
         this.score = initialScores ? new Map(initialScores) : new Map();
         if (!initialScores) {
@@ -45,12 +45,6 @@ export class Game {
         }
 
     };
-
-    initVotingRounds() {
-        for (let round = 1; round <= this.playerIDs.size; round++) {
-            this.votes.set(round, []); //Same amount of voting rounds as amount of players
-        }
-    }
 
     initScore() {
         for (let player of this.playerIDs) {
@@ -83,8 +77,8 @@ export class Game {
                 }
                 break;
             case Phase.VOTING:
-                if (this.VotingPhaseDone()) {
-                    this.gamePhase = Phase.END;
+                if (this.hasEveryoneVotedThisRound()) {
+                    this.nextVotingRound();
                 }
                 break;
             case Phase.END:
@@ -137,32 +131,24 @@ export class Game {
         }
     }
 
-    getCaptionsForVoting() {
-        const photoOwner = Array.from(this.photos.keys())[this.votingRound - 1];
-        const captions = this.captions
-            .filter((caption) => caption.photoOwnerPlayerID === photoOwner)
-            .map(({ ID, authorPlayerID, captionText }) => ({
-                ID,
-                authorPlayerID,
-                captionText,
-            }));
-        const captionsForVoting = {
-            owner: photoOwner,
-            captions: captions
-        }
-        return captionsForVoting;
-    }
-
     addVote(playerID: string, captionID: number) {
         const caption: Caption = this.captions[captionID];
         if (caption.authorPlayerID === playerID) {
             throw new Error('Player can not vote on own caption');
         }
-        const votes = this.votes.get(this.votingRound);
+        const votesThisRound = this.votes.get(this.votingRound);
         const vote = { playerID, captionID };
         if (!this.playerHasAlreadyVotedThisRound(playerID)) {
-            votes?.push(vote);
+            votesThisRound?.push(vote);
             this.addPoint(caption.authorPlayerID);
+        }
+    }
+
+    removeVote(playerID: string) {
+        const votesThisRound = this.votes.get(this.votingRound);
+        if (votesThisRound) {
+            const excludedArray = votesThisRound?.filter((vote) => vote.playerID !== playerID);
+            this.votes.set(this.votingRound, excludedArray);
         }
     }
 
@@ -173,15 +159,16 @@ export class Game {
 
     nextVotingRound() {
         this.votingRound += 1;
+        if (this.votingRound === this.photos.size + 1) {
+            this.gamePhase = Phase.END;
+        } else {
+            this.votes.set(this.votingRound, []);
+        }
     }
 
     hasEveryoneVotedThisRound() {
         const votes = this.votes.get(this.votingRound);
         return votes?.length === this.playerIDs.size;
-    }
-
-    VotingPhaseDone() {
-        return this.votingRound === this.votes.size + 1;
     }
 
     addPoint(playerID: string) {

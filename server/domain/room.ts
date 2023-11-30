@@ -27,6 +27,13 @@ export class Room {
         }
     }
 
+    removePlayer(playerID: string) {
+        this.playerIDs.delete(playerID);
+        if (this.game) {
+            this.game.removeVote(playerID);
+        }
+    }
+
     getPlayers() {
         return this.playerIDs;
     }
@@ -50,13 +57,17 @@ export class Room {
         return this.game ? true : false;
     }
 
-    createNextGame() {
-        const score = this.game?.score;
-        if (score) {
-            this.game = new Game(this.playerIDs, score);
-        } else {
-            this.game = new Game(this.playerIDs);
-        }
+    createNextGameKeepScore() {
+        const score = this.game?.score!;
+        const newScore = new Map(
+            [...score].filter(([key]) => this.playerIDs.has(key))
+        );
+        this.game = new Game(this.playerIDs, newScore);
+        this.datetime_created = Date.now();
+    }
+
+    createNextGameResetScore() {
+        this.game = new Game(this.playerIDs);
         this.datetime_created = Date.now();
     }
 
