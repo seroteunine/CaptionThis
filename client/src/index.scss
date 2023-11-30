@@ -5,37 +5,50 @@ $success: #37a77e;
 $font-family-base: 'Poppins';
 
 .bg-third {
-    background-color: #f2c65f;
+  background-color: #f2c65f;
 }
 
 .bg-fourth {
-    background-color: #d68033;
+  background-color: #d68033;
+}
+
+.fixed-badge {
+  position: fixed;
+  top: 5px;
+  right: 30px;
+  z-index: 1000;
+}
+
+.player-item:hover {
+  text-decoration: line-through;
 }
 
 .grid-image {
-    max-height: 30vh;
-    object-fit: contain;
+  max-height: 30vh;
+  object-fit: contain;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-  
-.caption-enter {
+  from {
     opacity: 0;
-    animation: fadeIn 2s ease forwards;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
-.animate-character
-{
-  background-image: linear-gradient(
-    -225deg,
-    $primary 0%,
-    #44107a 29%,
-    $success 67%,
-    $secondary 100%
-  );
+.caption-enter {
+  opacity: 0;
+  animation: fadeIn 2s ease forwards;
+}
+
+.animate-character {
+  background-image: linear-gradient(-225deg,
+      $primary 0%,
+      #44107a 29%,
+      $success 67%,
+      $secondary 100%);
   background-size: auto auto;
   background-clip: border-box;
   background-size: 200% auto;
