@@ -1,5 +1,3 @@
-const express = require('express')
-const app = express();
 const http = require('http')
 import dotenv from 'dotenv';
 dotenv.config();
@@ -10,7 +8,7 @@ import { generateRoomID, generatePlayerID } from './utils';
 import { Phase } from './domain/game';
 
 //Setup Http & socket.io server
-const server = http.Server(app)
+const server = http.Server()
 const io = new Server(server, {
     cors: {
         origin: process.env.MY_SERVICE_URL,
