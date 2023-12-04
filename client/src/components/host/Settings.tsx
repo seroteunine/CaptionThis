@@ -1,6 +1,6 @@
 import { useNameContext } from "../../context/NamesContext";
 import { useRoom } from "../../context/RoomContext";
-import socket from "../../socket";
+import { removePlayer } from "../../service/SocketService";
 
 function Settings() {
 
@@ -8,8 +8,7 @@ function Settings() {
     const { nameMap } = useNameContext();
 
     const handleRemovePlayer = (playerID: string) => {
-        console.log('delete player: ', playerID);
-        socket.emit('host:remove-player', ({ roomID: sessionStorage.getItem('roomID'), playerID: playerID }));
+        removePlayer(playerID);
     }
 
     return (

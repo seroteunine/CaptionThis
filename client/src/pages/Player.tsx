@@ -6,6 +6,7 @@ import PhotoUploadPlayer from "../components/player/PhotoUploadPlayer";
 import CaptionPlayer from "../components/player/CaptionPlayer";
 import VotingPlayer from "../components/player/VotingPlayer";
 import EndPlayer from "../components/player/EndPlayer";
+import Instructions from "../components/player/Instructions";
 
 function Player() {
 
@@ -25,6 +26,8 @@ function Player() {
 
     return (
         <>
+            <Instructions phase={roomDTO?.game ? roomDTO!.game.phase : 'WAITING'}></Instructions>
+
             <div className="bg-primary text-white text-center p-3 shadow-sm">
                 <h2>Roomcode: <span className="badge bg-success">{roomDTO!.roomID}</span></h2>
                 <h4>{roomDTO!.game ? (`Your current score is ${roomDTO!.game!.score[sessionStorage.getItem('playerID')!]}`) : 'You are a player'}</h4>

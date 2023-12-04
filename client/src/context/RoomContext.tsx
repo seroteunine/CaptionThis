@@ -12,8 +12,10 @@ type Vote = {
     captionID: number;
 }
 
+type Phase = "PHOTO_UPLOAD" | "CAPTION" | "VOTING" | "END";
+
 type GameDTO = {
-    phase: string;
+    phase: Phase;
     playerIDs: string[];
     photos: { [k: string]: ArrayBuffer };
     captions: Caption[];
