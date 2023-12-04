@@ -34,10 +34,6 @@ export function sendCaption(caption: string, ownerOfPhoto: string) {
     socket.emit('player:send-caption', captionDTO)
 }
 
-export function sendFirstPhotoRequest() {
-    socket.emit('host:request-first-photo', (sessionStorage.getItem('roomID')));
-}
-
 export function sendVote(captionID: number) {
     socket.emit('player:send-vote', { roomID: sessionStorage.getItem('roomID'), captionID: captionID });
 }
@@ -52,4 +48,8 @@ export function sendAnotherRoundKeepScore() {
 
 export function sendAnotherRoundResetScore() {
     socket.emit('host:another-round-reset-score', sessionStorage.getItem('roomID'));
+}
+
+export function removePlayer(playerID: string) {
+    socket.emit('host:remove-player', ({ roomID: sessionStorage.getItem('roomID'), playerID: playerID }));
 }
