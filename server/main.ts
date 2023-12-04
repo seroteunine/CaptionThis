@@ -34,10 +34,13 @@ type Vote = {
     captionID: number;
 }
 
+type PhotosDTO = {
+    photos: { [k: string]: ArrayBuffer };
+}
+
 type GameDTO = {
     phase: string;
     playerIDs: string[];
-    photos: { [k: string]: ArrayBuffer };
     captions: Caption[];
     votes: { [k: string]: Vote[] };
     votingRound: number;
@@ -87,6 +90,21 @@ function sendPlayersRoomDTO(room: Room) {
     }
 }
 
+function sendEveryonePhotos(room: Room) {
+    if (room.hasGame()) {
+        const photosDTO: PhotosDTO = room.game!.getPhotosDTO();
+        const hostID = room.getHostID();
+        const hostSocketID = socketIDMap.get(hostID);
+        io.to(hostSocketID || '').emit('host:photo-update', photosDTO);
+        const players = room.getPlayers();
+        for (const playerID of players.keys()) {
+            const playerSocketID = socketIDMap.get(playerID);
+            io.to(playerSocketID || '').emit('player:photo-update', photosDTO);
+        }
+    }
+
+}
+
 function sendEveryoneRoomDTO(room: Room) {
     sendHostRoomDTO(room);
     sendPlayersRoomDTO(room);
@@ -111,6 +129,8 @@ function resendRoomIfExists(socket: CustomSocket) {
         io.to(socketID || '').emit('player:room-update', roomDTO);
     }
 }
+
+
 
 //Remove rooms and sockets that have been inactive 
 // (otherwise the roommap and socketIDmap will get crowded and increase collision)
@@ -216,6 +236,7 @@ io.on('connection', (socket_before) => {
             socket.emit('player:photo-received');
             game.tryNextPhase();
             sendEveryoneRoomDTO(room);
+            sendEveryonePhotos(room);
         }
     });
 

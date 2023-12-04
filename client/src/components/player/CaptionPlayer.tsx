@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useRoom } from "../../context/RoomContext";
 import ImageComponent from "../player/ImageComponentPlayer";
 import { sendCaption } from "../../service/SocketService";
+import { useImagesContext } from "../../context/ImagesContext";
 
 
 function CaptionPlayer() {
 
     const { roomDTO } = useRoom();
+    const { photos } = useImagesContext();
     const playerID = sessionStorage.getItem('playerID')!;
 
     const [caption, setCaption] = useState('');
@@ -14,8 +16,8 @@ function CaptionPlayer() {
     const captionCountOfThisPlayer = roomDTO!.game?.captions.filter(caption => caption.authorPlayerID === playerID).length || 0;
     const currentPhotoIndex = captionCountOfThisPlayer;
 
-    const photos = Object.entries(roomDTO!.game!.photos).filter(([key]) => playerID !== key);
-    const [key, value] = photos[currentPhotoIndex] || [undefined, undefined];
+    const photos_excludeSelf = Object.entries(photos).filter(([key]) => playerID !== key);
+    const [key, value] = photos_excludeSelf[currentPhotoIndex] || [undefined, undefined];
 
     const submitCaption = (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,7 +30,7 @@ function CaptionPlayer() {
         <div>
             <h1>Captioning phase</h1>
 
-            {(captionCountOfThisPlayer === photos.length) ?
+            {(captionCountOfThisPlayer === photos_excludeSelf.length) ?
                 <h2>Wait for the others to finish.</h2>
                 :
                 <div key={key}>

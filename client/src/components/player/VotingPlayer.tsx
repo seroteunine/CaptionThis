@@ -1,3 +1,4 @@
+import { useImagesContext } from "../../context/ImagesContext";
 import { useRoom } from "../../context/RoomContext";
 import { sendVote } from "../../service/SocketService";
 
@@ -5,6 +6,7 @@ import { sendVote } from "../../service/SocketService";
 function VotingPlayer() {
 
     const { roomDTO } = useRoom();
+    const { photos } = useImagesContext();
     const ownPlayerID = sessionStorage.getItem('playerID');
     const votingRound = roomDTO!.game!.votingRound;
 
@@ -13,8 +15,7 @@ function VotingPlayer() {
         sendVote(ID);
     };
 
-    const photos = Object.entries(roomDTO!.game!.photos);
-    const [playerID] = photos[votingRound - 1];
+    const [playerID] = Object.entries(photos)[votingRound - 1];
 
     const captions = roomDTO!.game!.captions.filter((caption) => caption.photoOwnerPlayerID === playerID && caption.authorPlayerID != ownPlayerID);
 

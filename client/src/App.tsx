@@ -6,6 +6,7 @@ import Player from './pages/Player';
 import socket from './socket';
 import { useRoom } from './context/RoomContext';
 import { useNameContext } from './context/NamesContext';
+import { useImagesContext } from './context/ImagesContext';
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
 
   const { roomDTO, setRoomDTO } = useRoom();
   const { setNameMap } = useNameContext();
+  const { setPhotos } = useImagesContext();
 
   useEffect(() => {
 
@@ -25,8 +27,16 @@ function App() {
       setNameMap((nameMap) => !Array.from(nameMap.values()).includes(username) ? new Map<string, string>(nameMap).set(playerID, username) : nameMap);
     });
 
+    socket.on('host:photo-update', (photoDTO) => {
+      setPhotos(photoDTO);
+    })
+
     socket.on('player:room-update', (roomDTO) => {
       setRoomDTO(roomDTO);
+    })
+
+    socket.on('player:photo-update', (photoDTO) => {
+      setPhotos(photoDTO);
     })
 
     socket.on('host:invalid-gamestart', () => {

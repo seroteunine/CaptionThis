@@ -182,11 +182,16 @@ export class Game {
         return {
             phase: this.gamePhase.toString(),
             playerIDs: Array.from(this.playerIDs),
-            photos: Object.fromEntries(this.photos.entries()),
             captions: this.captions,
             votes: Object.fromEntries(this.votes.entries()),
             votingRound: this.votingRound,
             score: Object.fromEntries(this.score.entries()),
+        }
+    }
+
+    getPhotosDTO() {
+        return {
+            photos: Object.fromEntries(this.photos.entries())
         }
     }
 
