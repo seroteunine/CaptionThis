@@ -24,4 +24,4 @@ You can run the vite development server for the front-end locally as well.
 - Tailwind
 
 ## Architecture
-<img alt="Game architecture" height="400" src="./client/src/assets/Architecture.png"/>
+<img alt="Game architecture" height="400" src="./client/src/assets/Architecture_CaptionThis.png"/>
