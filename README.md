@@ -11,17 +11,5 @@ Go to http://teunvandalen.nl to play the game. No installing needed. One client 
 You can also run the server yourself on your local device, see the specific folders for install instructions. Beaware that the backend requires mongoDB to store some game-stats. Therefore, make sure that the url in server/database/setup.ts points to a running mongoDB server. Just starting a basic mongoDB server with 'sudo systemctl start mongod' should be enough. 
 You can run the vite development server for the front-end locally as well. 
 
-## Back-end technologies
-- Typescript
-- Socket.io
-- MongoDB
-
-## Front-end technologies
-- Typescript
-- Vite (Development server)
-- Socket.io - client
-- React
-- Tailwind
-
 ## Architecture
 <img alt="Game architecture" height="400" src="./client/src/assets/Architecture_CaptionThis.png"/>
